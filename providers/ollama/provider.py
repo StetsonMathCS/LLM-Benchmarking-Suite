@@ -40,7 +40,7 @@ class OllamaProvider(BaseProvider):
             return LLMResponse(
                 content=response["message"]["content"],
                 model=self.config.model_name,
-                provider="ollama"
+                provider="ollama",
                 raw_response=response
             )
         except Exception as e:

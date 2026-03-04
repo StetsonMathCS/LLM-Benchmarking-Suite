@@ -8,7 +8,7 @@ from typing import Optional
 from core.base import BaseProvider, ModelConfig, LLMResponse
 from core.registry import ProviderRegistry
 
-@ProviderRegistry.register("ollama")
+@ProviderRegistry.register("huggingface")
 class HuggingFaceProvider(BaseProvider):
     """
     Load any HuggingFace model locally.

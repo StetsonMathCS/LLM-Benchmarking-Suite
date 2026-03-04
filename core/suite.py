@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import Optional, Callable
 import time
 
-from core.base import BaseProvider, BenchmarkResult, BaseBenchmark, BenchmarkStatus
+from core.base import BaseProvider, BenchmarkResult, BaseBenchmark, BenchmarkStatus, ModelConfig
 
 @dataclass
 class SuiteConfig:
@@ -73,7 +73,7 @@ class TestSuite:
         passed = sum(1 for r in self._results if r.status == BenchmarkStatus.PASSED)
         failed = sum(1 for r in self._results if r.status == BenchmarkStatus.FAILED)
         errored = sum(1 for r in self._results if r.status == BenchmarkStatus.ERROR)
-        elapsed = time.perf_counter() = self._start_time if self._start_time else 0
+        elapsed = time.perf_counter() - self._start_time if self._start_time else 0
 
         return {
             "suite_name": self.config.name,
