@@ -10,7 +10,7 @@ class CodeRunner():
 
     @staticmethod
     def _safe_run(cmd, input_data=None, env=None):
-        """Run a command with timeout, output cap, and no network (Linux only)."""
+        """Run a command with timeout, output cap, and no network."""
         try:
             result = subprocess.run(
                 cmd,
@@ -19,10 +19,10 @@ class CodeRunner():
                 timeout=CodeRunner.TIMEOUT,
                 input=input_data,
                 env={**os.environ, **(env or {})},
-                # Limit memory to 128MB (Linux only)
-                preexec_fn=lambda: resource.setrlimit(
-                    resource.RLIMIT_AS, (128 * 1024 * 1024, 128 * 1024 * 1024)
-                )
+                # # Limit memory to 128MB (Linux only)
+                # preexec_fn=lambda: resource.setrlimit(
+                #     resource.RLIMIT_AS, (128 * 1024 * 1024, 128 * 1024 * 1024)
+                # )
             )
             out = result.stdout or result.stderr
             return out

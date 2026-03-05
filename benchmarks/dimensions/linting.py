@@ -17,6 +17,31 @@ class LintingDimension(BaseDimension):
 
     def evaluate(self, language: str, original_code: str, generated_code: str, **kwargs) -> DimensionResult:
         try:
+            # If no original code provided, only lint generated code and return 1.0
+            if not original_code:
+                if language == "python":
+                    gen_violations = self._lint_python(generated_code)
+                elif language == "cpp":
+                    gen_violations = self._lint_cpp(generated_code)
+                elif language == "javascript":
+                    gen_violations = self._lint_javascript(generated_code)
+                else:
+                    return DimensionResult(
+                        dimension_name=self.name,
+                        score=0.0,
+                        details={"error": f"Unsupported language: {language}"}
+                    )
+                
+                return DimensionResult(
+                    dimension_name=self.name,
+                    score=1.0,
+                    details={
+                        "generated_violations": gen_violations,
+                        "note": "No original code provided for comparison"
+                    }
+                )
+            
+            # Standard flow: compare original vs generated
             if language == "python":
                 orig_violations = self._lint_python(original_code)
                 gen_violations = self._lint_python(generated_code)

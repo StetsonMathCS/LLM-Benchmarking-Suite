@@ -18,6 +18,31 @@ class VulnerabilitiesDimension(BaseDimension):
 
     def evaluate(self, language: str, original_code: str, generated_code: str, **kwargs) -> DimensionResult:
         try:
+            # If no original code provided, only scan generated code and return 1.0
+            if not original_code:
+                if language == "python":
+                    gen_vulns = self._scan_python(generated_code)
+                elif language == "cpp":
+                    gen_vulns = self._scan_cpp(generated_code)
+                elif language == "javascript":
+                    gen_vulns = self._scan_javascript(generated_code)
+                else:
+                    return DimensionResult(
+                        dimension_name=self.name,
+                        score=0.0,
+                        details={"error": f"Unsupported language: {language}"}
+                    )
+                
+                return DimensionResult(
+                    dimension_name=self.name,
+                    score=1.0,
+                    details={
+                        "generated_vulnerabilities": gen_vulns,
+                        "note": "No original code provided for comparison"
+                    }
+                )
+            
+            # Standard flow: compare original vs generated
             if language == "python":
                 orig_vulns = self._scan_python(original_code)
                 gen_vulns = self._scan_python(generated_code)

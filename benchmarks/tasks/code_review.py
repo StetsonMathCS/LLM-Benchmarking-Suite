@@ -23,15 +23,16 @@ class CodeReviewBenchmark(BaseBenchmark):
             "python": "python_review.txt",
             "cpp": "cpp_review.txt"
         }
+        review_requested = kwargs.get('review_request', '')
         template = self._load_prompt_template(language, filename_map)
         if template:
-            return template.replace("{{CODE}}", code_input)
+            return template.replace("{{REVIEW_REQUEST}}", review_requested).replace("{{CODE}}", code_input)
         else:
             raise RuntimeError(f"Code review {language} template not available.")
-
+    
     def run(self, code_input: str, system_prompt: Optional[str], **kwargs) -> BenchmarkResult:
         llm_response = self.provider.complete(code_input, system_prompt)
-
+        
         if not llm_response.success:
             return BenchmarkResult(
                 benchmark_name=self.name,

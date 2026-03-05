@@ -23,6 +23,7 @@ import os
 import subprocess
 import tempfile
 import json 
+import math
 
 class RuntimeAnalysisDimension(BaseDimension):
     name = "Runtime Analysis"
@@ -125,7 +126,7 @@ class RuntimeAnalysisDimension(BaseDimension):
             )
             time_score = ratio_score(
                 orig_results["wall_time"],
-                generated_results["wall_time"]  # fix typo from your code — should be generated
+                generated_results["wall_time"]  
             )
             # final score will be normalized sum of memory_score and time_score
             final_score = (0.5*memory_score) + (0.5*time_score) 
