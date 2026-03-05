@@ -174,7 +174,7 @@ class DimensionResult:
     """Score produced by a single evaluation dimension."""
     dimension_name: str
     score: float              # 0.0 – 1.0
-    passed: bool = True
+    passed: bool = True       # used for dimension tests passing without error
     details: dict = field(default_factory=dict)
     issues: list = field(default_factory=list)
 
@@ -197,6 +197,7 @@ class BaseDimension(ABC):
     @abstractmethod
     def evaluate(
         self,
+        language:str,
         original_code: str,
         generated_code: str,
         **kwargs,

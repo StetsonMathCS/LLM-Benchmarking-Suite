@@ -22,6 +22,8 @@ class SemanticDriftDimension(BaseDimension):
 
     name = "Semantic Dimension"
     description = "Dimension that tests the code snippet for semantic drift. Returns the percentage similarity"
+    _CPP_LANGUAGE = Language(tscpp.language())
+    _cpp_parser = Parser(_CPP_LANGUAGE)
 
     @staticmethod
     def ast_to_bracket(node) -> str:
@@ -29,7 +31,7 @@ class SemanticDriftDimension(BaseDimension):
         children = list(ast.iter_child_nodes(node))
         if not children:
             return f"{{{name}}}"
-        child_str = "".join(ast_to_bracket(c) for c in children)
+        child_str = "".join(SemanticDriftDimension.ast_to_bracket(c) for c in children)
         return f"{{{name}{child_str}}}"
 
     @staticmethod
@@ -37,8 +39,8 @@ class SemanticDriftDimension(BaseDimension):
         """Measures the percentage of semantic similarity in python code. returns a score from 0.0 to 1.0"""
         orig_code = ast.parse(original_code)
         gen_code = ast.parse(generated_code)
-        orig_children = ast_to_bracket(orig_code)
-        gen_children = ast_to_bracket(gen_code)
+        orig_children = SemanticDriftDimension.ast_to_bracket(orig_code)
+        gen_children = SemanticDriftDimension.ast_to_bracket(gen_code)
         tree1 = Tree.from_text(orig_children)
         tree2 = Tree.from_text(gen_children)
         # compute the tree edit distance
@@ -80,33 +82,19 @@ class SemanticDriftDimension(BaseDimension):
         max_distance = size1 + size2
 
         return 1 - (distance / max_distance) if max_distance > 0 else 1.0
-
-    @staticmethod
-    def measure_similarity_javascript(original_code:str, generated_code:str) -> float:
-        """Measures semantic similarity between two Javascript code snippets. Returns a score from 0.0 to 1.0"""
-        # Install eprisma in nodejs
-        subprocess.run(['npm','install','esprima'])
-        root1 = subprocess.run(['node','-e',f"""const esprima = require('esprima');
-                                console.loge(esprima.tokenize("{original_code}"));"""], capture_output=True).stdout        
-        root2 = subprocess.run(['node','-e',f"""const esprima = require('esprima');
-                                console.loge(esprima.tokenize("{original_code}"));"""], capture_output=True).stdout
-        tree1=Tree.from_text(root1) 
-        tree2=Tree.from_text(root2)
-        distance = APTED(tree1, tree2, Config()).compute_edit_distance()
-        return distance
     
     @staticmethod
     def js_ast_to_bracket(node):
         if isinstance(node, dict):
             label = node.get("type", "X")
             children = "".join(
-                js_ast_to_bracket(v)
+                SemanticDriftDimension.js_ast_to_bracket(v)
                 for v in node.values()
                 if isinstance(v, (dict, list))
             )
             return f"{{{label}{children}}}"
         elif isinstance(node, list):
-            return "".join(js_ast_to_bracket(item) for item in node)
+            return "".join(SemanticDriftDimension.js_ast_to_bracket(item) for item in node)
         return ""
 
     @staticmethod
@@ -132,8 +120,8 @@ class SemanticDriftDimension(BaseDimension):
             """Measures semantic similarity between two Javascript code snippets. Returns a score from 0.0 to 1.0"""
             # Install eprisma in nodejs
             subprocess.run(['npm','install','esprima'])
-            bracket1=js_ast_to_bracket(parse_js(original_code, "/tmp/one.js"))
-            bracket2=js_ast_to_bracket(parse_js(generated_code, "/tmp/two.js"))
+            bracket1=SemanticDriftDimension.js_ast_to_bracket(parse_js(original_code, "/tmp/one.js"))
+            bracket2=SemanticDriftDimension.js_ast_to_bracket(parse_js(generated_code, "/tmp/two.js"))
             tree1=Tree.from_text(bracket1) 
             tree2=Tree.from_text(bracket2)
             distance = APTED(tree1, tree2, Config()).compute_edit_distance()
@@ -145,3 +133,18 @@ class SemanticDriftDimension(BaseDimension):
             return 1 - (distance / max_distance) if max_distance > 0 else 1.0
 
     def evaluate(self, language:str,  original_code: str, generated_code: str, **kwargs) -> DimensionResult:
+        try:
+            if language=='python':
+                result = self.measure_similarity_python(original_code, generated_code)
+            elif language=='cpp':
+                result = self.measure_similarity_cpp(original_code, generated_code)
+            elif language=='javascript':
+                result = self.measure_similarity_javascript(original_code, generated_code)
+            else:
+                raise RuntimeError(f"Cannot benchmark {language} on semantic drift.")
+        except Exception as e:
+            raise RuntimeError(f"Error occured while semantic drift: {e}")
+        return DimensionResult(
+            dimension_name=self.name,
+            score=result,
+        )
