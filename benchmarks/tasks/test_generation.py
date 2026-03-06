@@ -20,8 +20,10 @@ class TestGenerationBenchmark(BaseBenchmark):
 
     def build_prompt(self, language: str, code_input: str, **kwargs) -> str:
         filename_map = {
+            # Only python tests gen benchmarking available rn.
             "python": "python_test_gen.txt",
-            "cpp": "cpp_test_gen.txt"
+            # "cpp": "cpp_test_gen.txt",
+            # "javascript": "javascript_test_gen.txt"
         }
         template = self._load_prompt_template(language, filename_map)
         if template:

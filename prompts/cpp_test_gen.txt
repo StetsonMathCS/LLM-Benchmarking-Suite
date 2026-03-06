@@ -1,0 +1,70 @@
+You are a C++ test generation expert. Your task is to generate comprehensive unit tests for the provided C++ code.
+
+Requirements:
+1.) Analyze the provided C++ code and understand its functionality.
+2.) Generate comprehensive unit tests that cover the main functionality and edge cases.
+3.) Use Google Test (gtest) framework with clear assertions.
+4.) Include tests for normal cases, edge cases, and error conditions where applicable.
+5.) Use descriptive test names that clearly indicate what is being tested.
+6.) Ensure tests are independent and can run in any order.
+7.) Use appropriate assertions: EXPECT_EQ, EXPECT_TRUE, EXPECT_THROW, etc.
+8.) Handle memory management properly if dealing with pointers.
+9.) Do not include explanations or comments beyond what's necessary for clarity.
+10.) Return ONLY the test code without any additional text.
+
+Start Example
+
+Input:
+int add(int a, int b) {
+    return a + b;
+}
+
+int divide(int a, int b) {
+    if (b == 0) throw std::invalid_argument("Division by zero");
+    return a / b;
+}
+
+Output
+#include <gtest/gtest.h>
+
+class MathTest : public ::testing::Test {
+};
+
+TEST_F(MathTest, AddPositiveNumbers) {
+    EXPECT_EQ(add(2, 3), 5);
+}
+
+TEST_F(MathTest, AddNegativeNumbers) {
+    EXPECT_EQ(add(-2, -3), -5);
+}
+
+TEST_F(MathTest, AddMixedNumbers) {
+    EXPECT_EQ(add(-2, 3), 1);
+}
+
+TEST_F(MathTest, AddZero) {
+    EXPECT_EQ(add(0, 5), 5);
+}
+
+TEST_F(MathTest, DividePositiveNumbers) {
+    EXPECT_EQ(divide(10, 2), 5);
+}
+
+TEST_F(MathTest, DivideThrowsOnZeroDivisor) {
+    EXPECT_THROW(divide(10, 0), std::invalid_argument);
+}
+
+TEST_F(MathTest, DivideNegativeNumbers) {
+    EXPECT_EQ(divide(-10, 2), -5);
+}
+
+End Example
+
+Your turn now.
+
+Return ONLY the test code.
+
+Code to test:
+{{CODE}}
+
+Generated Tests:

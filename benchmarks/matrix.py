@@ -13,7 +13,7 @@ from benchmarks.dimensions.runtime_analysis import RuntimeAnalysisDimension
 from benchmarks.dimensions.partial_transform import PartialTransformationDimension
 from benchmarks.dimensions.test_pass_rate import TestPassRateDimension
 from benchmarks.dimensions.vulnerabilities import VulnerabilitiesDimension
-
+from benchmarks.dimensions.code_review import CodeReviewDimension
 
 # Matrix Definition 
 # Keys   = task names (must match BaseBenchmark.name on each task)
@@ -40,7 +40,7 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
         VulnerabilitiesDimension
     ],
     "code_review" : [
-        
+        CodeReviewDimension
     ],
     "refactoring" : [
         CodeConsistencyDimension,

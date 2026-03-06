@@ -18,19 +18,20 @@ class TranslationBenchmark(BaseBenchmark):
     desc = "Evaluate the Language Model on code translation tasks."
     category = "transformation"
 
-    def build_prompt(self, language: str, code_input: str, target_language: str = "python", **kwargs) -> str:
+    def build_prompt(self, language: str, code_input: str, **kwargs) -> str:
         filename_map = {
-            "python": "python_translate.txt",
-            "cpp": "cpp_translate.txt"
+            "python": "translate.txt",
+            "cpp": "translate.txt",
+            "javascript": "translate.txt"
         }
+        target_language = kwargs.get("target_language", "python")
         template = self._load_prompt_template(language, filename_map)
         if template:
             return template.replace("{{CODE}}", code_input).replace("{{TARGET}}", target_language)
         else:
             raise RuntimeError(f"Code translation {language} template not available.")
 
-    def run(self, code_input: str, system_prompt: Optional[str], target_language: str = "python", **kwargs) -> BenchmarkResult:
-        prompt = self.build_prompt(kwargs.get("language", "python"), code_input, target_language)
+    def run(self, prompt: str, system_prompt: Optional[str], **kwargs) -> BenchmarkResult:
         llm_response = self.provider.complete(prompt, system_prompt)
 
         if not llm_response.success:

@@ -21,7 +21,8 @@ class BugFixingBenchmark(BaseBenchmark):
     def build_prompt(self, language: str, code_input: str, **kwargs) -> str:
         filename_map = {
             "python": "python_bugfix.txt",
-            "cpp": "cpp_bugfix.txt"
+            "cpp": "cpp_bugfix.txt",
+            "javascript": "javascript_bugfix.txt"
         }
         template = self._load_prompt_template(language, filename_map)
         if template:
@@ -29,8 +30,8 @@ class BugFixingBenchmark(BaseBenchmark):
         else:
             raise RuntimeError(f"Code bug fixing {language} template not available.")
 
-    def run(self, code_input: str, system_prompt: Optional[str], **kwargs) -> BenchmarkResult:
-        llm_response = self.provider.complete(code_input, system_prompt)
+    def run(self, prompt: str, system_prompt: Optional[str], **kwargs) -> BenchmarkResult:
+        llm_response = self.provider.complete(prompt, system_prompt)
 
         if not llm_response.success:
             return BenchmarkResult(

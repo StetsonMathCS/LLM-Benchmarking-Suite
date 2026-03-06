@@ -128,7 +128,7 @@ class BaseBenchmark(ABC):
 
     def _load_prompt_template(self, language: str, filename_map: dict) -> Optional[str]:
         """Try to load a prompt template from prompts/ directory."""
-        prompts_dir = Path(__file__).parent / "prompts"
+        prompts_dir = Path(__file__).parent.parent / "prompts"
         path = prompts_dir / filename_map.get(language, "python")
         if path.exists():
             return path.read_text(encoding="utf-8")

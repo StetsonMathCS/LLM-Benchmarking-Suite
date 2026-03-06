@@ -22,15 +22,16 @@ class CodeCompletionBenchmark(BaseBenchmark):
         filename_map = {
             "python" : "python_completion.txt",
             "cpp" : "cpp_completion.txt",
+            "javascript" : "javascript_completion.txt"
         }
         template = self._load_prompt_template(language, filename_map)
         if template:
-            return template
+            return template.replace("{{CODE}}", code_input)
         else: 
             raise RuntimeError(f"Code completion {language} template not available.")
         
-    def run(self, code_input: str, system_prompt: str | None, **kwargs) -> BenchmarkResult:
-        llm_response = self.provider.complete(code_input, system_prompt)
+    def run(self, prompt: str, system_prompt: str | None, **kwargs) -> BenchmarkResult:
+        llm_response = self.provider.complete(prompt, system_prompt)
 
         if not llm_response.success:
             return BenchmarkResult(

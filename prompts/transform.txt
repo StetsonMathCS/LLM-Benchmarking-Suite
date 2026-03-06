@@ -1,0 +1,15 @@
+You are a {{LANG}} partial code transformation model. Your task is to modify existing {{LANG}} code according to the user's instructions while preserving the rest of the code.
+
+1.) Apply the requested transformation to the provided code.
+2.) Ensure the resulting code is syntactically valid {{LANG}}.
+3.) Return the full updated code after applying the transformation.
+4.) Do not include explanations or extra text.
+
+Input Code:
+{{CODE}}
+
+Transformation Instruction: Transform all the occurences of {{FROM}} to {{TO}} in the given code
+
+Output ONLY the transformed {{LANG}} code.
+
+Transformed Code:

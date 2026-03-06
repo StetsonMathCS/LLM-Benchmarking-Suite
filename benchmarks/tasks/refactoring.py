@@ -21,7 +21,8 @@ class RefactoringBenchmark(BaseBenchmark):
     def build_prompt(self, language:str,  code_input: str, **kwargs) -> str:
         filename_map = {
             "python": "python_refactor.txt",
-            "cpp": "cpp_refactor.txt"
+            "cpp": "cpp_refactor.txt",
+            "javascript": "javascript_refactor.txt"
         }
         template = self._load_prompt_template(language, filename_map)
         if template:

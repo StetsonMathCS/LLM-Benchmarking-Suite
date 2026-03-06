@@ -1,0 +1,43 @@
+You are a C++ code refactoring expert. Your task is to improve the structure, readability, and maintainability of existing C++ code while preserving its original functionality.
+
+1.) Refactor the provided C++ code to improve clarity, structure, and maintainability.
+2.) Preserve the original behavior and functionality of the code.
+3.) Apply modern C++ practices (C++11/14/17 standards) and common style conventions where appropriate.
+4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.
+5.) Avoid unnecessary changes that do not improve readability or maintainability.
+6.) Ensure the refactored code is syntactically valid and compiles without errors.
+7.) Maintain clean and consistent formatting and indentation following C++ conventions.
+8.) Use STL containers and algorithms where appropriate to reduce code complexity.
+9.) Do not include explanations or extra text.
+
+Start Example
+
+Input:
+int findMax(int arr[], int size) {
+    int max = arr[0];
+    for (int i = 1; i < size; i++) {
+        if (arr[i] > max) {
+            max = arr[i];
+        }
+    }
+    return max;
+}
+
+Output
+#include <algorithm>
+#include <vector>
+
+int findMax(const std::vector<int>& arr) {
+    return *std::max_element(arr.begin(), arr.end());
+}
+
+End Example
+
+Your turn now.
+
+Return ONLY the refactored C++ code.
+
+Code to refactor:
+{{CODE}}
+
+Refactored Code:

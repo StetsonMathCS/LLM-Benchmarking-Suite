@@ -13,20 +13,24 @@ from core.base import (
     LLMResponse
 )
 class CodeGeneratinBenchmark(BaseBenchmark):
-    
+    name = "Code Generation Benchmark"
+    desc = "Evaluate the Language Model on code generation tasks."
+    category = "generation"
+
     def build_prompt(self, language:str, code_input: str, **kwargs) -> str:
         filename_map = {
             "python": "generation.txt",
-            "cpp": "generation.txt"
+            "cpp": "generation.txt",
+            "javascript": "generation.txt",
         }
         template = self._load_prompt_template(language, filename_map)
         if template:
-            return template
+            return template.replace("{{LANG}}", language).replace("{{INPUT}}", code_input)
         else:
             raise RuntimeError(f"Code generation {language} template not available.")
 
-    def run(self, code_input: str, system_prompt: str | None, **kwargs) -> BenchmarkResult:
-        llm_response = self.provider.complete(code_input, system_prompt)
+    def run(self, prompt: str, system_prompt: str | None, **kwargs) -> BenchmarkResult:
+        llm_response = self.provider.complete(prompt, system_prompt)
         if not llm_response.success:
             return BenchmarkResult(
                 benchmark_name=self.name,
