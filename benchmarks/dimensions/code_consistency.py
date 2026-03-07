@@ -9,7 +9,7 @@ from core.base import(
     DimensionResult
 )
 import re
-
+from typing import Optional
 
 class CodeConsistencyDimension(BaseDimension):
     name = "Code Consistency"
@@ -22,7 +22,7 @@ class CodeConsistencyDimension(BaseDimension):
         total_checks = 0
         
         # Check indentation consistency (spaces vs tabs)
-        lines = code.split('\n')
+        lines = code.split('\n')    
         indent_types = set()
         for line in lines:
             if len(line) > 0 and line[0] in (' ', '\t'):
@@ -139,7 +139,7 @@ class CodeConsistencyDimension(BaseDimension):
         score = max(0.0, 1.0 - (issues / max(1, total_checks)))
         return score
 
-    def evaluate(self, language: str, original_code: str, generated_code: str, **kwargs) -> DimensionResult:
+    def evaluate(self, language: str, original_code: Optional[str], generated_code: str, **kwargs) -> DimensionResult:
         language = language.lower().strip()
         try:
                 

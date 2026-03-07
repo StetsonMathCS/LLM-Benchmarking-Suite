@@ -5,6 +5,7 @@ Anthropic API provider
 from typing import Optional
 from core.registry import ProviderRegistry
 from core.base import BaseProvider, LLMResponse
+import asyncio
 
 @ProviderRegistry.register("anthropic")
 class AnthropicProvider(BaseProvider):

@@ -17,6 +17,7 @@ from tree_sitter import Language, Parser
 import tree_sitter_cpp as tscpp
 import subprocess
 import json
+from typing import Optional
 
 class SemanticDriftDimension(BaseDimension):
 

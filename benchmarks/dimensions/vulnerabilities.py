@@ -11,12 +11,13 @@ from core.base import (
     BaseDimension,
     DimensionResult
 )
+from typing import Optional
 
 class VulnerabilitiesDimension(BaseDimension):
     name = "Vulnerabilities"
     description = "Security issues: bandit (Python), cppcheck (C++), npm audit (JS)."
 
-    def evaluate(self, language: str, original_code: str, generated_code: str, **kwargs) -> DimensionResult:
+    def evaluate(self, language: str, original_code: Optional[str], generated_code: str, **kwargs) -> DimensionResult:
         try:
             # If no original code provided, only scan generated code and return 1.0
             if not original_code:
@@ -32,7 +33,6 @@ class VulnerabilitiesDimension(BaseDimension):
                         score=0.0,
                         details={"error": f"Unsupported language: {language}"}
                     )
-                
                 return DimensionResult(
                     dimension_name=self.name,
                     score=1.0,

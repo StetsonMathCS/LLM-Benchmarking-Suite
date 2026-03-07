@@ -9,7 +9,10 @@ from core.base import (
     BenchmarkResult,
     BenchmarkStatus
 )
-
+import matrix
+from benchmarks.dimensions import (
+    partial_transform
+)
 class PartialTransformBenchmark(BaseBenchmark):
     name = "Partial Transformation Benchmark"
     desc = "Evaluate the Language Model on code transformation tasks."
@@ -39,15 +42,27 @@ class PartialTransformBenchmark(BaseBenchmark):
             )
         generated_code = llm_response.content
 
-        # Evaluate with dimensions
-        # TO DO: evaluate on given dimensions via BenchmarkMatrix
-
-        # 3. Aggregate scores
+        weights = matrix.DIMENSION_WEIGHTS["partial_transform"] 
+        dimensions = matrix.get_dimensions_for_task("partial_transform")
+        results = {}
+        issues = {}
+        combined_score = 0.00
+        status = BenchmarkStatus.PASSED
+        for cls in dimensions:
+            dimension = cls()
+            result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=generated_code, **kwargs)
+            if not result.passed :
+                status = BenchmarkStatus.ERROR
+                issues[dimension.name] = result.details["error"]
+            results[dimension.name] = result
+            # Calculating scores
+            combined_score += (weights[dimension.name]*result.score) if result.score else 0.00
         return BenchmarkResult(
             benchmark_name=self.name,
-            status=BenchmarkStatus.PASSED,
-            score=None,
-            details={"transformed_code": generated_code},
-            raw_outputs=[llm_response],
+            status=status,
+            combined_score=combined_score,
+            details=results,
+            issues_found=issues,
+            llm_response=llm_response,
         )
     

@@ -12,8 +12,14 @@ from core.base import (
     BenchmarkStatus,
     LLMResponse,
 )
+import matrix
+from benchmarks.dimensions import (
+    code_consistency,
+    semantic_drift,
+)
 
 class BugFixingBenchmark(BaseBenchmark):
+    """Must provide expected output for the program as 'expected_output' arguement"""
     name = "Bug Fixing Benchmark"
     desc = "Evaluate the Language Model on bug fixing tasks."
     category = "transformation"
@@ -41,13 +47,29 @@ class BugFixingBenchmark(BaseBenchmark):
             )
 
         fixed_code = llm_response.content
-
-        # TO DO evaluate on given dimensions via BenchmarkMatrix
-
+        weights = matrix.DIMENSION_WEIGHTS["bug_fixing"] 
+        dimensions = matrix.get_dimensions_for_task("bug_fixing")
+        results = {}
+        issues = {}
+        combined_score = 0.00
+        status = BenchmarkStatus.PASSED
+        for cls in dimensions:
+            dimension = cls()
+            if isinstance(dimension, semantic_drift):
+                result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=fixed_code, **kwargs)
+            else:
+                result = dimension.evaluate(language=self.language, generated_code=fixed_code, **kwargs)
+            if not result.passed :
+                status = BenchmarkStatus.ERROR
+                issues[dimension.name] = result.details["error"]
+            results[dimension.name] = result
+            # Calculating scores
+            combined_score += (weights[dimension.name]*result.score) if result.score else 0.00
         return BenchmarkResult(
             benchmark_name=self.name,
-            status=BenchmarkStatus.PASSED,
-            score=None,
-            details={"fixed_code": fixed_code},
-            raw_outputs=[llm_response],
+            status=status,
+            combined_score=combined_score,
+            details=results,
+            issues_found=issues,
+            llm_response=llm_response,
         )

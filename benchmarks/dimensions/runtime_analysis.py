@@ -24,6 +24,7 @@ import subprocess
 import tempfile
 import json 
 import math
+from typing import Optional
 
 class RuntimeAnalysisDimension(BaseDimension):
     name = "Runtime Analysis"
@@ -75,8 +76,45 @@ class RuntimeAnalysisDimension(BaseDimension):
     def run_javascript(code):
         return RuntimeAnalysisDimension.subprocess_run(['node', '--max-old-space-size=128', '-e', code])
 
-    def evaluate(self, language: str, original_code: str, generated_code: str, **kwargs) -> DimensionResult:
+    def evaluate(self, language: str, original_code: Optional[str], generated_code: str, **kwargs) -> DimensionResult:
         try:
+            # If no original code, just analyze generated code
+            if not original_code:
+                if language == "python":
+                    generated_results = RuntimeAnalysisDimension.run_python(generated_code)
+                elif language == "cpp":
+                    generated_results = RuntimeAnalysisDimension.run_cpp(generated_code)
+                elif language == "javascript":
+                    generated_results = RuntimeAnalysisDimension.run_javascript(generated_code)
+                else:
+                    return DimensionResult(
+                        dimension_name=self.name,
+                        score=0.0,
+                        details={"error": "Evaluation error"}
+                    )
+                
+                if not generated_results.get("stdout"):
+                    return DimensionResult(
+                        dimension_name=self.name,
+                        score=0.0,
+                        passed=False,
+                        details={
+                            "error": generated_results.get("stderr") or "Error occurred",
+                        }
+                    )
+                
+                return DimensionResult(
+                    dimension_name=self.name,
+                    score=1.0,  # No comparison, return perfect score with metrics
+                    passed=True,
+                    details={
+                        "generated_code_runtime": generated_results["wall_time"],
+                        "generated_code_memory": generated_results["peak_memory"],
+                        "note": "No original code provided for comparison"
+                    }
+                )
+            
+            # Standard flow: compare original vs generated
             if language=="python":
                 orig_results=RuntimeAnalysisDimension.run_python(original_code)
                 generated_results=RuntimeAnalysisDimension.run_python(generated_code)

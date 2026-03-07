@@ -25,19 +25,23 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
         FunctionalCorrectnessDimension,
         LintingDimension,
         VulnerabilitiesDimension,
-        SemanticDriftDimension
+        SemanticDriftDimension,
+        RuntimeAnalysisDimension,
     ],
     "code_completion" : [
+        SemanticDriftDimension,
         CodeConsistencyDimension,
         FunctionalCorrectnessDimension,
         LintingDimension,
-        VulnerabilitiesDimension
+        VulnerabilitiesDimension,
+        RuntimeAnalysisDimension
     ],
     "code_generation" : [
         CodeConsistencyDimension,
         FunctionalCorrectnessDimension,
         LintingDimension,
-        VulnerabilitiesDimension
+        VulnerabilitiesDimension,
+        RuntimeAnalysisDimension
     ],
     "code_review" : [
         CodeReviewDimension
@@ -50,7 +54,7 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
         RuntimeAnalysisDimension,
         VulnerabilitiesDimension
     ],
-    "test_generation" : [
+    "test_generation" : [   
         CodeConsistencyDimension,
         TestPassRateDimension,
         LintingDimension
@@ -63,10 +67,75 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
     ],
     "partial_transform" : [
         PartialTransformationDimension,
-        FunctionalCorrectnessDimension
+        FunctionalCorrectnessDimension,
+        SemanticDriftDimension,
+        LintingDimension,
+        VulnerabilitiesDimension,
+        RuntimeAnalysisDimension
     ]
 }
 
+# Weights per dimension
+DIMENSION_WEIGHTS = {
+    "bug_fixing": {
+        "Functional Correctness": 0.70,
+        "Linting":                0.00,
+        "Code Consistency":       0.20,
+        "Vulnerabilities":        0.00,
+        "Semantic Drift":         0.10,
+        "Runtime Analysis":       0.00,
+    },
+    "code_completion" : {
+        "Semantic Drift" : 0.00,
+        "Code Consistency" : 0.50,
+        "Functional Correctness" : 0.50,
+        "Linting" : 0.00,
+        "Vulnerabilities" : 0.00,
+        "Runtime Analysis" : 0.00,
+    },
+    "code_generation" : {
+        "Code Consistency" : 0.50,
+        "Functional Correctness" : 0.50,
+        "Linting" : 0.00,
+        "Vulnerabilities" : 0.00,
+        "Runtime Analysis" : 0.00,
+    },
+    "code_review" : {
+        "Code Review" : 1.00,
+    },
+    "refactoring": {
+        "Functional Correctness": 0.30,
+        "Semantic Drift":         0.25,
+        "Runtime Analysis":       0.20,
+        "Code Consistency":       0.10,
+        "Linting":                0.10,
+        "Vulnerabilities":        0.05,
+    },
+    "test_generation": {
+        "Code Consistency" : 0.25,
+        "Test Pass Rate" : 0.75,
+        "Linting" : 0.00,
+    },
+    "translation": {
+        "Code Consistency": 0.50,
+        "Linting": 0.00,
+        "Vulnerabilities": 0.00,
+        "Functional Correctness": 0.50,
+    },
+    "partial_transform": {
+        "Partial Transform": 0.40,
+        "Functional Correctness": 0.20,
+        "Semantic Drift": 0.10,
+        "Linting": 0.10,
+        "Vulnerabilities": 0.10,
+        "Runtime Analysis": 0.10,
+    }
+}
+
+# Calculate
+weights = DIMENSION_WEIGHTS["bug_fixing"]
+weighted_sum = sum(results[name].score * weights[name] for name in weights)
+final_score = weighted_sum  # Already sums to 1.0 if weights sum to 1.0
 
 def get_dimensions_for_task(task_name: str) -> list[type]:
     """Return the dimension classes mapped to a given task name."""

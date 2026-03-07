@@ -12,7 +12,10 @@ from core.base import (
     BenchmarkStatus,
     LLMResponse,
 )
-
+import matrix
+from benchmarks.dimensions import (
+    test_pass_rate
+)
 class TestGenerationBenchmark(BaseBenchmark):
     name = "Test Generation Benchmark"
     desc = "Evaluate the Language Model on test generation tasks."
@@ -45,13 +48,29 @@ class TestGenerationBenchmark(BaseBenchmark):
 
         generated_tests = llm_response.content
 
-        # TO DO evaluate on given dimensions via BenchmarkMatrix
-
+        weights = matrix.DIMENSION_WEIGHTS["test_generation"] 
+        dimensions = matrix.get_dimensions_for_task("test_generation")
+        results = {}
+        issues = {}
+        combined_score = 0.00
+        status = BenchmarkStatus.PASSED
+        for cls in dimensions:
+            dimension = cls()
+            if isinstance(dimension, test_pass_rate):
+                result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=generated_tests, **kwargs)
+            else:
+                result = dimension.evaluate(language=self.language, generated_code=generated_tests, **kwargs)
+            if not result.passed :
+                status = BenchmarkStatus.ERROR
+                issues[dimension.name] = result.details["error"]
+            results[dimension.name] = result
+            # Calculating scores
+            combined_score += (weights[dimension.name]*result.score) if result.score else 0.00
         return BenchmarkResult(
             benchmark_name=self.name,
-            status=BenchmarkStatus.PASSED,
-            score=None,
-            details={"generated_tests": generated_tests},
-            raw_outputs=[llm_response],
+            status=status,
+            combined_score=combined_score,
+            details=results,
+            issues_found=issues,
+            llm_response=llm_response,
         )
-

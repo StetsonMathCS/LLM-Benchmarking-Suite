@@ -8,24 +8,24 @@ from core.base import (
     DimensionResult
 )
 from utils.code_runner import CodeRunner
-
+from typing import Optional
 class FunctionalCorrectnessDimension(BaseDimension):
     name = "Functional Correctness"
     description = "Does generated code produce same output as original?"
 
-    def evaluate(self, language: str, original_code: str, generated_code: str, **kwargs) -> DimensionResult:
+    def evaluate(self, language: str, original_code: Optional[str], generated_code: str, **kwargs) -> DimensionResult:
         """When you have only outputs and no original code (e.g. when you're checking for code generation) omit original_code and provide expected output in kwargs as original_output."""
         if not original_code:
-            gold_output = kwargs['original_output']
+            expected_output = kwargs['expected_output']
         try:
             if language == "python":
-                orig_output = CodeRunner.run_python(original_code) if original_code else gold_output
+                orig_output = CodeRunner.run_python(original_code) if original_code else expected_output
                 gen_output = CodeRunner.run_python(generated_code)
             elif language == "javascript":
-                orig_output = CodeRunner.run_javascript(original_code) if original_code else gold_output
+                orig_output = CodeRunner.run_javascript(original_code) if original_code else expected_output
                 gen_output = CodeRunner.run_javascript(generated_code)
             elif language == "cpp":
-                orig_output = CodeRunner.run_cpp(original_code) if original_code else gold_output
+                orig_output = CodeRunner.run_cpp(original_code) if original_code else expected_output
                 gen_output = CodeRunner.run_cpp(generated_code)
             else:
                 return DimensionResult(

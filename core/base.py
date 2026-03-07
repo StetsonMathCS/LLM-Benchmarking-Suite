@@ -52,22 +52,23 @@ class BenchmarkResult:
     """The result of a single benchmark test"""
     benchmark_name: str
     status: BenchmarkStatus
-    score: Optional[float]=None # 0.0-1.0 where applicable
+    combined_score: Optional[float]=None # 0.0-1.0 where applicable
     details: dict = field(default_factory=dict)
-    issues_found: list = field(default_factory=list)
-    raw_outputs: list = field(default_factory=list)
+    issues_found: dict = field(default_factory=dict)
     duration_s: float = 0.0
     metadata: dict = field(default_factory=dict)
+    llm_response: Optional[LLMResponse] = None
 
     def to_dict(self) -> dict:
             return {
                 "benchmark": self.benchmark_name,
                 "status": self.status.value,
-                "score": self.score,
+                "combined_score": self.combined_score,
                 "issues_found": len(self.issues_found),
                 "issues": self.issues_found,
                 "details": self.details,
                 "duration_s": self.duration_s,
+                "llm_response" : self.llm_response,
             }
 
 
@@ -119,10 +120,11 @@ class BaseBenchmark(ABC):
     name = "base_benchmark"
     desc = ""
     category = "general"
+    code_input = ""
 
     def __init__(self, code_language:str, provider: BaseProvider, model_config: "ModelConfig"):
         self.provider = provider
-        self.model_config = model_config
+        self.model_config = model_config    
         self._results: list[BenchmarkResult] = []
         self.language = code_language
 
@@ -151,6 +153,7 @@ class BaseBenchmark(ABC):
         ...
 
     def _timed_run(self, code_input: str, **kwargs) -> BenchmarkResult:
+        self.code_input = code_input
         start = perf_counter()
         prompt = self.build_prompt(self.language, code_input, **kwargs)
         system_prompt=self.model_config.system_prompt

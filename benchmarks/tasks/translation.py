@@ -12,6 +12,7 @@ from core.base import (
     BenchmarkStatus,
     LLMResponse,
 )
+import matrix
 
 class TranslationBenchmark(BaseBenchmark):
     name = "Translation Benchmark"
@@ -43,12 +44,26 @@ class TranslationBenchmark(BaseBenchmark):
 
         translated_code = llm_response.content
 
-        # TO DO evaluate on given dimensions via BenchmarkMatrix
-
+        weights = matrix.DIMENSION_WEIGHTS["translation"] 
+        dimensions = matrix.get_dimensions_for_task("translation")
+        results = {}
+        issues = {}
+        combined_score = 0.00
+        status = BenchmarkStatus.PASSED
+        for cls in dimensions:
+            dimension = cls()
+            result = dimension.evaluate(language=self.language, generated_code=translated_code, **kwargs)
+            if not result.passed :
+                status = BenchmarkStatus.ERROR
+                issues[dimension.name] = result.details["error"]
+            results[dimension.name] = result
+            # Calculating scores
+            combined_score += (weights[dimension.name]*result.score) if result.score else 0.00
         return BenchmarkResult(
             benchmark_name=self.name,
-            status=BenchmarkStatus.PASSED,
-            score=None,
-            details={"translated_code": translated_code},
-            raw_outputs=[llm_response],
+            status=status,
+            combined_score=combined_score,
+            details=results,
+            issues_found=issues,
+            llm_response=llm_response,
         )
