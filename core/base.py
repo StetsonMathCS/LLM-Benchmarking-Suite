@@ -121,12 +121,13 @@ class BaseBenchmark(ABC):
     desc = ""
     category = "general"
     code_input = ""
+    system_prompt = ""
 
-    def __init__(self, code_language:str, provider: BaseProvider, model_config: "ModelConfig"):
+    def __init__(self, code_language:str, provider: BaseProvider):
         self.provider = provider
-        self.model_config = model_config    
         self._results: list[BenchmarkResult] = []
         self.language = code_language
+        self.system_prompt = self.provider.config.system_prompt
 
     def _load_prompt_template(self, language: str, filename_map: dict) -> Optional[str]:
         """Try to load a prompt template from prompts/ directory."""
@@ -156,7 +157,7 @@ class BaseBenchmark(ABC):
         self.code_input = code_input
         start = perf_counter()
         prompt = self.build_prompt(self.language, code_input, **kwargs)
-        system_prompt=self.model_config.system_prompt
+        system_prompt=self.system_prompt
         result = self.run(prompt, system_prompt, **kwargs)
         result.duration_s = perf_counter() - start
         self._results.append(result)
