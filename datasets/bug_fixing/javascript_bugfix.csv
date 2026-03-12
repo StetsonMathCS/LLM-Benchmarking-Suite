@@ -1,0 +1,378 @@
+id,buggy_code,fixed_code,expected_output
+1,"const arr = [1, 2, 3];
+console.log(arr.lenght);
+// expected: 3","const arr = [1, 2, 3];
+console.log(arr.length);
+// expected: 3",3
+2,"function sum(a, b) {
+  a + b;
+}
+console.log(sum(2, 3));
+// expected: 5","function sum(a, b) {
+  return a + b;
+}
+console.log(sum(2, 3));
+// expected: 5",5
+3,"let total = 0;
+for (let i = 0; i < 3; i++) {
+  total += i;
+}
+console.log(total);
+// expected: 6","let total = 0;
+for (let i = 0; i <= 3; i++) {
+  total += i;
+}
+console.log(total);
+// expected: 6",6
+4,"const x = 3;
+if (x = 5) {
+  console.log('yes');
+} else {
+  console.log('no');
+}
+// expected: no","const x = 3;
+if (x === 5) {
+  console.log('yes');
+} else {
+  console.log('no');
+}
+// expected: no",no
+5,"const n = '10';
+console.log(n + 5);
+// expected: 15","const n = '10';
+console.log(Number(n) + 5);
+// expected: 15",15
+6,"const nums = [10, 20, 30];
+console.log(nums[3]);
+// expected: 30","const nums = [10, 20, 30];
+console.log(nums[2]);
+// expected: 30",30
+7,"function factorial(n) {
+  if (n === 1) return 1;
+  return n * factorial(n - 1);
+}
+console.log(factorial(0));
+// expected: 1","function factorial(n) {
+  if (n === 0 || n === 1) return 1;
+  return n * factorial(n - 1);
+}
+console.log(factorial(0));
+// expected: 1",1
+8,"const user = { name: 'Ava' };
+console.log(user.nmae);
+// expected: Ava","const user = { name: 'Ava' };
+console.log(user.name);
+// expected: Ava",Ava
+9,"for (var i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 0);
+}
+// expected: 0
+1
+2","for (let i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 0);
+}
+// expected: 0
+1
+2","0
+1
+2"
+10,"const s = 'code';
+console.log(s.split('').reverse());
+// expected: edoc","const s = 'code';
+console.log(s.split('').reverse().join(''));
+// expected: edoc",edoc
+11,"const nums = [10, 2, 30];
+console.log(nums.sort()[0]);
+// expected: 2","const nums = [10, 2, 30];
+console.log(nums.sort((a, b) => a - b)[0]);
+// expected: 2",2
+12,"const nums = [];
+const total = nums.reduce((a, b) => a + b);
+console.log(total);
+// expected: 0","const nums = [];
+const total = nums.reduce((a, b) => a + b, 0);
+console.log(total);
+// expected: 0",0
+13,"const nums = [4, 9, 1];
+console.log(Math.max(nums));
+// expected: 9","const nums = [4, 9, 1];
+console.log(Math.max(...nums));
+// expected: 9",9
+14,"const nums = [1, 2, 3];
+const doubled = nums.map((n) => { n * 2; });
+console.log(doubled.join(','));
+// expected: 2,4,6","const nums = [1, 2, 3];
+const doubled = nums.map((n) => n * 2);
+console.log(doubled.join(','));
+// expected: 2,4,6","2,4,6"
+15,"const nums = [1, 2, 3, 4];
+const gt2 = nums.filter((n) => { n > 2; });
+console.log(gt2.join(','));
+// expected: 3,4","const nums = [1, 2, 3, 4];
+const gt2 = nums.filter((n) => n > 2);
+console.log(gt2.join(','));
+// expected: 3,4","3,4"
+16,"const text = 'mia';
+console.log(text.toUppercase());
+// expected: MIA","const text = 'mia';
+console.log(text.toUpperCase());
+// expected: MIA",MIA
+17,"const d = new Date('2024-01-15');
+console.log(d.getMonth());
+// expected: 1","const d = new Date('2024-01-15');
+console.log(d.getMonth() + 1);
+// expected: 1",1
+18,"const s = 'javascript';
+console.log(s.substring(8, 4));
+// expected: scri","const s = 'javascript';
+console.log(s.substring(4, 8));
+// expected: scri",scri
+19,"const email = 'USER@EXAMPLE.COM';
+console.log(email.includes('@example.com'));
+// expected: true","const email = 'USER@EXAMPLE.COM';
+console.log(email.toLowerCase().includes('@example.com'));
+// expected: true",true
+20,"const x = Number('oops');
+console.log(x === NaN);
+// expected: true","const x = Number('oops');
+console.log(Number.isNaN(x));
+// expected: true",true
+21,"console.log(0.1 + 0.2);
+// expected: 0.3","console.log(Number((0.1 + 0.2).toFixed(1)));
+// expected: 0.3",0.3
+22,"const arr = [1, 2, 3, 4];
+const part = arr.splice(1, 2);
+console.log(arr.join(','));
+// expected: 1,2,3,4","const arr = [1, 2, 3, 4];
+const part = arr.slice(1, 3);
+console.log(arr.join(','));
+// expected: 1,2,3,4","1,2,3,4"
+23,"const counter = {
+  value: 2,
+  get() { return this.value; }
+};
+const fn = counter.get;
+console.log(fn());
+// expected: 2","const counter = {
+  value: 2,
+  get() { return this.value; }
+};
+const fn = counter.get.bind(counter);
+console.log(fn());
+// expected: 2",2
+24,"function area(w, h) {
+  return w * h;
+}
+console.log(area(5));
+// expected: 5","function area(w, h = 1) {
+  return w * h;
+}
+console.log(area(5));
+// expected: 5",5
+25,"const name = 'Kai';
+console.log('Hello ${name}');
+// expected: Hello Kai","const name = 'Kai';
+console.log(`Hello ${name}`);
+// expected: Hello Kai",Hello Kai
+26,"let i = 0;
+while (i > 2) {
+  i++;
+}
+console.log(i);
+// expected: 2","let i = 0;
+while (i < 2) {
+  i++;
+}
+console.log(i);
+// expected: 2",2
+27,"let i = 0;
+do {
+  i++;
+} while (i < 0);
+console.log(i);
+// expected: 0","let i = 0;
+while (i < 0) {
+  i++;
+}
+console.log(i);
+// expected: 0",0
+28,"const day = 'Tue';
+switch (day) {
+  case 'Tue':
+    console.log('work');
+  case 'Sat':
+    console.log('rest');
+}
+// expected: work","const day = 'Tue';
+switch (day) {
+  case 'Tue':
+    console.log('work');
+    break;
+  case 'Sat':
+    console.log('rest');
+    break;
+}
+// expected: work",work
+29,"const n = -3;
+console.log(n % 5);
+// expected: 2","const n = -3;
+console.log(((n % 5) + 5) % 5);
+// expected: 2",2
+30,"function fib(n) {
+  if (n <= 1) return 1;
+  return fib(n - 1) + fib(n - 2);
+}
+console.log(fib(5));
+// expected: 5","function fib(n) {
+  if (n <= 1) return n;
+  return fib(n - 1) + fib(n - 2);
+}
+console.log(fib(5));
+// expected: 5",5
+31,"const person = { firstName: 'Ira' };
+const { fistName } = person;
+console.log(fistName);
+// expected: Ira","const person = { firstName: 'Ira' };
+const { firstName } = person;
+console.log(firstName);
+// expected: Ira",Ira
+32,"const nums = [1, 1, 2, 3, 3];
+const unique = nums.filter((n, i) => nums.indexOf(n) >= 0);
+console.log(unique.join(','));
+// expected: 1,2,3","const nums = [1, 1, 2, 3, 3];
+const unique = [...new Set(nums)];
+console.log(unique.join(','));
+// expected: 1,2,3","1,2,3"
+33,"const re = /a/g;
+console.log(re.test('a'));
+console.log(re.test('a'));
+// expected: true
+true","const re = /a/g;
+re.lastIndex = 0;
+console.log(re.test('a'));
+re.lastIndex = 0;
+console.log(re.test('a'));
+// expected: true
+true","true
+true"
+34,"const text = 'ha ha ha';
+console.log(text.replace('ha', 'ho'));
+// expected: ho ho ho","const text = 'ha ha ha';
+console.log(text.replace(/ha/g, 'ho'));
+// expected: ho ho ho",ho ho ho
+35,"const csv = 'a, b, c';
+console.log(csv.split(',').join('|'));
+// expected: a|b|c","const csv = 'a, b, c';
+console.log(csv.split(',').map((s) => s.trim()).join('|'));
+// expected: a|b|c",a|b|c
+36,"console.log('2' > '10');
+// expected: false","console.log(Number('2') > Number('10'));
+// expected: false",false
+37,"const min = 1;
+const max = 3;
+const r = Math.floor(Math.random() * (max - min)) + min;
+console.log(r >= 1 && r <= 3);
+// expected: true","const min = 1;
+const max = 3;
+const r = Math.floor(Math.random() * (max - min + 1)) + min;
+console.log(r >= 1 && r <= 3);
+// expected: true",true
+38,"const n = 2.1;
+console.log(Math.ceil(n));
+// expected: 2","const n = 2.1;
+console.log(Math.floor(n));
+// expected: 2",2
+39,"function getValue() {
+  return Promise.resolve(7);
+}
+console.log(getValue());
+// expected: 7","async function getValue() {
+  return Promise.resolve(7);
+}
+(async () => {
+  console.log(await getValue());
+})();
+// expected: 7",7
+40,"const count = 0;
+console.log(count || 10);
+// expected: 0","const count = 0;
+console.log(count ?? 10);
+// expected: 0",0
+41,"const arr = ['1', '2', '3'];
+console.log(arr.map(parseInt).join(','));
+// expected: 1,2,3","const arr = ['1', '2', '3'];
+console.log(arr.map((x) => parseInt(x, 10)).join(','));
+// expected: 1,2,3","1,2,3"
+42,"const a = { x: 1 };
+const b = { x: 1 };
+console.log(a === b);
+// expected: true","const a = { x: 1 };
+const b = { x: 1 };
+console.log(JSON.stringify(a) === JSON.stringify(b));
+// expected: true",true
+43,"const arr = [1, 2, 3];
+delete arr[1];
+console.log(arr.length);
+// expected: 2","const arr = [1, 2, 3];
+arr.splice(1, 1);
+console.log(arr.length);
+// expected: 2",2
+44,"const arr = [10, 20, 30];
+let out = '';
+for (const v in arr) {
+  out += v;
+}
+console.log(out);
+// expected: 102030","const arr = [10, 20, 30];
+let out = '';
+for (const v of arr) {
+  out += v;
+}
+console.log(out);
+// expected: 102030",102030
+45,"function parseSafe(x) {
+  try {
+    return JSON.parse(x);
+  } catch (e) {
+    return {};
+  }
+}
+console.log(parseSafe('bad').ok);
+// expected: false","function parseSafe(x) {
+  try {
+    return JSON.parse(x);
+  } catch (e) {
+    return { ok: false };
+  }
+}
+console.log(parseSafe('bad').ok);
+// expected: false",false
+46,"const a = true;
+const b = false;
+console.log(a & b);
+// expected: false","const a = true;
+const b = false;
+console.log(a && b);
+// expected: false",false
+47,"console.log(2 ^ 3);
+// expected: 8","console.log(2 ** 3);
+// expected: 8",8
+48,"const s = 'bug';
+console.log(s.charAt(s.length));
+// expected: g","const s = 'bug';
+console.log(s.charAt(s.length - 1));
+// expected: g",g
+49,"const original = { nested: { v: 1 } };
+const copy = { ...original };
+copy.nested.v = 9;
+console.log(original.nested.v);
+// expected: 1","const original = { nested: { v: 1 } };
+const copy = { nested: { ...original.nested } };
+copy.nested.v = 9;
+console.log(original.nested.v);
+// expected: 1",1
+50,"const date = new Date('2024-02-29');
+console.log(date.getDay() === 4);
+// expected: true","const date = new Date(Date.UTC(2024, 1, 29));
+console.log(date.getUTCDay() === 4);
+// expected: true",true

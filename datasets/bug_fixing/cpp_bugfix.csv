@@ -1,0 +1,631 @@
+id,buggy_code,fixed_code,expected_output
+1,"#include <iostream>
+int main() {
+  int x = 5
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 5;
+  std::cout << x << std::endl;
+  return 0;
+}",5
+2,"#include <iostream>
+int main() {
+  for (int i = 0; i < 3; i++)
+    std::cout << i << std::endl
+  return 0;
+}","#include <iostream>
+int main() {
+  for (int i = 0; i < 3; i++)
+    std::cout << i << std::endl;
+  return 0;
+}","0
+1
+2"
+3,"#include <iostream>
+int main() {
+  if (5 > 3)
+    std::cout << ""yes"" << std::endl
+  return 0;
+}","#include <iostream>
+int main() {
+  if (5 > 3)
+    std::cout << ""yes"" << std::endl;
+  return 0;
+}",yes
+4,"#include <iostream>
+int main() {
+  int x = 5;
+  if (x = 3) std::cout << ""assigned"" << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 5;
+  if (x == 3) std::cout << ""equal"" << std::endl;
+  else std::cout << ""not equal"" << std::endl;
+  return 0;
+}",not equal
+5,"#include <iostream>
+int main() {
+  double x = 0.1 + 0.2;
+  if (x == 0.3) std::cout << ""equal"" << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  double x = 0.1 + 0.2;
+  if (x > 0.29 && x < 0.31) std::cout << ""equal"" << std::endl;
+  return 0;
+}",equal
+6,"#include <iostream>
+int main() {
+  for (int i = 1; i <= 3; i++)
+    std::cout << i << "" "";
+  return 0;
+}","#include <iostream>
+int main() {
+  for (int i = 1; i <= 3; i++)
+    std::cout << i << "" "";
+  std::cout << std::endl;
+  return 0;
+}",1 2 3
+7,"#include <iostream>
+int main() {
+  int sum = 0;
+  for (int i = 0; i < 4; i++)
+    sum += i;
+  std::cout << sum << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int sum = 0;
+  for (int i = 0; i < 4; i++)
+    sum += i;
+  std::cout << sum << std::endl;
+  return 0;
+}",6
+8,"#include <iostream>
+int main() {
+  int arr[3] = {10, 20, 30};
+  std::cout << arr[3] << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int arr[3] = {10, 20, 30};
+  std::cout << arr[2] << std::endl;
+  return 0;
+}",30
+9,"#include <iostream>
+int main() {
+  for (int i = 0; i < 3; i++);
+    std::cout << i << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  for (int i = 0; i < 3; i++)
+    std::cout << i << std::endl;
+  return 0;
+}","0
+1
+2"
+10,"#include <iostream>
+int main() {
+  int x = 5;
+  if (x > 3 & x < 10) std::cout << ""yes"" << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 5;
+  if (x > 3 && x < 10) std::cout << ""yes"" << std::endl;
+  return 0;
+}",yes
+11,"#include <iostream>
+int main() {
+  if (true | false) std::cout << ""yes"" << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  if (true || false) std::cout << ""yes"" << std::endl;
+  return 0;
+}",yes
+12,"#include <iostream>
+int main() {
+  {
+    int x = 5;
+  }
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x;
+  {
+    x = 5;
+  }
+  std::cout << x << std::endl;
+  return 0;
+}",5
+13,"#include <iostream>
+int main() {
+  int x = 5;
+  std::cout << x++ << std::endl;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 5;
+  std::cout << x << std::endl;
+  x++;
+  std::cout << x << std::endl;
+  return 0;
+}","5
+6"
+14,"#include <iostream>
+#include <string>
+int main() {
+  std::string s = ""hello"";
+  std::cout << s[10] << std::endl;
+  return 0;
+}","#include <iostream>
+#include <string>
+int main() {
+  std::string s = ""hello"";
+  if (s.length() > 0) std::cout << s[0] << std::endl;
+  return 0;
+}",h
+15,"#include <iostream>
+#include <string>
+int main() {
+  std::string a = ""abc"";
+  std::string b = ""abc"";
+  if (a = b) std::cout << ""equal"" << std::endl;
+  return 0;
+}","#include <iostream>
+#include <string>
+int main() {
+  std::string a = ""abc"";
+  std::string b = ""abc"";
+  if (a == b) std::cout << ""equal"" << std::endl;
+  return 0;
+}",equal
+16,"#include <iostream>
+int main() {
+  int x = 2 + 3 * 4;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 2 + 3 * 4;
+  std::cout << x << std::endl;
+  return 0;
+}",14
+17,"#include <iostream>
+int main() {
+  int x = 10 / 3;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 10 / 3;
+  std::cout << x << std::endl;
+  return 0;
+}",3
+18,"#include <iostream>
+int main() {
+  int x;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 0;
+  std::cout << x << std::endl;
+  return 0;
+}",0
+19,"#include <iostream>
+int main() {
+  int x = -5;
+  int y = x * -1;
+  std::cout << y << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = -5;
+  int y = x * -1;
+  std::cout << y << std::endl;
+  return 0;
+}",5
+20,"#include <iostream>
+int main() {
+  bool x = !true;
+  std::cout << (x ? ""true"" : ""false"") << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  bool x = !true;
+  std::cout << (x ? ""true"" : ""false"") << std::endl;
+  return 0;
+}",false
+21,"#include <iostream>
+int main() {
+  int x = -7 % 3;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = -7 % 3;
+  std::cout << x << std::endl;
+  return 0;
+}",-1
+22,"#include <iostream>
+int main() {
+  int x = 5;
+  int* p = &x;
+  std::cout << p << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 5;
+  int* p = &x;
+  std::cout << *p << std::endl;
+  return 0;
+}",5
+23,"#include <iostream>
+int main() {
+  int arr[] = {1, 2, 3, 4};
+  std::cout << (sizeof(arr) / sizeof(arr[0])) << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int arr[] = {1, 2, 3, 4};
+  std::cout << (sizeof(arr) / sizeof(arr[0])) << std::endl;
+  return 0;
+}",4
+24,"#include <iostream>
+int main() {
+  int x = 0;
+  while (x < 0) std::cout << x;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 0;
+  do { std::cout << x; } while (x < 0);
+  return 0;
+}",0
+25,"#include <iostream>
+int main() {
+  int x = 5;
+  int y = x > 3 ? 10 : 20;
+  std::cout << y << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 5;
+  int y = x > 3 ? 10 : 20;
+  std::cout << y << std::endl;
+  return 0;
+}",10
+26,"#include <iostream>
+int main() {
+  int x = 0, y = 0;
+  for (int i = 0; i < 3; i++) {
+    x += i;
+    y += i * 2;
+  }
+  std::cout << x << "","" << y << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 0, y = 0;
+  for (int i = 0; i < 3; i++) {
+    x += i;
+    y += i * 2;
+  }
+  std::cout << x << "","" << y << std::endl;
+  return 0;
+}","3,6"
+27,"#include <iostream>
+int main() {
+  for (int i = 0; i < 5; i++) {
+    if (i == 2) break;
+    std::cout << i;
+  }
+  return 0;
+}","#include <iostream>
+int main() {
+  for (int i = 0; i < 5; i++) {
+    if (i == 2) continue;
+    std::cout << i;
+  }
+  return 0;
+}",0134
+28,"#include <iostream>
+int main() {
+  for (int i = 0; i < 2; i++)
+    for (int j = 0; j < 2; j++)
+      std::cout << i << j;
+  return 0;
+}","#include <iostream>
+int main() {
+  for (int i = 0; i < 2; i++)
+    for (int j = 0; j < 2; j++)
+      std::cout << i << j;
+  std::cout << std::endl;
+  return 0;
+}",00011011
+29,"#include <iostream>
+#include <cmath>
+int main() {
+  std::cout << sqrt(16) << std::endl;
+  return 0;
+}","#include <iostream>
+#include <cmath>
+int main() {
+  std::cout << sqrt(16) << std::endl;
+  return 0;
+}",4
+30,"#include <iostream>
+int main() {
+  int x = 5 / 2;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  double x = 5.0 / 2.0;
+  std::cout << x << std::endl;
+  return 0;
+}",2.5
+31,"#include <iostream>
+int main() {
+  int a = 5, b = 3;
+  int m = a < b ? a : b;
+  std::cout << m << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int a = 5, b = 3;
+  int m = a < b ? a : b;
+  std::cout << m << std::endl;
+  return 0;
+}",3
+32,"#include <iostream>
+int main() {
+  int x = 1;
+  switch (x) {
+    case 1: std::cout << ""one"";
+    case 2: std::cout << ""two"";
+  }
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 1;
+  switch (x) {
+    case 1: std::cout << ""one""; break;
+    case 2: std::cout << ""two""; break;
+  }
+  return 0;
+}",one
+33,"#include <iostream>
+int main() {
+  int x = 5;
+  switch (x) {
+    case 1: std::cout << ""one""; break;
+    default: std::cout << ""other""; break;
+  }
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 5;
+  switch (x) {
+    case 1: std::cout << ""one""; break;
+    default: std::cout << ""other""; break;
+  }
+  return 0;
+}",other
+34,"#include <iostream>
+int main() {
+  int x = 5 & 3;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 5 & 3;
+  std::cout << x << std::endl;
+  return 0;
+}",1
+35,"#include <iostream>
+int main() {
+  int x = 5 ^ 3;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 5 ^ 3;
+  std::cout << x << std::endl;
+  return 0;
+}",6
+36,"#include <iostream>
+int main() {
+  int x = 4 << 2;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 4 << 2;
+  std::cout << x << std::endl;
+  return 0;
+}",16
+37,"#include <iostream>
+int main() {
+  int x = 16 >> 2;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 16 >> 2;
+  std::cout << x << std::endl;
+  return 0;
+}",4
+38,"#include <iostream>
+int main() {
+  unsigned int x = -5;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  unsigned int x = 5;
+  std::cout << x << std::endl;
+  return 0;
+}",5
+39,"#include <iostream>
+int main() {
+  double x = 5.7;
+  int y = (int)x;
+  std::cout << y << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  double x = 5.7;
+  int y = (int)x;
+  std::cout << y << std::endl;
+  return 0;
+}",5
+40,"#include <iostream>
+int main() {
+  const int x = 5;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  const int x = 5;
+  std::cout << x << std::endl;
+  return 0;
+}",5
+41,"#include <iostream>
+int main() {
+  int arr[5] = {1, 2};
+  std::cout << arr[2] << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int arr[5] = {1, 2};
+  std::cout << arr[2] << std::endl;
+  return 0;
+}",0
+42,"#include <iostream>
+int main() {
+  char c = 'A';
+  std::cout << (int)c << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  char c = 'A';
+  std::cout << (int)c << std::endl;
+  return 0;
+}",65
+43,"#include <iostream>
+#include <string>
+int main() {
+  std::string s = ""abc"";
+  std::cout << s.at(5) << std::endl;
+  return 0;
+}","#include <iostream>
+#include <string>
+int main() {
+  std::string s = ""abc"";
+  if (s.length() > 2) std::cout << s.at(2) << std::endl;
+  return 0;
+}",c
+44,"#include <iostream>
+int max(int a, int b) {
+  if (a > b) return a;
+}
+int main() {
+  std::cout << max(5, 3) << std::endl;
+  return 0;
+}","#include <iostream>
+int max(int a, int b) {
+  if (a > b) return a;
+  else return b;
+}
+int main() {
+  std::cout << max(5, 3) << std::endl;
+  return 0;
+}",5
+45,"#include <iostream>
+int main() {
+  int x = 5;
+  int y = ++x;
+  std::cout << x << "" "" << y << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 5;
+  int y = ++x;
+  std::cout << x << "" "" << y << std::endl;
+  return 0;
+}",6 6
+46,"#include <iostream>
+int main() {
+  char a = 'A';
+  char b = a + 1;
+  std::cout << (int)b << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  char a = 'A';
+  char b = a + 1;
+  std::cout << (int)b << std::endl;
+  return 0;
+}",66
+47,"#include <iostream>
+int main() {
+  int* p = nullptr;
+  if (p != nullptr) std::cout << *p << std::endl;
+  else std::cout << ""null"" << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int* p = nullptr;
+  if (p != nullptr) std::cout << *p << std::endl;
+  else std::cout << ""null"" << std::endl;
+  return 0;
+}",null
+48,"#include <iostream>
+int main() {
+  int x = 5;
+  x = x++ + ++x;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 5;
+  int temp = x;
+  x++;
+  ++x;
+  x = temp + x;
+  std::cout << x << std::endl;
+  return 0;
+}",12
+49,"#include <iostream>
+int main() {
+  int x = 1, y = 2, z = 3;
+  x = y = z;
+  std::cout << x << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 1, y = 2, z = 3;
+  x = y = z;
+  std::cout << x << std::endl;
+  return 0;
+}",3
+50,"#include <iostream>
+int main() {
+  int x = 5;
+  if (x > 3 && x < 10 || x == 0) std::cout << ""yes"" << std::endl;
+  return 0;
+}","#include <iostream>
+int main() {
+  int x = 5;
+  if ((x > 3 && x < 10) || x == 0) std::cout << ""yes"" << std::endl;
+  return 0;
+}",yes
