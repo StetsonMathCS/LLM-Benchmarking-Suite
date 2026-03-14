@@ -1,0 +1,266 @@
+id,code_snippet,code_output
+1,"#include <iostream>
+int add(int a, int b) { return a + b; }
+int main() { std::cout << add(3, 5) << std::endl; }",8
+2,"#include <iostream>
+#include <vector>
+int main() {
+    std::vector<int> squares;
+    for (int i = 1; i <= 5; i++) squares.push_back(i * i);
+    std::cout << ""["";
+    for (int i = 0; i < (int)squares.size(); i++) std::cout << (i?"", "":"""") << squares[i];
+    std::cout << ""]"" << std::endl;
+}","[1, 4, 9, 16, 25]"
+3,"#include <iostream>
+#include <string>
+int main() {
+    std::string name = ""Alice"";
+    int age = 30;
+    std::cout << name << std::endl;
+}",Alice
+4,"#include <iostream>
+int main() { for (int i = 0; i < 5; i++) std::cout << i << ""\n""; }","0
+1
+2
+3
+4"
+5,"#include <iostream>
+int factorial(int n) { return n == 0 ? 1 : n * factorial(n - 1); }
+int main() { std::cout << factorial(5) << std::endl; }",120
+6,"#include <iostream>
+#include <vector>
+#include <algorithm>
+int main() {
+    std::vector<int> nums = {3, 1, 4, 1, 5, 9};
+    std::sort(nums.begin(), nums.end());
+    std::cout << ""["";
+    for (int i = 0; i < (int)nums.size(); i++) std::cout << (i?"", "":"""") << nums[i];
+    std::cout << ""]"" << std::endl;
+}","[1, 1, 3, 4, 5, 9]"
+7,"#include <iostream>
+#include <string>
+#include <algorithm>
+int main() {
+    std::string text = ""hello world"";
+    std::transform(text.begin(), text.end(), text.begin(), ::toupper);
+    std::cout << text << std::endl;
+}",HELLO WORLD
+8,"#include <iostream>
+#include <vector>
+int main() {
+    std::vector<int> evens;
+    for (int i = 0; i < 10; i++) if (i % 2 == 0) evens.push_back(i);
+    std::cout << ""["";
+    for (int i = 0; i < (int)evens.size(); i++) std::cout << (i?"", "":"""") << evens[i];
+    std::cout << ""]"" << std::endl;
+}","[0, 2, 4, 6, 8]"
+9,"#include <iostream>
+#include <string>
+class Dog {
+    std::string name;
+public:
+    Dog(std::string n) : name(n) {}
+    std::string bark() { return name + "" says woof!""; }
+};
+int main() {
+    Dog d(""Rex"");
+    std::cout << d.bark() << std::endl;
+}",Rex says woof!
+10,"#include <iostream>
+#include <cmath>
+int main() { std::cout << std::sqrt(144.0) << std::endl; }",12
+11,"#include <iostream>
+#include <vector>
+#include <string>
+int main() {
+    std::vector<std::string> words = {""apple"", ""banana"", ""cherry""};
+    for (int i = 0; i < (int)words.size(); i++) std::cout << (i?"", "":"""") << words[i];
+    std::cout << std::endl;
+}","apple, banana, cherry"
+12,"#include <iostream>
+#include <map>
+#include <string>
+int main() {
+    std::map<std::string,int> d = {{""a"",1},{""b"",2},{""c"",3}};
+    for (auto& p : d) std::cout << p.first << "" "" << p.second << ""\n"";
+}","a 1
+b 2
+c 3"
+13,"#include <iostream>
+#include <stack>
+int main() {
+    std::stack<int> s;
+    s.push(1); s.push(2); s.push(3);
+    std::cout << s.top() << std::endl;
+    s.pop();
+}",3
+14,"#include <iostream>
+#include <string>
+#include <algorithm>
+bool isPalindrome(std::string s) {
+    std::string r = s;
+    std::reverse(r.begin(), r.end());
+    return s == r;
+}
+int main() { std::cout << std::boolalpha << isPalindrome(""racecar"") << std::endl; }",true
+15,"#include <iostream>
+int main() {
+    int x = 10;
+    std::cout << (x % 2 == 0 ? ""even"" : ""odd"") << std::endl;
+}",even
+16,"#include <iostream>
+#include <vector>
+#include <numeric>
+int main() {
+    std::vector<int> nums = {1, 2, 3, 4, 5};
+    int total = std::accumulate(nums.begin(), nums.end(), 0);
+    std::cout << total << std::endl;
+}",15
+17,"#include <iostream>
+#include <string>
+void greet(std::string name = ""World"") {
+    std::cout << ""Hello, "" << name << ""!"" << std::endl;
+}
+int main() { greet(); greet(""Alice""); }","Hello, World!
+Hello, Alice!"
+18,"#include <iostream>
+#include <vector>
+int main() {
+    std::vector<std::vector<int>> matrix = {{1,2},{3,4},{5,6}};
+    std::vector<int> flat;
+    for (auto& row : matrix) for (int x : row) flat.push_back(x);
+    std::cout << ""["";
+    for (int i = 0; i < (int)flat.size(); i++) std::cout << (i?"", "":"""") << flat[i];
+    std::cout << ""]"" << std::endl;
+}","[1, 2, 3, 4, 5, 6]"
+19,"#include <iostream>
+#include <vector>
+#include <set>
+int main() {
+    std::vector<int> items = {1, 2, 2, 3, 3, 4};
+    std::set<int> seen;
+    std::vector<int> unique_items;
+    for (int x : items) if (seen.insert(x).second) unique_items.push_back(x);
+    std::cout << ""["";
+    for (int i = 0; i < (int)unique_items.size(); i++) std::cout << (i?"", "":"""") << unique_items[i];
+    std::cout << ""]"" << std::endl;
+}","[1, 2, 3, 4]"
+20,"#include <iostream>
+#include <stdexcept>
+int main() {
+    try {
+        throw std::runtime_error(""Cannot divide by zero"");
+    } catch (const std::exception& e) {
+        std::cout << e.what() << std::endl;
+    }
+}",Cannot divide by zero
+21,"#include <iostream>
+#include <vector>
+int main() {
+    std::vector<int> fibs;
+    int a = 0, b = 1;
+    for (int i = 0; i < 8; i++) { fibs.push_back(a); int t = a+b; a=b; b=t; }
+    std::cout << ""["";
+    for (int i = 0; i < (int)fibs.size(); i++) std::cout << (i?"", "":"""") << fibs[i];
+    std::cout << ""]"" << std::endl;
+}","[0, 1, 1, 2, 3, 5, 8, 13]"
+22,"#include <iostream>
+#include <map>
+#include <vector>
+#include <string>
+int main() {
+    std::vector<std::string> words = {""cat"",""dog"",""cat"",""bird"",""dog"",""cat""};
+    std::map<std::string,int> counts;
+    for (auto& w : words) counts[w]++;
+    std::cout << ""{"";
+    bool first = true;
+    for (auto& p : counts) { std::cout << (first?"""":"", "") << p.first << "": "" << p.second; first=false; }
+    std::cout << ""}"" << std::endl;
+}","{bird: 1, cat: 3, dog: 2}"
+23,"#include <iostream>
+#include <vector>
+#include <algorithm>
+int main() {
+    std::vector<int> nums = {5, 3, 8, 1, 9, 2};
+    std::cout << *std::max_element(nums.begin(), nums.end()) << ""\n"";
+    std::cout << *std::min_element(nums.begin(), nums.end()) << ""\n"";
+}","9
+1"
+24,"#include <iostream>
+#include <functional>
+std::function<int()> makeCounter() {
+    int count = 0;
+    return [count]() mutable { return ++count; };
+}
+int main() {
+    auto counter = makeCounter();
+    std::cout << counter() << ""\n"";
+    std::cout << counter() << ""\n"";
+}","1
+2"
+25,"#include <iostream>
+#include <vector>
+#include <tuple>
+#include <string>
+int main() {
+    std::vector<std::tuple<int,std::string>> pairs = {{1,""a""},{2,""b""},{3,""c""}};
+    std::cout << ""["";
+    for (int i = 0; i < (int)pairs.size(); i++) {
+        std::cout << (i?"", "":"""") << ""("" << std::get<0>(pairs[i]) << "", "" << std::get<1>(pairs[i]) << "")"";
+    }
+    std::cout << ""]"" << std::endl;
+}","[(1, a), (2, b), (3, c)]"
+26,"#include <iostream>
+int main() {
+    std::cout << ""{\""key\"": \""value\"", \""num\"": 42}"" << std::endl;
+}","{""key"": ""value"", ""num"": 42}"
+27,"#include <iostream>
+#include <vector>
+void bubbleSort(std::vector<int>& arr) {
+    int n = arr.size();
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n-i-1; j++)
+            if (arr[j] > arr[j+1]) std::swap(arr[j], arr[j+1]);
+}
+int main() {
+    std::vector<int> arr = {64, 34, 25, 12};
+    bubbleSort(arr);
+    std::cout << ""["";
+    for (int i = 0; i < (int)arr.size(); i++) std::cout << (i?"", "":"""") << arr[i];
+    std::cout << ""]"" << std::endl;
+}","[12, 25, 34, 64]"
+28,"#include <iostream>
+#include <vector>
+#include <string>
+void greetAll(std::vector<std::string> names) {
+    for (auto& name : names) std::cout << ""Hi, "" << name << ""!\n"";
+}
+int main() { greetAll({""Alice"", ""Bob"", ""Charlie""}); }","Hi, Alice!
+Hi, Bob!
+Hi, Charlie!"
+29,"#include <iostream>
+#include <string>
+class Animal {
+public:
+    std::string name;
+    Animal(std::string n) : name(n) {}
+    virtual std::string speak() = 0;
+};
+class Cat : public Animal {
+public:
+    Cat(std::string n) : Animal(n) {}
+    std::string speak() override { return name + "" says meow""; }
+};
+int main() {
+    Cat c(""Whiskers"");
+    std::cout << c.speak() << std::endl;
+}",Whiskers says meow
+30,"#include <iostream>
+#include <vector>
+#include <numeric>
+#include <functional>
+int main() {
+    std::vector<int> nums = {1, 2, 3, 4, 5};
+    int product = std::accumulate(nums.begin(), nums.end(), 1, std::multiplies<int>());
+    std::cout << product << std::endl;
+}",120

@@ -1,0 +1,996 @@
+id,original_code,refactoring_task,output_expected
+1,"function getUser(userId) {
+  return new Promise((resolve, reject) => {
+    fetch('/api/users/' + userId)
+      .then(function(res) {
+        res.json().then(function(data) {
+          resolve(data);
+        }).catch(function(err) { reject(err); });
+      })
+      .catch(function(err) { reject(err); });
+  });
+}
+
+function getUserOrders(userId) {
+  return new Promise((resolve, reject) => {
+    fetch('/api/orders?user=' + userId)
+      .then(function(res) {
+        res.json().then(function(data) {
+          resolve(data);
+        }).catch(function(err) { reject(err); });
+      })
+      .catch(function(err) { reject(err); });
+  });
+}",Replace Promise constructor anti-pattern and callback-style .then chains with async/await and extract a shared apiFetch(url) helper,"async function apiFetch(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${url}`);
+  return res.json();
+}
+
+async function getUser(userId) {
+  return apiFetch(`/api/users/${userId}`);
+}
+
+async function getUserOrders(userId) {
+  return apiFetch(`/api/orders?user=${userId}`);
+}"
+2,"class Store {
+  constructor() {
+    this.state = { count: 0, user: null, loading: false };
+    this.listeners = [];
+  }
+  getState() { return this.state; }
+  setState(newState) {
+    this.state = Object.assign({}, this.state, newState);
+    this.listeners.forEach(fn => fn(this.state));
+  }
+  subscribe(fn) { this.listeners.push(fn); }
+  unsubscribe(fn) { this.listeners = this.listeners.filter(l => l !== fn); }
+  increment() { this.setState({ count: this.state.count + 1 }); }
+  decrement() { this.setState({ count: this.state.count - 1 }); }
+  setUser(user) { this.setState({ user }); }
+  setLoading(loading) { this.setState({ loading }); }
+}","Refactor Store to use a reducer pattern with an explicit dispatch(action) method and action type constants, keeping subscribe/unsubscribe","const Actions = Object.freeze({
+  INCREMENT:   'INCREMENT',
+  DECREMENT:   'DECREMENT',
+  SET_USER:    'SET_USER',
+  SET_LOADING: 'SET_LOADING',
+});
+
+function reducer(state, action) {
+  switch (action.type) {
+    case Actions.INCREMENT:   return { ...state, count: state.count + 1 };
+    case Actions.DECREMENT:   return { ...state, count: state.count - 1 };
+    case Actions.SET_USER:    return { ...state, user: action.payload };
+    case Actions.SET_LOADING: return { ...state, loading: action.payload };
+    default: return state;
+  }
+}
+
+class Store {
+  #state;
+  #listeners = new Set();
+
+  constructor(initialState = { count: 0, user: null, loading: false }) {
+    this.#state = initialState;
+  }
+
+  getState() { return this.#state; }
+
+  dispatch(action) {
+    this.#state = reducer(this.#state, action);
+    this.#listeners.forEach(fn => fn(this.#state));
+  }
+
+  subscribe(fn)   { this.#listeners.add(fn); return () => this.#listeners.delete(fn); }
+  unsubscribe(fn) { this.#listeners.delete(fn); }
+}"
+3,"var userData = {};
+var orderData = {};
+var productData = {};
+
+function loadUser(id) {
+  if (userData[id]) return userData[id];
+  var user = fetchFromDB('users', id);
+  userData[id] = user;
+  return user;
+}
+
+function loadOrder(id) {
+  if (orderData[id]) return orderData[id];
+  var order = fetchFromDB('orders', id);
+  orderData[id] = order;
+  return order;
+}
+
+function loadProduct(id) {
+  if (productData[id]) return productData[id];
+  var product = fetchFromDB('products', id);
+  productData[id] = product;
+  return product;
+}",Extract the duplicated manual cache pattern into a generic createCachedLoader(table) factory function and replace all three loaders,"function createCachedLoader(table) {
+  const cache = new Map();
+  return function load(id) {
+    if (cache.has(id)) return cache.get(id);
+    const record = fetchFromDB(table, id);
+    cache.set(id, record);
+    return record;
+  };
+}
+
+const loadUser    = createCachedLoader('users');
+const loadOrder   = createCachedLoader('orders');
+const loadProduct = createCachedLoader('products');"
+4,"function processUsers(users) {
+  var result = [];
+  for (var i = 0; i < users.length; i++) {
+    if (users[i].active === true) {
+      var orders = [];
+      for (var j = 0; j < users[i].orders.length; j++) {
+        if (users[i].orders[j].value > 100) {
+          orders.push({
+            id: users[i].orders[j].id,
+            value: users[i].orders[j].value
+          });
+        }
+      }
+      if (orders.length > 0) {
+        result.push({
+          userId: users[i].id,
+          name: users[i].name,
+          orders: orders
+        });
+      }
+    }
+  }
+  return result;
+}","Replace var, nested for-loops, and manual push with const/let, chained array methods (filter, map), and destructuring","function processUsers(users) {
+  return users
+    .filter(({ active }) => active)
+    .map(({ id: userId, name, orders }) => ({
+      userId,
+      name,
+      orders: orders
+        .filter(({ value }) => value > 100)
+        .map(({ id, value }) => ({ id, value })),
+    }))
+    .filter(({ orders }) => orders.length > 0);
+}"
+5,"class ApiClient {
+  constructor(baseUrl) {
+    this.baseUrl = baseUrl;
+    this.token = null;
+  }
+  setToken(token) { this.token = token; }
+  request(method, path, body) {
+    var headers = { 'Content-Type': 'application/json' };
+    if (this.token) headers['Authorization'] = 'Bearer ' + this.token;
+    var opts = { method: method, headers: headers };
+    if (body) opts.body = JSON.stringify(body);
+    return fetch(this.baseUrl + path, opts)
+      .then(res => {
+        if (res.status === 401) throw new Error('Unauthorized');
+        if (res.status === 404) throw new Error('Not found');
+        if (!res.ok) throw new Error('Request failed: ' + res.status);
+        return res.json();
+      });
+  }
+  get(path)        { return this.request('GET', path); }
+  post(path, body) { return this.request('POST', path, body); }
+  put(path, body)  { return this.request('PUT', path, body); }
+  delete(path)     { return this.request('DELETE', path); }
+}","Convert ApiClient to use async/await, replace string error messages with typed ApiError subclasses, and add retry(n) logic to request()","class ApiError extends Error {
+  constructor(message, status) {
+    super(message); this.name = 'ApiError'; this.status = status;
+  }
+}
+class UnauthorizedError extends ApiError {
+  constructor() { super('Unauthorized', 401); this.name = 'UnauthorizedError'; }
+}
+class NotFoundError extends ApiError {
+  constructor() { super('Not found', 404); this.name = 'NotFoundError'; }
+}
+
+class ApiClient {
+  #baseUrl; #token = null;
+  constructor(baseUrl) { this.#baseUrl = baseUrl; }
+  setToken(token) { this.#token = token; }
+
+  async request(method, path, body = null, retries = 3) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (this.#token) headers['Authorization'] = `Bearer ${this.#token}`;
+    const opts = { method, headers, ...(body && { body: JSON.stringify(body) }) };
+    let lastErr;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const res = await fetch(this.#baseUrl + path, opts);
+        if (res.status === 401) throw new UnauthorizedError();
+        if (res.status === 404) throw new NotFoundError();
+        if (!res.ok) throw new ApiError('Request failed', res.status);
+        return await res.json();
+      } catch (err) {
+        if (err instanceof ApiError) throw err;
+        lastErr = err;
+        if (attempt < retries) await new Promise(r => setTimeout(r, 2 ** attempt * 100));
+      }
+    }
+    throw lastErr;
+  }
+
+  get(path)        { return this.request('GET', path); }
+  post(path, body) { return this.request('POST', path, body); }
+  put(path, body)  { return this.request('PUT', path, body); }
+  delete(path)     { return this.request('DELETE', path); }
+}"
+6,"function validateForm(data) {
+  var errors = {};
+  if (!data.username) {
+    errors.username = 'Username is required';
+  } else if (data.username.length < 3) {
+    errors.username = 'Username must be at least 3 characters';
+  } else if (data.username.length > 20) {
+    errors.username = 'Username must be at most 20 characters';
+  } else if (!/^[a-z0-9_]+$/i.test(data.username)) {
+    errors.username = 'Username may only contain letters, numbers, underscores';
+  }
+  if (!data.email) {
+    errors.email = 'Email is required';
+  } else if (!data.email.includes('@')) {
+    errors.email = 'Invalid email address';
+  }
+  if (!data.password) {
+    errors.password = 'Password is required';
+  } else if (data.password.length < 8) {
+    errors.password = 'Password must be at least 8 characters';
+  } else if (!/[A-Z]/.test(data.password)) {
+    errors.password = 'Password must contain an uppercase letter';
+  } else if (!/[0-9]/.test(data.password)) {
+    errors.password = 'Password must contain a number';
+  }
+  return errors;
+}","Refactor into a schema-driven validator where each field has an array of { test, message } rule objects, executed by a generic validate(schema, data) function","const formSchema = {
+  username: [
+    { test: v => Boolean(v),              message: 'Username is required' },
+    { test: v => v.length >= 3,           message: 'Username must be at least 3 characters' },
+    { test: v => v.length <= 20,          message: 'Username must be at most 20 characters' },
+    { test: v => /^[a-z0-9_]+$/i.test(v), message: 'Username may only contain letters, numbers, underscores' },
+  ],
+  email: [
+    { test: v => Boolean(v),              message: 'Email is required' },
+    { test: v => v.includes('@'),         message: 'Invalid email address' },
+  ],
+  password: [
+    { test: v => Boolean(v),              message: 'Password is required' },
+    { test: v => v.length >= 8,           message: 'Password must be at least 8 characters' },
+    { test: v => /[A-Z]/.test(v),         message: 'Password must contain an uppercase letter' },
+    { test: v => /[0-9]/.test(v),         message: 'Password must contain a number' },
+  ],
+};
+
+function validate(schema, data) {
+  const errors = {};
+  for (const [field, rules] of Object.entries(schema)) {
+    const value = data[field] ?? '';
+    const failed = rules.find(({ test }) => !test(value));
+    if (failed) errors[field] = failed.message;
+  }
+  return errors;
+}
+
+function validateForm(data) {
+  return validate(formSchema, data);
+}"
+7,"function EventEmitter() {
+  this._events = {};
+}
+EventEmitter.prototype.on = function(event, listener) {
+  if (!this._events[event]) this._events[event] = [];
+  this._events[event].push(listener);
+};
+EventEmitter.prototype.off = function(event, listener) {
+  if (!this._events[event]) return;
+  this._events[event] = this._events[event].filter(l => l !== listener);
+};
+EventEmitter.prototype.emit = function(event) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  if (!this._events[event]) return;
+  this._events[event].forEach(function(listener) { listener.apply(null, args); });
+};
+EventEmitter.prototype.once = function(event, listener) {
+  var self = this;
+  function wrapper() { self.off(event, wrapper); listener.apply(null, arguments); }
+  this.on(event, wrapper);
+};","Convert prototype-based EventEmitter to ES6 class with private fields, fix this-binding in emit, add listenerCount(event) and removeAllListeners(event) methods","class EventEmitter {
+  #events = new Map();
+
+  on(event, listener) {
+    if (!this.#events.has(event)) this.#events.set(event, []);
+    this.#events.get(event).push(listener);
+    return this;
+  }
+
+  off(event, listener) {
+    const listeners = this.#events.get(event);
+    if (!listeners) return this;
+    const filtered = listeners.filter(l => l !== listener);
+    if (filtered.length) this.#events.set(event, filtered);
+    else this.#events.delete(event);
+    return this;
+  }
+
+  emit(event, ...args) {
+    const listeners = this.#events.get(event);
+    if (!listeners) return false;
+    listeners.forEach(l => l(...args));
+    return true;
+  }
+
+  once(event, listener) {
+    const wrapper = (...args) => { this.off(event, wrapper); listener(...args); };
+    return this.on(event, wrapper);
+  }
+
+  listenerCount(event) { return this.#events.get(event)?.length ?? 0; }
+
+  removeAllListeners(event) {
+    if (event) this.#events.delete(event);
+    else this.#events.clear();
+    return this;
+  }
+}"
+8,"function buildReport(orders) {
+  var totalRevenue = 0, totalOrders = 0, totalItems = 0, maxOrder = 0;
+  var statusCounts = {}, productRevenue = {};
+  for (var i = 0; i < orders.length; i++) {
+    var order = orders[i];
+    totalRevenue += order.value; totalOrders++; totalItems += order.items.length;
+    if (order.value > maxOrder) maxOrder = order.value;
+    statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
+    for (var j = 0; j < order.items.length; j++) {
+      var item = order.items[j];
+      productRevenue[item.productId] = (productRevenue[item.productId] || 0) + item.price * item.qty;
+    }
+  }
+  var avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+  var topProducts = Object.entries(productRevenue).sort((a,b) => b[1]-a[1]).slice(0,5);
+  return { totalRevenue, totalOrders, totalItems, avgOrderValue, maxOrder, statusCounts, topProducts };
+}","Refactor into a class-based ReportBuilder with an add(order) method, a build() method returning a frozen report object, and replace var with const/let","class ReportBuilder {
+  #totalRevenue = 0; #totalOrders = 0; #totalItems = 0; #maxOrder = 0;
+  #statusCounts = {}; #productRevenue = {};
+
+  add({ value, status, items }) {
+    this.#totalRevenue += value; this.#totalOrders++; this.#totalItems += items.length;
+    if (value > this.#maxOrder) this.#maxOrder = value;
+    this.#statusCounts[status] = (this.#statusCounts[status] ?? 0) + 1;
+    for (const { productId, price, qty } of items) {
+      this.#productRevenue[productId] = (this.#productRevenue[productId] ?? 0) + price * qty;
+    }
+    return this;
+  }
+
+  build() {
+    const n = this.#totalOrders;
+    const topProducts = Object.entries(this.#productRevenue)
+      .sort(([, a], [, b]) => b - a).slice(0, 5);
+    return Object.freeze({
+      totalRevenue: this.#totalRevenue, totalOrders: n, totalItems: this.#totalItems,
+      avgOrderValue: n > 0 ? this.#totalRevenue / n : 0,
+      maxOrder: this.#maxOrder, statusCounts: { ...this.#statusCounts }, topProducts,
+    });
+  }
+}
+
+function buildReport(orders) {
+  const builder = new ReportBuilder();
+  orders.forEach(o => builder.add(o));
+  return builder.build();
+}"
+9,"var express = require('express');
+var router = express.Router();
+var db = require('./db');
+
+router.get('/users', function(req, res) {
+  db.query('SELECT * FROM users', function(err, results) {
+    if (err) { console.log(err); res.status(500).send('Error'); return; }
+    res.json(results);
+  });
+});
+
+router.get('/users/:id', function(req, res) {
+  db.query('SELECT * FROM users WHERE id = ' + req.params.id, function(err, results) {
+    if (err) { console.log(err); res.status(500).send('Error'); return; }
+    if (results.length === 0) { res.status(404).send('Not found'); return; }
+    res.json(results[0]);
+  });
+});","Convert callback-style DB calls to async/await, fix SQL injection with parameterized queries, replace console.log error handling with next(err), and extract a query helper","const express = require('express');
+const router  = express.Router();
+const db      = require('./db');
+
+async function dbQuery(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.query(sql, params, (err, results) => err ? reject(err) : resolve(results));
+  });
+}
+
+router.get('/users', async (req, res, next) => {
+  try {
+    const results = await dbQuery('SELECT id, name, email FROM users');
+    res.json(results);
+  } catch (err) { next(err); }
+});
+
+router.get('/users/:id', async (req, res, next) => {
+  try {
+    const results = await dbQuery('SELECT id, name, email FROM users WHERE id = ?', [req.params.id]);
+    if (!results.length) return res.status(404).json({ error: 'User not found' });
+    res.json(results[0]);
+  } catch (err) { next(err); }
+});
+
+module.exports = router;"
+10,"function fetchDashboardData(userId) {
+  return fetch('/api/user/' + userId)
+    .then(function(r) { return r.json(); })
+    .then(function(user) {
+      return fetch('/api/orders?userId=' + userId)
+        .then(function(r) { return r.json(); })
+        .then(function(orders) {
+          return fetch('/api/notifications/' + userId)
+            .then(function(r) { return r.json(); })
+            .then(function(notifications) {
+              return { user: user, orders: orders, notifications: notifications };
+            });
+        });
+    });
+}",Flatten the deeply nested promise chain into async/await with parallel fetches using Promise.all,"async function fetchDashboardData(userId) {
+  const [user, orders, notifications] = await Promise.all([
+    fetch(`/api/user/${userId}`).then(r => r.json()),
+    fetch(`/api/orders?userId=${userId}`).then(r => r.json()),
+    fetch(`/api/notifications/${userId}`).then(r => r.json()),
+  ]);
+  return { user, orders, notifications };
+}"
+11,"class LinkedList {
+  constructor() { this.head = null; this.size = 0; }
+  append(value) {
+    var node = { value: value, next: null };
+    if (!this.head) { this.head = node; }
+    else {
+      var current = this.head;
+      while (current.next) current = current.next;
+      current.next = node;
+    }
+    this.size++;
+  }
+  remove(value) {
+    if (!this.head) return false;
+    if (this.head.value === value) { this.head = this.head.next; this.size--; return true; }
+    var current = this.head;
+    while (current.next) {
+      if (current.next.value === value) { current.next = current.next.next; this.size--; return true; }
+      current = current.next;
+    }
+    return false;
+  }
+  toArray() {
+    var arr = [], current = this.head;
+    while (current) { arr.push(current.value); current = current.next; }
+    return arr;
+  }
+}","Refactor LinkedList to use a private #createNode factory, add a Symbol.iterator to make it iterable, and add a prepend(value) method","class LinkedList {
+  #head = null; #size = 0;
+
+  get size() { return this.#size; }
+
+  #createNode(value) { return { value, next: null }; }
+
+  prepend(value) {
+    const node = this.#createNode(value);
+    node.next = this.#head; this.#head = node; this.#size++;
+    return this;
+  }
+
+  append(value) {
+    const node = this.#createNode(value);
+    if (!this.#head) { this.#head = node; }
+    else {
+      let current = this.#head;
+      while (current.next) current = current.next;
+      current.next = node;
+    }
+    this.#size++;
+    return this;
+  }
+
+  remove(value) {
+    if (!this.#head) return false;
+    if (this.#head.value === value) { this.#head = this.#head.next; this.#size--; return true; }
+    let current = this.#head;
+    while (current.next) {
+      if (current.next.value === value) { current.next = current.next.next; this.#size--; return true; }
+      current = current.next;
+    }
+    return false;
+  }
+
+  toArray() { return [...this]; }
+
+  [Symbol.iterator]() {
+    let current = this.#head;
+    return {
+      next() {
+        if (!current) return { done: true, value: undefined };
+        const value = current.value; current = current.next;
+        return { done: false, value };
+      }
+    };
+  }
+}"
+12,"function parseCSV(text) {
+  var lines = text.split('\n');
+  var headers = lines[0].split(',');
+  var result = [];
+  for (var i = 1; i < lines.length; i++) {
+    if (lines[i].trim() === '') continue;
+    var values = lines[i].split(',');
+    var obj = {};
+    for (var j = 0; j < headers.length; j++) {
+      obj[headers[j].trim()] = values[j] ? values[j].trim() : '';
+    }
+    result.push(obj);
+  }
+  return result;
+}
+
+function toCSV(data) {
+  if (!data.length) return '';
+  var headers = Object.keys(data[0]);
+  var lines = [headers.join(',')];
+  for (var i = 0; i < data.length; i++) {
+    lines.push(headers.map(h => data[i][h]).join(','));
+  }
+  return lines.join('\n');
+}",Refactor parseCSV and toCSV into a CsvCodec class with parse(text) and serialize(data) static methods; add proper quoted-field handling for values containing commas,"class CsvCodec {
+  static #splitLine(line) {
+    const fields = [];
+    let field = '', inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '""' && !inQuotes) { inQuotes = true; continue; }
+      if (ch === '""' && inQuotes) {
+        if (line[i + 1] === '""') { field += '""'; i++; } else inQuotes = false;
+        continue;
+      }
+      if (ch === ',' && !inQuotes) { fields.push(field.trim()); field = ''; continue; }
+      field += ch;
+    }
+    fields.push(field.trim());
+    return fields;
+  }
+
+  static #escapeField(value) {
+    const s = String(value ?? '');
+    return s.includes(',') || s.includes('""') || s.includes('\n')
+      ? `""${s.replace(/""/g, '""""')}""` : s;
+  }
+
+  static parse(text) {
+    const lines = text.split('\n').filter(l => l.trim());
+    if (!lines.length) return [];
+    const headers = CsvCodec.#splitLine(lines[0]);
+    return lines.slice(1).map(line => {
+      const values = CsvCodec.#splitLine(line);
+      return Object.fromEntries(headers.map((h, i) => [h, values[i] ?? '']));
+    });
+  }
+
+  static serialize(data) {
+    if (!data.length) return '';
+    const headers = Object.keys(data[0]);
+    const rows = data.map(row => headers.map(h => CsvCodec.#escapeField(row[h])).join(','));
+    return [headers.join(','), ...rows].join('\n');
+  }
+}"
+13,"function debounce(fn, wait) {
+  var timer;
+  return function() {
+    var self = this, args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(function() { fn.apply(self, args); }, wait);
+  };
+}
+
+function throttle(fn, limit) {
+  var inThrottle = false;
+  return function() {
+    var self = this, args = arguments;
+    if (!inThrottle) {
+      fn.apply(self, args); inThrottle = true;
+      setTimeout(function() { inThrottle = false; }, limit);
+    }
+  };
+}",Rewrite debounce and throttle using arrow functions and rest/spread; add a leading-edge option to debounce and a trailing-call option to throttle,"function debounce(fn, wait, { leading = false } = {}) {
+  let timer, leadingFired = false;
+  return function(...args) {
+    if (leading && !timer) { fn.apply(this, args); leadingFired = true; }
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      timer = null;
+      if (!leading || !leadingFired) fn.apply(this, args);
+      leadingFired = false;
+    }, wait);
+  };
+}
+
+function throttle(fn, limit, { trailing = false } = {}) {
+  let inThrottle = false, lastArgs = null;
+  return function(...args) {
+    if (!inThrottle) {
+      fn.apply(this, args); inThrottle = true;
+      setTimeout(() => {
+        inThrottle = false;
+        if (trailing && lastArgs) { fn.apply(this, lastArgs); lastArgs = null; }
+      }, limit);
+    } else if (trailing) { lastArgs = args; }
+  };
+}"
+14,"class DataTable {
+  constructor(containerId, data) {
+    this.container = document.getElementById(containerId);
+    this.data = data; this.sortKey = null; this.sortDir = 'asc'; this.filterText = '';
+    this.render();
+  }
+  render() {
+    this.container.innerHTML = '';
+    var filtered = this.data.filter(row =>
+      Object.values(row).some(v => String(v).toLowerCase().includes(this.filterText))
+    );
+    if (this.sortKey) {
+      filtered.sort((a, b) => {
+        if (a[this.sortKey] < b[this.sortKey]) return this.sortDir === 'asc' ? -1 : 1;
+        if (a[this.sortKey] > b[this.sortKey]) return this.sortDir === 'asc' ?  1 : -1;
+        return 0;
+      });
+    }
+    var table = document.createElement('table');
+    var headerRow = document.createElement('tr');
+    Object.keys(this.data[0]).forEach(key => {
+      var th = document.createElement('th');
+      th.textContent = key; th.onclick = () => this.setSort(key); headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+    filtered.forEach(row => {
+      var tr = document.createElement('tr');
+      Object.values(row).forEach(val => {
+        var td = document.createElement('td'); td.textContent = val; tr.appendChild(td);
+      });
+      table.appendChild(tr);
+    });
+    this.container.appendChild(table);
+  }
+  setSort(key) {
+    if (this.sortKey === key) this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+    else { this.sortKey = key; this.sortDir = 'asc'; }
+    this.render();
+  }
+  setFilter(text) { this.filterText = text.toLowerCase(); this.render(); }
+}",Separate data logic (filtering/sorting) from DOM rendering; extract a pure getDisplayData(state) function and a buildTable(rows) DOM builder; make DataTable a thin coordinator,"function getDisplayData(data, { filterText = '', sortKey = null, sortDir = 'asc' } = {}) {
+  let rows = filterText
+    ? data.filter(row => Object.values(row).some(v => String(v).toLowerCase().includes(filterText)))
+    : [...data];
+  if (sortKey) {
+    rows.sort((a, b) => {
+      if (a[sortKey] < b[sortKey]) return sortDir === 'asc' ? -1 : 1;
+      if (a[sortKey] > b[sortKey]) return sortDir === 'asc' ?  1 : -1;
+      return 0;
+    });
+  }
+  return rows;
+}
+
+function buildTable(rows, { onHeaderClick } = {}) {
+  if (!rows.length) return document.createTextNode('No results');
+  const table = document.createElement('table');
+  const headerRow = document.createElement('tr');
+  Object.keys(rows[0]).forEach(key => {
+    const th = document.createElement('th');
+    th.textContent = key;
+    if (onHeaderClick) th.addEventListener('click', () => onHeaderClick(key));
+    headerRow.appendChild(th);
+  });
+  table.appendChild(headerRow);
+  rows.forEach(row => {
+    const tr = document.createElement('tr');
+    Object.values(row).forEach(val => {
+      const td = document.createElement('td'); td.textContent = val; tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+  return table;
+}
+
+class DataTable {
+  #container; #data; #state;
+  constructor(containerId, data) {
+    this.#container = document.getElementById(containerId); this.#data = data;
+    this.#state = { filterText: '', sortKey: null, sortDir: 'asc' };
+    this.#render();
+  }
+  #render() {
+    const rows = getDisplayData(this.#data, this.#state);
+    this.#container.innerHTML = '';
+    this.#container.appendChild(buildTable(rows, { onHeaderClick: k => this.setSort(k) }));
+  }
+  setSort(key) {
+    const s = this.#state;
+    this.#state = { ...s, sortKey: key, sortDir: s.sortKey === key && s.sortDir === 'asc' ? 'desc' : 'asc' };
+    this.#render();
+  }
+  setFilter(text) { this.#state = { ...this.#state, filterText: text.toLowerCase() }; this.#render(); }
+}"
+15,"const EventBus = {
+  events: {},
+  on(event, handler) { (this.events[event] = this.events[event] || []).push(handler); },
+  off(event, handler) { this.events[event] = (this.events[event] || []).filter(h => h !== handler); },
+  emit(event, ...args) { (this.events[event] || []).forEach(h => h(...args)); }
+};
+
+let cache = {};
+
+function fetchUser(id) {
+  if (cache[id]) { EventBus.emit('user:loaded', cache[id]); return Promise.resolve(cache[id]); }
+  return fetch('/api/users/' + id)
+    .then(r => r.json())
+    .then(user => { cache[id] = user; EventBus.emit('user:loaded', user); return user; });
+}
+
+function clearCache() { cache = {}; }","Convert the global mutable EventBus and cache into an encapsulated UserService class with a private Map-based cache and EventEmitter, exposing fetchUser(id), invalidate(id), and on(event, handler)","class UserService {
+  #cache = new Map();
+  #listeners = new Map();
+
+  on(event, handler) {
+    if (!this.#listeners.has(event)) this.#listeners.set(event, new Set());
+    this.#listeners.get(event).add(handler);
+    return () => this.#listeners.get(event)?.delete(handler);
+  }
+
+  #emit(event, ...args) {
+    this.#listeners.get(event)?.forEach(h => h(...args));
+  }
+
+  async fetchUser(id) {
+    if (this.#cache.has(id)) {
+      const user = this.#cache.get(id);
+      this.#emit('user:loaded', user);
+      return user;
+    }
+    const res = await fetch(`/api/users/${id}`);
+    if (!res.ok) throw new Error(`Failed to fetch user ${id}: ${res.status}`);
+    const user = await res.json();
+    this.#cache.set(id, user);
+    this.#emit('user:loaded', user);
+    return user;
+  }
+
+  invalidate(id) {
+    if (id !== undefined) this.#cache.delete(id);
+    else this.#cache.clear();
+  }
+}"
+16,"function createMiddlewarePipeline(middlewares) {
+  return function(req, res) {
+    var index = 0;
+    function next(err) {
+      if (err) { console.error('Middleware error:', err); res.status(500).send('Internal Server Error'); return; }
+      if (index >= middlewares.length) return;
+      var mw = middlewares[index++];
+      try { mw(req, res, next); } catch(e) { next(e); }
+    }
+    next();
+  };
+}","Refactor createMiddlewarePipeline to support async middlewares, an error-handler middleware signature (err, req, res, next), and a use(fn) fluent API wrapped in a Pipeline class","class Pipeline {
+  #middlewares = [];
+  #errorHandlers = [];
+
+  use(fn) {
+    if (fn.length === 4) this.#errorHandlers.push(fn);
+    else this.#middlewares.push(fn);
+    return this;
+  }
+
+  handler() {
+    return async (req, res) => {
+      const dispatch = async (i, err) => {
+        if (err) {
+          for (const h of this.#errorHandlers) {
+            try { await h(err, req, res, () => {}); return; } catch (e) { err = e; }
+          }
+          if (!res.headersSent) res.status(500).json({ error: 'Internal Server Error' });
+          return;
+        }
+        if (i >= this.#middlewares.length) return;
+        try {
+          await this.#middlewares[i](req, res, nextErr => dispatch(i + 1, nextErr));
+        } catch (e) { await dispatch(i, e); }
+      };
+      await dispatch(0, null);
+    };
+  }
+}"
+17,"class TaskQueue {
+  constructor() { this.queue = []; this.running = false; }
+  add(task) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ task, resolve, reject });
+      if (!this.running) this._run();
+    });
+  }
+  _run() {
+    if (this.queue.length === 0) { this.running = false; return; }
+    this.running = true;
+    var item = this.queue.shift();
+    Promise.resolve().then(() => item.task())
+      .then(result => { item.resolve(result); this._run(); })
+      .catch(err => { item.reject(err); this._run(); });
+  }
+}","Refactor TaskQueue to support a concurrency limit, expose a size getter and a clear() method, and use async/await internally","class TaskQueue {
+  #queue = []; #running = 0; #concurrency;
+
+  constructor(concurrency = 1) { this.#concurrency = concurrency; }
+
+  get size()    { return this.#queue.length; }
+  get pending() { return this.#running; }
+
+  add(task) {
+    return new Promise((resolve, reject) => {
+      this.#queue.push({ task, resolve, reject });
+      this.#drain();
+    });
+  }
+
+  clear() {
+    this.#queue.splice(0).forEach(({ reject }) => reject(new Error('Task cancelled')));
+  }
+
+  async #drain() {
+    while (this.#queue.length && this.#running < this.#concurrency) {
+      const { task, resolve, reject } = this.#queue.shift();
+      this.#running++;
+      try { resolve(await task()); }
+      catch (err) { reject(err); }
+      finally { this.#running--; this.#drain(); }
+    }
+  }
+}"
+18,"function deepMerge(target, source) {
+  var result = Object.assign({}, target);
+  for (var key in source) {
+    if (!source.hasOwnProperty(key)) continue;
+    if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      if (typeof result[key] === 'object' && result[key] !== null && !Array.isArray(result[key])) {
+        result[key] = deepMerge(result[key], source[key]);
+      } else {
+        result[key] = deepMerge({}, source[key]);
+      }
+    } else {
+      result[key] = source[key];
+    }
+  }
+  return result;
+}","Refactor deepMerge to use Object.keys instead of for-in, support merging arrays by strategy option ('replace' | 'concat'), and handle circular references via a WeakMap","function deepMerge(target, source, { arrayStrategy = 'replace' } = {}, seen = new WeakMap()) {
+  if (source === null || typeof source !== 'object') return source;
+  if (seen.has(source)) return seen.get(source);
+
+  if (Array.isArray(source)) {
+    const targetArr = Array.isArray(target) ? target : [];
+    const merged = arrayStrategy === 'concat' ? [...targetArr, ...source] : [...source];
+    seen.set(source, merged);
+    return merged;
+  }
+
+  const result = { ...(typeof target === 'object' && target !== null ? target : {}) };
+  seen.set(source, result);
+
+  for (const key of Object.keys(source)) {
+    const srcVal = source[key];
+    result[key] = (srcVal !== null && typeof srcVal === 'object')
+      ? deepMerge(result[key], srcVal, { arrayStrategy }, seen)
+      : srcVal;
+  }
+  return result;
+}"
+19,"function createPubSub() {
+  var subscribers = {};
+  return {
+    subscribe: function(topic, fn) {
+      if (!subscribers[topic]) subscribers[topic] = [];
+      subscribers[topic].push(fn);
+      return function() { subscribers[topic] = subscribers[topic].filter(f => f !== fn); };
+    },
+    publish: function(topic, data) {
+      (subscribers[topic] || []).forEach(fn => fn(data));
+    },
+    publishAsync: function(topic, data) {
+      return Promise.all((subscribers[topic] || []).map(fn => Promise.resolve(fn(data))));
+    }
+  };
+}","Convert createPubSub factory into an ES6 PubSub class with private fields, add typed topics via a topics Map, wildcard '*' subscriptions, and a once(topic, fn) method","class PubSub {
+  #topics = new Map();
+  #wildcards = new Set();
+
+  #getListeners(topic) {
+    if (!this.#topics.has(topic)) this.#topics.set(topic, new Set());
+    return this.#topics.get(topic);
+  }
+
+  subscribe(topic, fn) {
+    if (topic === '*') { this.#wildcards.add(fn); return () => this.#wildcards.delete(fn); }
+    this.#getListeners(topic).add(fn);
+    return () => this.#getListeners(topic).delete(fn);
+  }
+
+  once(topic, fn) {
+    const unsub = this.subscribe(topic, (...args) => { fn(...args); unsub(); });
+    return unsub;
+  }
+
+  publish(topic, data) {
+    this.#getListeners(topic).forEach(fn => fn(data));
+    this.#wildcards.forEach(fn => fn(topic, data));
+  }
+
+  async publishAsync(topic, data) {
+    const fns = [...this.#getListeners(topic), ...this.#wildcards];
+    await Promise.all(fns.map(fn => Promise.resolve(fn(data))));
+  }
+}"
+20,"function runPipeline(data, steps) {
+  var current = data, log = [];
+  for (var i = 0; i < steps.length; i++) {
+    var step = steps[i];
+    try {
+      current = step.fn(current);
+      log.push({ step: step.name, status: 'ok' });
+    } catch(e) {
+      log.push({ step: step.name, status: 'error', error: e.message });
+      if (step.stopOnError !== false) break;
+    }
+  }
+  return { result: current, log: log };
+}","Refactor into an async Pipeline class with a pipe(name, fn, opts) fluent method, support for async steps, a timeout per step, and a structured PipelineResult","class PipelineError extends Error {
+  constructor(step, cause) {
+    super(`Step '${step}' failed: ${cause.message}`);
+    this.step = step; this.cause = cause;
+  }
+}
+
+class Pipeline {
+  #steps = [];
+
+  pipe(name, fn, { stopOnError = true, timeoutMs = null } = {}) {
+    this.#steps.push({ name, fn, stopOnError, timeoutMs });
+    return this;
+  }
+
+  async run(data) {
+    let current = data;
+    const log = [];
+    for (const step of this.#steps) {
+      try {
+        let promise = Promise.resolve(step.fn(current));
+        if (step.timeoutMs) {
+          const timeout = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error(`Timed out after ${step.timeoutMs}ms`)), step.timeoutMs)
+          );
+          promise = Promise.race([promise, timeout]);
+        }
+        current = await promise;
+        log.push({ step: step.name, status: 'ok' });
+      } catch (err) {
+        log.push({ step: step.name, status: 'error', error: err.message });
+        if (step.stopOnError) throw new PipelineError(step.name, err);
+      }
+    }
+    return Object.freeze({ result: current, log, ok: log.every(e => e.status === 'ok') });
+  }
+}"

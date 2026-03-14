@@ -1,0 +1,429 @@
+id,prompt,completed
+1,"// Description: Compute the sum of all numbers in an array.
+function sumArray(nums) {
+  let total = 0;
+  for (const n of nums) {","// Description: Compute the sum of all numbers in an array.
+function sumArray(nums) {
+  let total = 0;
+  for (const n of nums) {
+    total += n;
+  }
+  return total;
+}
+
+console.log(sumArray([1, 2, 3, 4]));"
+2,"// Description: Extract user names and convert them to uppercase.
+const users = [
+  { id: 1, name: 'Ava' },
+  { id: 2, name: 'Liam' },","// Description: Extract user names and convert them to uppercase.
+const users = [
+  { id: 1, name: 'Ava' },
+  { id: 2, name: 'Liam' },
+  { id: 3, name: 'Mia' }
+];
+
+const names = users.map(u => u.name.toUpperCase());
+console.log(names.join(', '));"
+3,"// Description: Check whether a string is a palindrome after normalization.
+function isPalindrome(text) {
+  const cleaned = text.toLowerCase().replace(/[^a-z0-9]/g, '');","// Description: Check whether a string is a palindrome after normalization.
+function isPalindrome(text) {
+  const cleaned = text.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const reversed = cleaned.split('').reverse().join('');
+  return cleaned === reversed;
+}
+
+console.log(isPalindrome('Race car'));"
+4,"// Description: Apply tax to prices and compute the subtotal.
+const prices = [19.99, 5.5, 12.0, 3.25];","// Description: Apply tax to prices and compute the subtotal.
+const prices = [19.99, 5.5, 12.0, 3.25];
+const withTax = prices.map(p => Number((p * 1.07).toFixed(2)));
+const subtotal = withTax.reduce((acc, p) => acc + p, 0);
+console.log(subtotal.toFixed(2));"
+5,"// Description: Fetch JSON data from a URL with HTTP error handling.
+async function fetchJson(url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+  return response.json();
+}
+","// Description: Fetch JSON data from a URL with HTTP error handling.
+async function fetchJson(url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+  return response.json();
+}
+
+fetchJson('https://example.com/data')
+  .then(data => console.log(data))
+  .catch(err => console.error(err.message));"
+6,"// Description: Implement a basic queue class with enqueue and dequeue.
+class Queue {
+  constructor() {
+    this.items = [];
+  }
+
+  enqueue(value) {
+    this.items.push(value);
+  }
+
+  dequeue() {
+    return this.items.shift();
+  }
+
+  size() {","// Description: Implement a basic queue class with enqueue and dequeue.
+class Queue {
+  constructor() {
+    this.items = [];
+  }
+
+  enqueue(value) {
+    this.items.push(value);
+  }
+
+  dequeue() {
+    return this.items.shift();
+  }
+
+  size() {
+    return this.items.length;
+  }
+}
+
+const q = new Queue();
+q.enqueue('task-1');
+q.enqueue('task-2');
+console.log(q.dequeue(), q.size());"
+7,"// Description: Group array items by a computed key.
+function groupBy(arr, keyFn) {
+  return arr.reduce((acc, item) => {
+    const key = keyFn(item);
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(item);
+    return acc;","// Description: Group array items by a computed key.
+function groupBy(arr, keyFn) {
+  return arr.reduce((acc, item) => {
+    const key = keyFn(item);
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(item);
+    return acc;
+  }, {});
+}
+
+const grouped = groupBy([1, 2, 3, 4, 5], n => (n % 2 === 0 ? 'even' : 'odd'));
+console.log(grouped);"
+8,"// Description: Iterate over inventory entries stored in a Map.
+const inventory = new Map();
+inventory.set('apples', 10);
+inventory.set('bananas', 6);","// Description: Iterate over inventory entries stored in a Map.
+const inventory = new Map();
+inventory.set('apples', 10);
+inventory.set('bananas', 6);
+inventory.set('oranges', 8);
+
+for (const [item, count] of inventory.entries()) {
+  console.log(`${item}: ${count}`);
+}"
+9,"// Description: Create a debounced event handler for resize events.
+function debounce(fn, wait) {
+  let timer = null;
+  return (...args) => {
+    clearTimeout(timer);","// Description: Create a debounced event handler for resize events.
+function debounce(fn, wait) {
+  let timer = null;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), wait);
+  };
+}
+
+const logResize = debounce(() => console.log('resized'), 200);
+window.addEventListener('resize', logResize);"
+10,"// Description: Count occurrences of words in a sentence.
+const text = 'lorem ipsum dolor sit amet';
+const words = text.split(' ');","// Description: Count occurrences of words in a sentence.
+const text = 'lorem ipsum dolor sit amet';
+const words = text.split(' ');
+const counts = words.reduce((acc, word) => {
+  acc[word] = (acc[word] || 0) + 1;
+  return acc;
+}, {});
+
+console.log(counts);"
+11,"// Description: Clamp numeric values within a min and max range.
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+","// Description: Clamp numeric values within a min and max range.
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+const samples = [-2, 3, 8, 15];
+const clamped = samples.map(n => clamp(n, 0, 10));
+console.log(clamped);"
+12,"// Description: Filter tasks to collect IDs of pending items.
+const tasks = [
+  { id: 1, done: true },
+  { id: 2, done: false },
+  { id: 3, done: true }
+];
+","// Description: Filter tasks to collect IDs of pending items.
+const tasks = [
+  { id: 1, done: true },
+  { id: 2, done: false },
+  { id: 3, done: true }
+];
+
+const pending = tasks.filter(t => !t.done).map(t => t.id);
+console.log(pending);"
+13,"// Description: Build a URL query string from an object.
+function toQuery(params) {
+  return Object.entries(params)","// Description: Build a URL query string from an object.
+function toQuery(params) {
+  return Object.entries(params)
+    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+    .join('&');
+}
+
+console.log(toQuery({ q: 'open ai', page: 2 }));"
+14,"// Description: Read the diagonal values from a matrix.
+const matrix = [
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9]
+];
+","// Description: Read the diagonal values from a matrix.
+const matrix = [
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9]
+];
+
+const diagonal = matrix.map((row, i) => row[i]);
+console.log(diagonal);"
+15,"// Description: Retry an asynchronous function a limited number of times.
+function retry(fn, attempts) {
+  return fn().catch(err => {
+    if (attempts <= 1) {
+      throw err;
+    }","// Description: Retry an asynchronous function a limited number of times.
+function retry(fn, attempts) {
+  return fn().catch(err => {
+    if (attempts <= 1) {
+      throw err;
+    }
+    return retry(fn, attempts - 1);
+  });
+}
+
+retry(() => Promise.reject(new Error('fail')), 3).catch(err => console.error(err.message));"
+16,"// Description: Use a getter to derive a full name from an object.
+const person = {
+  firstName: 'Nina',
+  lastName: 'Lopez',
+  get fullName() {","// Description: Use a getter to derive a full name from an object.
+const person = {
+  firstName: 'Nina',
+  lastName: 'Lopez',
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+};
+
+console.log(person.fullName);"
+17,"// Description: Return unique values from an array.
+function uniqueValues(arr) {
+  return [...new Set(arr)];
+}
+","// Description: Return unique values from an array.
+function uniqueValues(arr) {
+  return [...new Set(arr)];
+}
+
+const ids = [1, 2, 2, 3, 4, 4, 5];
+console.log(uniqueValues(ids));"
+18,"// Description: Calculate the average score from a list of objects.
+const data = [
+  { score: 91 },
+  { score: 85 },
+  { score: 88 }
+];
+","// Description: Calculate the average score from a list of objects.
+const data = [
+  { score: 91 },
+  { score: 85 },
+  { score: 88 }
+];
+
+const avg = data.reduce((sum, item) => sum + item.score, 0) / data.length;
+console.log(avg.toFixed(1));"
+19,"// Description: Convert a sentence to title case.
+function titleCase(sentence) {
+  return sentence
+    .split(' ')","// Description: Convert a sentence to title case.
+function titleCase(sentence) {
+  return sentence
+    .split(' ')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
+
+console.log(titleCase('javaScript utility FUNCTIONS'));"
+20,"// Description: Filter even numbers and map them to squares.
+const numbers = Array.from({ length: 10 }, (_, i) => i + 1);","// Description: Filter even numbers and map them to squares.
+const numbers = Array.from({ length: 10 }, (_, i) => i + 1);
+const evens = numbers.filter(n => n % 2 === 0);
+const squares = evens.map(n => n * n);
+console.log(squares);"
+21,"// Description: Flatten an array by one nesting level.
+function flattenOnce(arr) {","// Description: Flatten an array by one nesting level.
+function flattenOnce(arr) {
+  return arr.reduce((acc, item) => acc.concat(item), []);
+}
+
+console.log(flattenOnce([[1, 2], [3, 4], [5]]));"
+22,"// Description: Clone and update configuration settings immutably.
+const settings = {
+  theme: 'light',
+  notifications: true,
+  language: 'en'
+};
+","// Description: Clone and update configuration settings immutably.
+const settings = {
+  theme: 'light',
+  notifications: true,
+  language: 'en'
+};
+
+const next = { ...settings, theme: 'dark' };
+console.log(next);"
+23,"// Description: Split an array into fixed-size chunks.
+function chunk(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) {","// Description: Split an array into fixed-size chunks.
+function chunk(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) {
+    out.push(arr.slice(i, i + size));
+  }
+  return out;
+}
+
+console.log(chunk([1, 2, 3, 4, 5, 6, 7], 3));"
+24,"// Description: Count error log entries from a log list.
+const logs = [
+  'INFO Start',
+  'ERROR Network timeout',
+  'INFO Retry',","// Description: Count error log entries from a log list.
+const logs = [
+  'INFO Start',
+  'ERROR Network timeout',
+  'INFO Retry',
+  'ERROR Invalid token'
+];
+
+const errors = logs.filter(line => line.startsWith('ERROR'));
+console.log(errors.length);"
+25,"// Description: Ensure a function executes only once.
+function once(fn) {
+  let called = false;
+  let value;
+  return (...args) => {
+    if (!called) {
+      called = true;
+      value = fn(...args);
+    }","// Description: Ensure a function executes only once.
+function once(fn) {
+  let called = false;
+  let value;
+  return (...args) => {
+    if (!called) {
+      called = true;
+      value = fn(...args);
+    }
+    return value;
+  };
+}
+
+const init = once(() => Math.random());
+console.log(init(), init());"
+26,"// Description: Calculate shopping cart total from quantity and price.
+const cart = [
+  { name: 'book', qty: 2, price: 12 },
+  { name: 'pen', qty: 5, price: 1.5 }
+];
+","// Description: Calculate shopping cart total from quantity and price.
+const cart = [
+  { name: 'book', qty: 2, price: 12 },
+  { name: 'pen', qty: 5, price: 1.5 }
+];
+
+const total = cart.reduce((sum, item) => sum + item.qty * item.price, 0);
+console.log(total);"
+27,"// Description: Parse a CSV line into trimmed cells.
+function parseCsvLine(line) {","// Description: Parse a CSV line into trimmed cells.
+function parseCsvLine(line) {
+  return line.split(',').map(cell => cell.trim());
+}
+
+const row = parseCsvLine('apple, banana, cherry');
+console.log(row);"
+28,"// Description: Build an object map from key-value entry pairs.
+const byId = Object.fromEntries([","// Description: Build an object map from key-value entry pairs.
+const byId = Object.fromEntries([
+  ['u1', { name: 'Ari' }],
+  ['u2', { name: 'Ben' }]
+]);
+
+console.log(byId.u1.name);"
+29,"// Description: Sleep asynchronously and run a timed async sequence.
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+(async () => {","// Description: Sleep asynchronously and run a timed async sequence.
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+(async () => {
+  console.log('start');
+  await sleep(100);
+  console.log('done');
+})();"
+30,"// Description: Find minimum and maximum values in a numeric array.
+const nums = [3, 7, 2, 9, 4];
+const max = nums.reduce((a, b) => (a > b ? a : b));","// Description: Find minimum and maximum values in a numeric array.
+const nums = [3, 7, 2, 9, 4];
+const max = nums.reduce((a, b) => (a > b ? a : b));
+const min = nums.reduce((a, b) => (a < b ? a : b));
+console.log({ min, max });"
+31,"// Description: Compose functions from right to left.
+function compose(...fns) {
+  return input => fns.reduceRight((value, fn) => fn(value), input);
+}
+","// Description: Compose functions from right to left.
+function compose(...fns) {
+  return input => fns.reduceRight((value, fn) => fn(value), input);
+}
+
+const add2 = n => n + 2;
+const times3 = n => n * 3;
+console.log(compose(add2, times3)(5));"
+32,"// Description: Transform, filter, and join an array into a string.
+const result = ['a', 'b', 'c']
+  .map((ch, i) => `${i}:${ch}`)","// Description: Transform, filter, and join an array into a string.
+const result = ['a', 'b', 'c']
+  .map((ch, i) => `${i}:${ch}`)
+  .filter(item => !item.startsWith('1'))
+  .join('|');
+
+console.log(result);"

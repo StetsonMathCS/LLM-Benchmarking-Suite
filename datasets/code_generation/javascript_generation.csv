@@ -1,0 +1,85 @@
+id,instruction,generated_code,expected output
+1,"Write a function to sum an array of integers and print the result for [1,2,3,4,5].","function sum(arr){return arr.reduce((a,b)=>a+b,0);}
+console.log(sum([1,2,3,4,5]));",15
+2,Write code to count vowels in a string and print the count for 'benchmarking'.,"function countVowels(s){return (s.match(/[aeiou]/gi)||[]).length;}
+console.log(countVowels('benchmarking'));",3
+3,Implement factorial recursively and print factorial(6).,"function fact(n){return n<=1?1:n*fact(n-1);}
+console.log(fact(6));",720
+4,Implement Fibonacci with dynamic programming and print fib(10).,"function fib(n){const dp=[0,1];for(let i=2;i<=n;i++)dp[i]=dp[i-1]+dp[i-2];return dp[n];}
+console.log(fib(10));",55
+5,Reverse words in a sentence and print the result for 'js code generation'.,"const s='js code generation';
+console.log(s.split(' ').reverse().join(' '));",generation code js
+6,"Find unique values in [1,2,2,3,4,4,5] and print as comma-separated string.","const out=[...new Set([1,2,2,3,4,4,5])];
+console.log(out.join(','));","1,2,3,4,5"
+7,"Sort objects by score descending and print the top name from [{n:'A',s:7},{n:'B',s:10},{n:'C',s:8}].","const arr=[{n:'A',s:7},{n:'B',s:10},{n:'C',s:8}];
+arr.sort((x,y)=>y.s-x.s);
+console.log(arr[0].n);",B
+8,Use map/filter/reduce to sum squares of even numbers from 1 to 6 and print result.,"const nums=[1,2,3,4,5,6];
+const v=nums.filter(n=>n%2===0).map(n=>n*n).reduce((a,b)=>a+b,0);
+console.log(v);",56
+9,"Parse JSON string and print the age field from '{""name"":""Ana"",""age"":29}'.","const obj=JSON.parse('{\""name\"":\""Ana\"",\""age\"":29}');
+console.log(obj.age);",29
+10,Format number 12.34567 to 2 decimal places and print it.,console.log((12.34567).toFixed(2));,12.35
+11,"Write a class Counter with increment method, increment twice, and print value.","class Counter{constructor(){this.v=0;}inc(){this.v++;}}
+const c=new Counter();c.inc();c.inc();console.log(c.v);",2
+12,"Use closure to create adder(5), call with 7, and print result.","function adder(x){return y=>x+y;}
+const add5=adder(5);
+console.log(add5(7));",12
+13,Implement debounce-like behavior simulation by calling wrapped function once immediately and print count.,"let count=0;
+function once(fn){let done=false;return (...args)=>{if(done)return;done=true;return fn(...args);};}
+const f=once(()=>{count++;});f();f();f();
+console.log(count);",1
+14,Use Promise.resolve chain to multiply 3 by 4 and print result.,Promise.resolve(3).then(x=>x*4).then(v=>console.log(v));,12
+15,Use async/await to await resolved value 42 and print it.,async function main(){const v=await Promise.resolve(42);console.log(v);}main();,42
+16,"Implement binary search in sorted array [1,3,5,7,9] for target 7 and print index.","function bs(a,t){let l=0,r=a.length-1;while(l<=r){const m=(l+r)>>1;if(a[m]===t)return m;if(a[m]<t)l=m+1;else r=m-1;}return -1;}
+console.log(bs([1,3,5,7,9],7));",3
+17,"Implement BFS traversal for graph {A:[B,C],B:[D],C:[],D:[]} starting at A and print order joined by '->'.","const g={A:['B','C'],B:['D'],C:[],D:[]};
+function bfs(s){const q=[s],seen=new Set([s]),out=[];while(q.length){const u=q.shift();out.push(u);for(const v of g[u])if(!seen.has(v)){seen.add(v);q.push(v);}}return out;}
+console.log(bfs('A').join('->'));",A->B->C->D
+18,Implement DFS (iterative stack) on same graph from A and print order joined by '-'.,"const g={A:['B','C'],B:['D'],C:[],D:[]};
+function dfs(s){const st=[s],seen=new Set(),out=[];while(st.length){const u=st.pop();if(seen.has(u))continue;seen.add(u);out.push(u);for(let i=g[u].length-1;i>=0;i--)st.push(g[u][i]);}return out;}
+console.log(dfs('A').join('-'));",A-B-D-C
+19,Count character frequencies in 'aabccc' and print frequency of 'c'.,const s='aabccc';const f={};for(const ch of s)f[ch]=(f[ch]||0)+1;console.log(f['c']);,3
+20,"Check palindrome ignoring punctuation for 'A man, a plan, a canal: Panama' and print true/false.","const s='A man, a plan, a canal: Panama'.toLowerCase().replace(/[^a-z0-9]/g,'');
+console.log(s===s.split('').reverse().join(''));",true
+21,"Compute matrix diagonal sum for [[1,2,3],[4,5,6],[7,8,9]] and print result.","const m=[[1,2,3],[4,5,6],[7,8,9]];
+let sum=0;for(let i=0;i<m.length;i++)sum+=m[i][i];
+console.log(sum);",15
+22,Implement quick check for balanced parentheses for '(()())' and print result.,"const s='(()())';let bal=0,ok=true;for(const ch of s){if(ch==='(')bal++;else bal--;if(bal<0){ok=false;break;}}if(bal!==0)ok=false;console.log(ok);",true
+23,Use regex to extract all numbers from 'x=12;y=7;z=105' and print as comma-separated.,"const nums='x=12;y=7;z=105'.match(/\d+/g);
+console.log(nums.join(','));","12,7,105"
+24,Transform array to object map by id and print mapped name for id 2.,"const arr=[{id:1,name:'One'},{id:2,name:'Two'}];
+const map=Object.fromEntries(arr.map(x=>[x.id,x]));
+console.log(map[2].name);",Two
+25,Demonstrate error handling with try/catch by throwing 'boom' and printing caught message.,try{throw new Error('boom');}catch(e){console.log(e.message);},boom
+26,Implement memoized Fibonacci and print fib(12).,"const memo={0:0,1:1};
+function fib(n){if(n in memo)return memo[n];memo[n]=fib(n-1)+fib(n-2);return memo[n];}
+console.log(fib(12));",144
+27,"Flatten one-level nested array [[1,2],[3,4],[5]] and print joined result.","const a=[[1,2],[3,4],[5]];
+console.log(a.flat().join('-'));",1-2-3-4-5
+28,"Compute intersection of arrays [1,2,3,4] and [3,4,5] and print sorted comma-separated output.","const a=[1,2,3,4],b=[3,4,5];
+const setB=new Set(b);
+const out=a.filter(x=>setB.has(x));
+console.log(out.sort((x,y)=>x-y).join(','));","3,4"
+29,"Chunk array [1,2,3,4,5] into size 2 and print chunk count.","const arr=[1,2,3,4,5],size=2,ch=[];
+for(let i=0;i<arr.length;i+=size)ch.push(arr.slice(i,i+size));
+console.log(ch.length);",3
+30,Implement topological-sort style output for dependencies A->B->C and print as string.,"const order=['A','B','C'];
+console.log(order.join('->'));",A->B->C
+31,Use Date object in deterministic way by parsing ISO date and printing UTC full year.,"const d=new Date('2020-05-01T00:00:00Z');
+console.log(d.getUTCFullYear());",2020
+32,Compute percentage change from 80 to 100 and print with one decimal and percent sign.,"const oldV=80,newV=100;
+const p=((newV-oldV)/oldV)*100;
+console.log(p.toFixed(1)+'%');",25.0%
+33,"Implement simple LRU-like cache with max 2 entries and print keys after operations set(a),set(b),get(a),set(c).","class LRU{constructor(k){this.k=k;this.m=new Map();}get(x){if(!this.m.has(x))return null;const v=this.m.get(x);this.m.delete(x);this.m.set(x,v);return v;}set(x,v){if(this.m.has(x))this.m.delete(x);this.m.set(x,v);if(this.m.size>this.k){const first=this.m.keys().next().value;this.m.delete(first);}}keys(){return [...this.m.keys()];}}
+const c=new LRU(2);c.set('a',1);c.set('b',2);c.get('a');c.set('c',3);
+console.log(c.keys().join(','));","a,c"
+34,Implement Dijkstra on tiny graph and print shortest distance from A to C.,"const g={A:[['B',2],['C',5]],B:[['C',1]],C:[]};
+const dist={A:0,B:Infinity,C:Infinity};const done=new Set();
+while(done.size<3){let u=null,best=Infinity;for(const n of Object.keys(dist)){if(!done.has(n)&&dist[n]<best){best=dist[n];u=n;}}if(u===null)break;done.add(u);for(const [v,w] of g[u])dist[v]=Math.min(dist[v],dist[u]+w);}
+console.log(dist.C);",3
+35,Write code to deep clone a plain object with JSON methods and print whether clone is independent after mutation.,"const obj={a:1,b:{c:2}};const copy=JSON.parse(JSON.stringify(obj));copy.b.c=99;
+console.log(obj.b.c===2);",true
+36,"Compute longest common prefix for ['flower','flow','flight'] and print result.","const arr=['flower','flow','flight'];
+let p=arr[0];for(let i=1;i<arr.length;i++){while(!arr[i].startsWith(p))p=p.slice(0,-1);}
+console.log(p);",fl

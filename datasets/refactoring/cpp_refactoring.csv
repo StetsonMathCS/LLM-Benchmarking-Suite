@@ -1,0 +1,841 @@
+id,original_code,refactoring_task,output_expected
+1,"#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+bool processFile(const std::string& path) {
+    FILE* f = fopen(path.c_str(), ""r"");
+    if (!f) return false;
+    char buf[256];
+    std::vector<std::string> lines;
+    while (fgets(buf, sizeof(buf), f)) {
+        lines.push_back(std::string(buf));
+    }
+    fclose(f);
+    for (auto& l : lines) std::cout << l;
+    return true;
+}",Replace raw FILE* C-style I/O with std::ifstream RAII; replace char buffer with std::string getline; remove manual fclose,"#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
+
+bool processFile(const std::string& path) {
+    std::ifstream f(path);
+    if (!f.is_open()) return false;
+    std::string line;
+    while (std::getline(f, line)) {
+        std::cout << line << '\n';
+    }
+    return true;
+}"
+2,"class Buffer {
+public:
+    Buffer(size_t size) {
+        data_ = new char[size];
+        size_ = size;
+    }
+    ~Buffer() { delete[] data_; }
+    char* data() { return data_; }
+    size_t size() const { return size_; }
+private:
+    char* data_;
+    size_t size_;
+};","Apply the Rule of Five: add copy constructor, copy assignment, move constructor, and move assignment; or replace raw pointer with std::unique_ptr to apply Rule of Zero","#include <memory>
+#include <cstddef>
+
+class Buffer {
+public:
+    explicit Buffer(std::size_t size)
+        : data_(std::make_unique<char[]>(size)), size_(size) {}
+
+    // Rule of Zero: unique_ptr handles copy-delete and move automatically.
+    // Copying a Buffer is intentionally deleted (unique ownership).
+    Buffer(const Buffer&) = delete;
+    Buffer& operator=(const Buffer&) = delete;
+
+    Buffer(Buffer&&) noexcept = default;
+    Buffer& operator=(Buffer&&) noexcept = default;
+
+    char* data() { return data_.get(); }
+    const char* data() const { return data_.get(); }
+    std::size_t size() const { return size_; }
+
+private:
+    std::unique_ptr<char[]> data_;
+    std::size_t size_;
+};"
+3,"#include <vector>
+#include <string>
+
+struct Employee {
+    std::string name;
+    std::string department;
+    double salary;
+};
+
+double getAverageSalary(const std::vector<Employee>& employees, const std::string& dept) {
+    double total = 0;
+    int count = 0;
+    for (int i = 0; i < employees.size(); i++) {
+        if (employees[i].department == dept) {
+            total += employees[i].salary;
+            count++;
+        }
+    }
+    if (count == 0) return 0.0;
+    return total / count;
+}",Replace raw index loop with range-based for; fix signed/unsigned comparison; use std::accumulate + std::count_if from <numeric>/<algorithm> for clarity,"#include <algorithm>
+#include <numeric>
+#include <string>
+#include <vector>
+
+struct Employee {
+    std::string name;
+    std::string department;
+    double salary;
+};
+
+double getAverageSalary(const std::vector<Employee>& employees, const std::string& dept) {
+    auto inDept = [&dept](const Employee& e) { return e.department == dept; };
+    const long count = std::count_if(employees.begin(), employees.end(), inDept);
+    if (count == 0) return 0.0;
+    const double total = std::accumulate(employees.begin(), employees.end(), 0.0,
+        [&dept](double sum, const Employee& e) {
+            return e.department == dept ? sum + e.salary : sum;
+        });
+    return total / static_cast<double>(count);
+}"
+4,"#include <string>
+#include <iostream>
+
+class Logger {
+public:
+    static Logger* getInstance() {
+        if (!instance_) instance_ = new Logger();
+        return instance_;
+    }
+    void log(const std::string& msg) { std::cout << msg << '\n'; }
+private:
+    Logger() = default;
+    static Logger* instance_;
+};
+
+Logger* Logger::instance_ = nullptr;","Fix the broken singleton (raw pointer, not thread-safe, leaks) using a Meyers singleton with a static local; delete copy and move operations","#include <iostream>
+#include <string>
+
+class Logger {
+public:
+    static Logger& getInstance() {
+        static Logger instance;   // thread-safe since C++11 (magic static)
+        return instance;
+    }
+
+    Logger(const Logger&)            = delete;
+    Logger& operator=(const Logger&) = delete;
+    Logger(Logger&&)                 = delete;
+    Logger& operator=(Logger&&)      = delete;
+
+    void log(const std::string& msg) const { std::cout << msg << '\n'; }
+
+private:
+    Logger() = default;
+};"
+5,"#include <vector>
+#include <algorithm>
+
+void removeDuplicates(std::vector<int>& v) {
+    for (int i = 0; i < v.size(); i++) {
+        for (int j = i + 1; j < v.size(); ) {
+            if (v[i] == v[j]) v.erase(v.begin() + j);
+            else j++;
+        }
+    }
+}",Replace O(n^2) nested-erase loop with the sort + std::unique + erase idiom; fix signed/unsigned index comparison,"#include <algorithm>
+#include <vector>
+
+void removeDuplicates(std::vector<int>& v) {
+    std::sort(v.begin(), v.end());
+    v.erase(std::unique(v.begin(), v.end()), v.end());
+}"
+6,"#include <string>
+#include <stdexcept>
+
+double divide(double a, double b) {
+    if (b == 0) {
+        throw ""division by zero"";
+    }
+    return a / b;
+}
+
+void compute() {
+    try {
+        double r = divide(10.0, 0.0);
+    } catch (const char* msg) {
+        printf(""Error: %s\n"", msg);
+    }
+}",Replace throwing and catching raw string literals with std::invalid_argument; replace printf with std::cerr,"#include <iostream>
+#include <stdexcept>
+#include <string>
+
+double divide(double a, double b) {
+    if (b == 0.0) {
+        throw std::invalid_argument(""division by zero"");
+    }
+    return a / b;
+}
+
+void compute() {
+    try {
+        double r = divide(10.0, 0.0);
+        (void)r;
+    } catch (const std::invalid_argument& e) {
+        std::cerr << ""Error: "" << e.what() << '\n';
+    }
+}"
+7,"#include <vector>
+
+template<typename T>
+class Stack {
+public:
+    void push(T val) { data_.push_back(val); }
+    T pop() {
+        T val = data_.back();
+        data_.pop_back();
+        return val;
+    }
+    T peek() { return data_.back(); }
+    bool empty() { return data_.empty(); }
+    int size() { return data_.size(); }
+private:
+    std::vector<T> data_;
+};",Fix pop() exception safety by separating top()/pop(); mark all non-mutating methods const; fix signed/unsigned size(); take push argument by value and move it,"#include <stdexcept>
+#include <vector>
+
+template<typename T>
+class Stack {
+public:
+    void push(T val) { data_.push_back(std::move(val)); }
+
+    // Separate top() + pop() for exception safety
+    const T& top() const {
+        if (empty()) throw std::underflow_error(""Stack::top on empty stack"");
+        return data_.back();
+    }
+
+    void pop() {
+        if (empty()) throw std::underflow_error(""Stack::pop on empty stack"");
+        data_.pop_back();
+    }
+
+    bool empty() const { return data_.empty(); }
+    std::size_t size() const { return data_.size(); }
+
+private:
+    std::vector<T> data_;
+};"
+8,"#include <string>
+#include <vector>
+#include <sstream>
+#include <iostream>
+
+std::vector<std::string> split(const std::string& s, char delim) {
+    std::vector<std::string> result;
+    std::string token = """";
+    for (int i = 0; i < s.size(); i++) {
+        if (s[i] == delim) {
+            result.push_back(token);
+            token = """";
+        } else {
+            token += s[i];
+        }
+    }
+    result.push_back(token);
+    return result;
+}",Replace manual character loop with std::istringstream + std::getline; use range-based for or iterators; fix signed/unsigned comparison,"#include <sstream>
+#include <string>
+#include <vector>
+
+std::vector<std::string> split(const std::string& s, char delim) {
+    std::vector<std::string> result;
+    std::istringstream ss(s);
+    std::string token;
+    while (std::getline(ss, token, delim)) {
+        result.push_back(std::move(token));
+    }
+    return result;
+}"
+9,"#include <iostream>
+#include <vector>
+#include <string>
+
+struct Shape {
+    std::string type;
+    double dim1, dim2;
+};
+
+double area(const Shape& s) {
+    if (s.type == ""rectangle"") return s.dim1 * s.dim2;
+    else if (s.type == ""circle"") return 3.14159 * s.dim1 * s.dim1;
+    else if (s.type == ""triangle"") return 0.5 * s.dim1 * s.dim2;
+    return 0.0;
+}
+
+void printAreas(const std::vector<Shape>& shapes) {
+    for (const auto& s : shapes) std::cout << area(s) << '\n';
+}","Replace type-string dispatch struct with a polymorphic class hierarchy: abstract Shape base with virtual area(); Rectangle, Circle, Triangle subclasses; virtual destructor","#include <cmath>
+#include <iostream>
+#include <memory>
+#include <vector>
+
+struct Shape {
+    virtual double area() const = 0;
+    virtual ~Shape() = default;
+};
+
+struct Rectangle : Shape {
+    double width, height;
+    Rectangle(double w, double h) : width(w), height(h) {}
+    double area() const override { return width * height; }
+};
+
+struct Circle : Shape {
+    double radius;
+    explicit Circle(double r) : radius(r) {}
+    double area() const override { return M_PI * radius * radius; }
+};
+
+struct Triangle : Shape {
+    double base, height;
+    Triangle(double b, double h) : base(b), height(h) {}
+    double area() const override { return 0.5 * base * height; }
+};
+
+void printAreas(const std::vector<std::unique_ptr<Shape>>& shapes) {
+    for (const auto& s : shapes) std::cout << s->area() << '\n';
+}"
+10,"#include <map>
+#include <string>
+#include <mutex>
+
+class Config {
+public:
+    void set(const std::string& key, const std::string& value) {
+        data_[key] = value;
+    }
+    std::string get(const std::string& key) {
+        if (data_.count(key)) return data_[key];
+        return """";
+    }
+    bool has(const std::string& key) { return data_.count(key) > 0; }
+private:
+    std::map<std::string, std::string> data_;
+};","Replace std::map with std::unordered_map for O(1) average lookup; make get() return std::optional<std::string>; add thread safety with std::shared_mutex (shared reads, exclusive writes)","#include <optional>
+#include <shared_mutex>
+#include <string>
+#include <unordered_map>
+
+class Config {
+public:
+    void set(const std::string& key, const std::string& value) {
+        std::unique_lock lock(mutex_);
+        data_[key] = value;
+    }
+
+    std::optional<std::string> get(const std::string& key) const {
+        std::shared_lock lock(mutex_);
+        auto it = data_.find(key);
+        if (it == data_.end()) return std::nullopt;
+        return it->second;
+    }
+
+    bool has(const std::string& key) const {
+        std::shared_lock lock(mutex_);
+        return data_.count(key) > 0;
+    }
+
+private:
+    std::unordered_map<std::string, std::string> data_;
+    mutable std::shared_mutex mutex_;
+};"
+11,"#include <vector>
+#include <string>
+#include <algorithm>
+
+std::vector<std::string> filterAndTransform(const std::vector<std::string>& input) {
+    std::vector<std::string> result;
+    for (size_t i = 0; i < input.size(); i++) {
+        if (input[i].length() > 3) {
+            std::string s = input[i];
+            std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+            result.push_back(s);
+        }
+    }
+    return result;
+}",Replace index loop with range-based for; extract the uppercase transform into a lambda; use std::copy_if + std::transform pipeline or a single loop with emplace_back and move,"#include <algorithm>
+#include <string>
+#include <vector>
+
+std::vector<std::string> filterAndTransform(const std::vector<std::string>& input) {
+    auto toUpper = [](std::string s) {
+        std::transform(s.begin(), s.end(), s.begin(),
+            [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+        return s;
+    };
+
+    std::vector<std::string> result;
+    for (const auto& s : input) {
+        if (s.length() > 3) result.emplace_back(toUpper(s));
+    }
+    return result;
+}"
+12,"#include <functional>
+#include <vector>
+#include <map>
+#include <string>
+#include <stdexcept>
+
+class EventBus {
+public:
+    using Handler = std::function<void(const std::string&)>;
+
+    void subscribe(const std::string& event, Handler handler) {
+        handlers_[event].push_back(handler);
+    }
+
+    void publish(const std::string& event, const std::string& data) {
+        if (handlers_.count(event)) {
+            for (auto& h : handlers_[event]) h(data);
+        }
+    }
+private:
+    std::map<std::string, std::vector<Handler>> handlers_;
+};",Replace std::map with std::unordered_map; subscribe() should return an unsubscribe token (integer ID); add unsubscribe(id) method; use const reference iteration,"#include <cstdint>
+#include <functional>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+class EventBus {
+public:
+    using Handler  = std::function<void(const std::string&)>;
+    using Token    = std::uint64_t;
+
+    Token subscribe(const std::string& event, Handler handler) {
+        Token id = nextId_++;
+        handlers_[event].push_back({ id, std::move(handler) });
+        return id;
+    }
+
+    void unsubscribe(Token id) {
+        for (auto& [event, vec] : handlers_) {
+            vec.erase(std::remove_if(vec.begin(), vec.end(),
+                [id](const Entry& e) { return e.id == id; }), vec.end());
+        }
+    }
+
+    void publish(const std::string& event, const std::string& data) const {
+        auto it = handlers_.find(event);
+        if (it == handlers_.end()) return;
+        for (const auto& entry : it->second) entry.handler(data);
+    }
+
+private:
+    struct Entry { Token id; Handler handler; };
+    std::unordered_map<std::string, std::vector<Entry>> handlers_;
+    Token nextId_ = 0;
+};"
+13,"#include <vector>
+#include <string>
+#include <iostream>
+
+void printMatrix(int** matrix, int rows, int cols) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            std::cout << matrix[i][j] << "" "";
+        }
+        std::cout << ""\n"";
+    }
+}
+
+int** createMatrix(int rows, int cols) {
+    int** m = new int*[rows];
+    for (int i = 0; i < rows; i++) m[i] = new int[cols]();
+    return m;
+}
+
+void freeMatrix(int** m, int rows) {
+    for (int i = 0; i < rows; i++) delete[] m[i];
+    delete[] m;
+}",Replace raw double pointer matrix with a Matrix class wrapping a flat std::vector<int> with row-major indexing; add operator() for element access; eliminate manual memory management,"#include <iostream>
+#include <stdexcept>
+#include <vector>
+
+class Matrix {
+public:
+    Matrix(std::size_t rows, std::size_t cols, int init = 0)
+        : rows_(rows), cols_(cols), data_(rows * cols, init) {}
+
+    int& operator()(std::size_t r, std::size_t c) {
+        if (r >= rows_ || c >= cols_) throw std::out_of_range(""Matrix index out of range"");
+        return data_[r * cols_ + c];
+    }
+    const int& operator()(std::size_t r, std::size_t c) const {
+        if (r >= rows_ || c >= cols_) throw std::out_of_range(""Matrix index out of range"");
+        return data_[r * cols_ + c];
+    }
+
+    std::size_t rows() const { return rows_; }
+    std::size_t cols() const { return cols_; }
+
+    void print() const {
+        for (std::size_t i = 0; i < rows_; ++i) {
+            for (std::size_t j = 0; j < cols_; ++j)
+                std::cout << (*this)(i, j) << ' ';
+            std::cout << '\n';
+        }
+    }
+
+private:
+    std::size_t rows_, cols_;
+    std::vector<int> data_;
+};"
+14,"#include <string>
+#include <vector>
+#include <sstream>
+
+std::string buildQuery(const std::string& table,
+                       const std::vector<std::string>& fields,
+                       const std::vector<std::string>& conditions) {
+    std::string query = ""SELECT "";
+    for (int i = 0; i < fields.size(); i++) {
+        query += fields[i];
+        if (i < fields.size() - 1) query += "", "";
+    }
+    query += "" FROM "" + table;
+    if (!conditions.empty()) {
+        query += "" WHERE "";
+        for (int i = 0; i < conditions.size(); i++) {
+            query += conditions[i];
+            if (i < conditions.size() - 1) query += "" AND "";
+        }
+    }
+    return query;
+}",Replace manual string concatenation loops with a join() helper using std::ostringstream; fix signed/unsigned comparisons; make join a reusable template lambda or free function,"#include <sstream>
+#include <string>
+#include <vector>
+
+namespace {
+std::string join(const std::vector<std::string>& parts, const std::string& sep) {
+    if (parts.empty()) return {};
+    std::ostringstream oss;
+    oss << parts.front();
+    for (std::size_t i = 1; i < parts.size(); ++i) oss << sep << parts[i];
+    return oss.str();
+}
+} // namespace
+
+std::string buildQuery(const std::string& table,
+                       const std::vector<std::string>& fields,
+                       const std::vector<std::string>& conditions) {
+    std::string query = ""SELECT "" + join(fields, "", "") + "" FROM "" + table;
+    if (!conditions.empty())
+        query += "" WHERE "" + join(conditions, "" AND "");
+    return query;
+}"
+15,"#include <iostream>
+#include <string>
+
+template<typename T>
+void print(T val) { std::cout << val; }
+
+template<typename T, typename... Args>
+void print(T val, Args... args) {
+    std::cout << val << "" "";
+    print(args...);
+}
+
+template<typename... Args>
+void println(Args... args) {
+    print(args...);
+    std::cout << ""\n"";
+}",Refactor variadic print/println to use fold expressions (C++17) instead of recursive template instantiation; pass args by const reference to avoid copies,"#include <iostream>
+
+template<typename... Args>
+void print(const Args&... args) {
+    bool first = true;
+    ((std::cout << (first ? (first = false, """") : "" "") << args), ...);
+}
+
+template<typename... Args>
+void println(const Args&... args) {
+    print(args...);
+    std::cout << '\n';
+}"
+16,"#include <vector>
+#include <functional>
+#include <string>
+
+class Pipeline {
+public:
+    using Step = std::function<std::string(std::string)>;
+
+    void addStep(Step step) { steps_.push_back(step); }
+
+    std::string run(std::string input) {
+        std::string current = input;
+        for (int i = 0; i < steps_.size(); i++) {
+            current = steps_[i](current);
+        }
+        return current;
+    }
+private:
+    std::vector<Step> steps_;
+};",Add fluent pipe() method returning *this; replace index loop with range-based for; take Step by value in addStep and move into vector; mark run() const,"#include <functional>
+#include <string>
+#include <vector>
+
+class Pipeline {
+public:
+    using Step = std::function<std::string(std::string)>;
+
+    Pipeline& pipe(Step step) {
+        steps_.push_back(std::move(step));
+        return *this;
+    }
+
+    std::string run(std::string input) const {
+        for (const auto& step : steps_) input = step(std::move(input));
+        return input;
+    }
+
+private:
+    std::vector<Step> steps_;
+};"
+17,"#include <string>
+#include <stdexcept>
+
+class Result {
+public:
+    bool ok;
+    std::string value;
+    std::string error;
+
+    static Result success(const std::string& val) {
+        Result r; r.ok = true; r.value = val; return r;
+    }
+    static Result failure(const std::string& err) {
+        Result r; r.ok = false; r.error = err; return r;
+    }
+};
+
+Result parseInt(const std::string& s) {
+    try {
+        int val = std::stoi(s);
+        return Result::success(std::to_string(val));
+    } catch (...) {
+        return Result::failure(""not a valid integer: "" + s);
+    }
+}","Replace the ad-hoc Result struct with std::expected<int, std::string> (C++23) or a std::variant<int, std::string>-based Expected<T,E> template for C++17","#include <stdexcept>
+#include <string>
+#include <variant>
+
+template<typename T, typename E>
+class Expected {
+public:
+    static Expected ok(T val)  { Expected e; e.data_ = std::move(val); return e; }
+    static Expected err(E err) { Expected e; e.data_ = std::move(err); return e; }
+
+    bool has_value() const { return std::holds_alternative<T>(data_); }
+    explicit operator bool() const { return has_value(); }
+
+    T&       value()       { return std::get<T>(data_); }
+    const T& value() const { return std::get<T>(data_); }
+    const E& error() const { return std::get<E>(data_); }
+
+private:
+    std::variant<T, E> data_;
+};
+
+Expected<int, std::string> parseInt(const std::string& s) {
+    try {
+        return Expected<int, std::string>::ok(std::stoi(s));
+    } catch (const std::exception&) {
+        return Expected<int, std::string>::err(""not a valid integer: "" + s);
+    }
+}"
+18,"#include <string>
+#include <vector>
+#include <algorithm>
+#include <iostream>
+
+struct Person {
+    std::string name;
+    int age;
+};
+
+void report(const std::vector<Person>& people) {
+    std::vector<Person> adults;
+    for (const auto& p : people) {
+        if (p.age >= 18) adults.push_back(p);
+    }
+    std::sort(adults.begin(), adults.end(), [](const Person& a, const Person& b) {
+        return a.name < b.name;
+    });
+    for (const auto& p : adults) {
+        std::cout << p.name << "" ("" << p.age << "")\n"";
+    }
+}","Eliminate the intermediate adults copy: use std::copy_if into the result vector then std::sort, or produce a sorted view; use std::partition_copy or ranges::filter | ranges::sort if C++20 available","#include <algorithm>
+#include <iostream>
+#include <string>
+#include <vector>
+
+struct Person { std::string name; int age; };
+
+void report(const std::vector<Person>& people) {
+    std::vector<const Person*> adults;
+    adults.reserve(people.size());
+    for (const auto& p : people)
+        if (p.age >= 18) adults.push_back(&p);
+
+    std::sort(adults.begin(), adults.end(),
+        [](const Person* a, const Person* b) { return a->name < b->name; });
+
+    for (const auto* p : adults)
+        std::cout << p->name << "" ("" << p->age << "")\n"";
+}"
+19,"#include <string>
+#include <unordered_map>
+#include <functional>
+#include <stdexcept>
+
+class CommandDispatcher {
+public:
+    using Handler = std::function<void(const std::string&)>;
+
+    void registerCommand(std::string name, Handler handler) {
+        handlers_[name] = handler;
+    }
+
+    void dispatch(const std::string& name, const std::string& arg) {
+        if (handlers_.count(name) == 0)
+            throw std::runtime_error(""Unknown command: "" + name);
+        handlers_[name](arg);
+    }
+private:
+    std::unordered_map<std::string, Handler> handlers_;
+};",registerCommand() should take Handler by value and move it into the map; dispatch() should use find() to avoid double-lookup; add a deregister(name) method and a hasCommand(name) const query,"#include <functional>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+
+class CommandDispatcher {
+public:
+    using Handler = std::function<void(const std::string&)>;
+
+    void registerCommand(std::string name, Handler handler) {
+        handlers_.emplace(std::move(name), std::move(handler));
+    }
+
+    void deregister(const std::string& name) {
+        handlers_.erase(name);
+    }
+
+    bool hasCommand(const std::string& name) const {
+        return handlers_.count(name) > 0;
+    }
+
+    void dispatch(const std::string& name, const std::string& arg) const {
+        auto it = handlers_.find(name);
+        if (it == handlers_.end())
+            throw std::runtime_error(""Unknown command: "" + name);
+        it->second(arg);
+    }
+
+private:
+    std::unordered_map<std::string, Handler> handlers_;
+};"
+20,"#include <vector>
+#include <thread>
+#include <mutex>
+#include <functional>
+
+class ThreadPool {
+public:
+    ThreadPool(int numThreads) {
+        for (int i = 0; i < numThreads; i++) {
+            threads_.push_back(std::thread([this]() {
+                while (true) {
+                    std::function<void()> task;
+                    {
+                        std::lock_guard<std::mutex> lock(mutex_);
+                        if (tasks_.empty()) continue;
+                        task = tasks_.front();
+                        tasks_.erase(tasks_.begin());
+                    }
+                    task();
+                }
+            }));
+        }
+    }
+    void submit(std::function<void()> task) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        tasks_.push_back(task);
+    }
+private:
+    std::vector<std::thread> threads_;
+    std::vector<std::function<void()>> tasks_;
+    std::mutex mutex_;
+};",Fix the busy-wait spin loop by replacing it with std::condition_variable; add a stop flag for clean shutdown; use a std::queue instead of std::vector for tasks; add destructor that joins all threads,"#include <condition_variable>
+#include <functional>
+#include <mutex>
+#include <queue>
+#include <thread>
+#include <vector>
+
+class ThreadPool {
+public:
+    explicit ThreadPool(std::size_t numThreads) {
+        for (std::size_t i = 0; i < numThreads; ++i) {
+            threads_.emplace_back([this] { workerLoop(); });
+        }
+    }
+
+    ~ThreadPool() {
+        {
+            std::unique_lock lock(mutex_);
+            stop_ = true;
+        }
+        cv_.notify_all();
+        for (auto& t : threads_) t.join();
+    }
+
+    void submit(std::function<void()> task) {
+        {
+            std::unique_lock lock(mutex_);
+            tasks_.push(std::move(task));
+        }
+        cv_.notify_one();
+    }
+
+private:
+    void workerLoop() {
+        while (true) {
+            std::function<void()> task;
+            {
+                std::unique_lock lock(mutex_);
+                cv_.wait(lock, [this] { return stop_ || !tasks_.empty(); });
+                if (stop_ && tasks_.empty()) return;
+                task = std::move(tasks_.front());
+                tasks_.pop();
+            }
+            task();
+        }
+    }
+
+    std::vector<std::thread> threads_;
+    std::queue<std::function<void()>> tasks_;
+    std::mutex mutex_;
+    std::condition_variable cv_;
+    bool stop_ = false;
+};"

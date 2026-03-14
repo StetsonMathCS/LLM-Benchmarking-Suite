@@ -1,0 +1,315 @@
+id,code_snippet,from,to,final_output,verify_ast_nodes_removed,verify_ast_nodes_added,verify_strategy,verify_note
+1,"def get_users():
+    users = []
+    for i in range(len(data)):
+        users.append(data[i]['name'])
+    return users",range(len(data)) iteration with index access,enumerate() or direct iteration,"def get_users():
+    return [item['name'] for item in data]","range,len",,ast,No range() or len() calls; direct iteration over data
+2,"result = filter(lambda x: x > 0, numbers)
+items = map(lambda x: x * 2, result)
+final = list(items)",chained filter/map with lambdas,single list comprehension,final = [x * 2 for x in numbers if x > 0],"filter,map",ListComp,ast,Single ListComp with if-condition; no filter/map calls
+3,"class UserService:
+    def __init__(self):
+        self.db = Database()
+        self.cache = Redis()
+        self.logger = Logger()
+
+    def get_user(self, user_id):
+        return self.db.query(f'SELECT * FROM users WHERE id = {user_id}')",f-string SQL interpolation in query(),parameterized query with %s placeholder,"class UserService:
+    def __init__(self):
+        self.db = Database()
+        self.cache = Redis()
+        self.logger = Logger()
+
+    def get_user(self, user_id):
+        return self.db.query('SELECT * FROM users WHERE id = %s', (user_id,))",JoinedStr,Tuple,ast,No f-string (JoinedStr) in query call; tuple of params passed as second arg
+4,"try:
+    result = int(user_input)
+except:
+    print('error')",bare except clause,except ValueError with descriptive error message,"try:
+    result = int(user_input)
+except ValueError as e:
+    print(f'Invalid input, expected an integer: {e}')",,ExceptHandler:ValueError,ast,ExceptHandler must name ValueError; no bare except
+5,"CONFIG = {
+    'db_host': 'localhost',
+    'db_port': 5432,
+    'secret_key': 'abc123',
+    'debug': True
+}",hardcoded config values dict,os.environ.get() calls with fallback defaults,"import os
+
+CONFIG = {
+    'db_host': os.environ.get('DB_HOST', 'localhost'),
+    'db_port': int(os.environ.get('DB_PORT', '5432')),
+    'secret_key': os.environ.get('SECRET_KEY', ''),
+    'debug': os.environ.get('DEBUG', 'false').lower() == 'true'
+}",,os.environ.get,ast+exec,All values use os.environ.get(); no bare string literals as dict values
+6,"def calculate_stats(numbers):
+    mean = sum(numbers) / len(numbers)
+    variance = sum((x - mean) ** 2 for x in numbers) / len(numbers)
+    return mean, variance",two separate O(n) passes over numbers,single-pass accumulation using running sum and sum of squares,"def calculate_stats(numbers):
+    n = len(numbers)
+    total = 0
+    total_sq = 0
+    for x in numbers:
+        total += x
+        total_sq += x * x
+    mean = total / n
+    variance = (total_sq / n) - (mean ** 2)
+    return mean, variance",,,exec,"exec: calculate_stats([2,4,4,4,5,5,7,9]) == (5.0, 4.0) within 1e-9; only one loop over input"
+7,"class Singleton:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        self.data = {}",__init__ unconditionally resetting state on every call,hasattr guard to initialize state only once,"class Singleton:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        if not hasattr(self, 'data'):
+            self.data = {}",,hasattr,exec,exec: s=Singleton(); s.data['k']=1; s2=Singleton(); assert s2.data == {'k':1}
+8,"def read_file(path):
+    f = open(path, 'r')
+    content = f.read()
+    f.close()
+    return content",manual open/close file handling,with statement context manager,"def read_file(path):
+    with open(path, 'r') as f:
+        return f.read()",f.close,With,ast,With node wraps open(); no explicit .close() call present
+9,"def is_adult(age):
+    if age >= 18:
+        return True
+    else:
+        return False",explicit if/else returning True/False literals,single boolean expression return,"def is_adult(age):
+    return age >= 18",If,,ast+exec,"No If node in function body; exec: is_adult(18)==True, is_adult(17)==False"
+10,"users = []
+for user in all_users:
+    if user['active']:
+        users.append({'id': user['id'], 'name': user['name']})",for-loop with conditional append and manual dict construction,list comprehension with dict expression,"users = [{'id': u['id'], 'name': u['name']} for u in all_users if u['active']]","For,If,Attribute:append",ListComp,ast+exec,Single ListComp with if-guard; exec output matches loop output
+11,"def fetch_all(urls):
+    results = []
+    for url in urls:
+        r = requests.get(url)
+        results.append(r.json())
+    return results",sequential synchronous requests in a for-loop,concurrent.futures.ThreadPoolExecutor with map(),"from concurrent.futures import ThreadPoolExecutor
+
+def fetch_all(urls):
+    def _fetch(url):
+        return requests.get(url).json()
+    with ThreadPoolExecutor() as executor:
+        return list(executor.map(_fetch, urls))",For,"ThreadPoolExecutor,With",ast,No sequential For loop; ThreadPoolExecutor used as context manager with .map()
+12,"import time
+
+def retry(func, n):
+    for i in range(n):
+        try:
+            return func()
+        except Exception:
+            time.sleep(1)
+    return None",fixed 1-second sleep between retries,"exponential backoff with jitter using 2**i + random.uniform(0, 1)","import time
+import random
+
+def retry(func, n):
+    for i in range(n):
+        try:
+            return func()
+        except Exception:
+            time.sleep(2 ** i + random.uniform(0, 1))
+    return None",,"random.uniform,BinOp:Pow",ast,time.sleep arg is 2**i expression plus random.uniform(); no bare time.sleep(1)
+13,"product = 1
+for num in numbers:
+    product *= num",manual accumulation loop,functools.reduce() with operator.mul,"import functools
+import operator
+
+product = functools.reduce(operator.mul, numbers, 1)","For,AugAssign","functools.reduce,Attr:mul",ast+exec,"No For loop; exec: reduce(mul,[1,2,3,4],1)==24"
+14,"def get_first_admin(users):
+    for user in users:
+        if user.role == 'admin':
+            return user
+    return None",explicit for-loop with early return search pattern,next() with a generator expression and default,"def get_first_admin(users):
+    return next((u for u in users if u.role == 'admin'), None)","For,If,Return:None","next,GeneratorExp",ast+exec,Single return with next(); exec: returns correct user or None
+15,"data = json.loads(response.text)
+name = data.get('user', {}).get('profile', {}).get('name', '')
+age = data.get('user', {}).get('profile', {}).get('age', 0)
+city = data.get('user', {}).get('address', {}).get('city', '')",repeated chained .get() calls on the same nested dict,Pydantic BaseModel with nested models for single-call validation and access,"from pydantic import BaseModel
+from typing import Optional
+
+class Profile(BaseModel):
+    name: str = ''
+    age: int = 0
+
+class Address(BaseModel):
+    city: str = ''
+
+class User(BaseModel):
+    profile: Profile = Profile()
+    address: Address = Address()
+
+class ResponseModel(BaseModel):
+    user: User = User()
+
+parsed = ResponseModel(**json.loads(response.text))
+name = parsed.user.profile.name
+age = parsed.user.profile.age
+city = parsed.user.address.city",Attribute:get,base:BaseModel,ast,No chained .get() calls; Pydantic BaseModel subclasses defined; attribute access used
+16,"squared = {}
+for n in numbers:
+    squared[n] = n ** 2",for-loop building a dict with assignment,dict comprehension,squared = {n: n ** 2 for n in numbers},For,DictComp,ast+exec,"DictComp node; exec: {1:1,2:4,3:9} for [1,2,3]"
+17,"def log(msg, level='INFO'):
+    print('[' + level + '] ' + msg)",string concatenation with +,f-string interpolation,"def log(msg, level='INFO'):
+    print(f'[{level}] {msg}')",BinOp:Add,JoinedStr,ast+exec,JoinedStr (f-string) in print arg; no BinOp Add on strings; exec output identical
+18,"class Animal:
+    def speak(self):
+        pass
+
+class Dog(Animal):
+    def speak(self):
+        return 'Woof'
+
+class Cat(Animal):
+    def speak(self):
+        return 'Meow'
+
+def animal_sound(animal):
+    if isinstance(animal, Dog):
+        return animal.speak()
+    elif isinstance(animal, Cat):
+        return animal.speak()",isinstance dispatch chain in animal_sound(),direct polymorphic call to animal.speak(),"class Animal:
+    def speak(self):
+        pass
+
+class Dog(Animal):
+    def speak(self):
+        return 'Woof'
+
+class Cat(Animal):
+    def speak(self):
+        return 'Meow'
+
+def animal_sound(animal):
+    return animal.speak()","isinstance,If",,ast+exec,"No isinstance() or If in animal_sound; exec: Dog→'Woof', Cat→'Meow'"
+19,"def find_duplicates(lst):
+    seen = []
+    duplicates = []
+    for item in lst:
+        if item in seen:
+            duplicates.append(item)
+        else:
+            seen.append(item)
+    return duplicates",list-based seen and duplicates with O(n) membership checks,set-based O(1) lookup using seen: set and duplicates: set,"def find_duplicates(lst):
+    seen = set()
+    duplicates = set()
+    for item in lst:
+        if item in seen:
+            duplicates.add(item)
+        else:
+            seen.add(item)
+    return list(duplicates)","list:seen,list:duplicates,Attribute:append","set,Attribute:add",ast+exec,seen and duplicates initialized as set(); .add() used not .append(); exec result set equals expected
+20,"@app.route('/user/<id>')
+def get_user(id):
+    user = db.session.query(User).filter(User.id == id).first()
+    return jsonify({
+        'id': user.id,
+        'name': user.name,
+        'email': user.email
+    })",missing null-check before attribute access on ORM result,explicit 404 guard using abort(404) if user is None before serialization,"@app.route('/user/<id>')
+def get_user(id):
+    user = db.session.query(User).filter(User.id == id).first()
+    if user is None:
+        abort(404)
+    return jsonify({
+        'id': user.id,
+        'name': user.name,
+        'email': user.email
+    })",,"abort,If",ast,If block checking 'user is None' with abort(404) inserted before jsonify
+21,"numbers = [1, 2, 3, 4, 5]
+total = 0
+for n in numbers:
+    total += n",manual summation loop,built-in sum(),"numbers = [1, 2, 3, 4, 5]
+total = sum(numbers)","For,AugAssign",sum,ast+exec,No For loop; sum() call; exec: total==15
+22,"def celsius_to_fahrenheit(c):
+    return (c * 9/5) + 32
+
+def fahrenheit_to_celsius(f):
+    return (f - 32) * 5/9
+
+def kelvin_to_celsius(k):
+    return k - 273.15",three standalone conversion functions,staticmethods grouped inside a TemperatureConverter class,"class TemperatureConverter:
+    @staticmethod
+    def celsius_to_fahrenheit(c):
+        return (c * 9/5) + 32
+
+    @staticmethod
+    def fahrenheit_to_celsius(f):
+        return (f - 32) * 5/9
+
+    @staticmethod
+    def kelvin_to_celsius(k):
+        return k - 273.15",FunctionDef:module-level,"ClassDef:TemperatureConverter,dec:staticmethod",ast+exec,ClassDef named TemperatureConverter; all three methods decorated with @staticmethod; exec: results identical
+23,"with open('out.txt', 'w') as f:
+    for row in data:
+        line = ','.join(str(x) for x in row)
+        f.write(line + '\n')",manual CSV serialization with join and write,csv.writer with writerows(),"import csv
+
+with open('out.txt', 'w', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerows(data)","For,str.join,f.write","csv.writer,Attr:writerows",ast,csv.writer instantiated; writerows() called; no manual join/write loop
+24,"def get_env():
+    host = os.environ['DB_HOST']
+    port = os.environ['DB_PORT']
+    name = os.environ['DB_NAME']
+    return host, port, name",os.environ[] direct access that raises KeyError on missing vars,os.environ.get() with explicit missing-var error reporting,"def get_env():
+    required = ['DB_HOST', 'DB_PORT', 'DB_NAME']
+    missing = [k for k in required if not os.environ.get(k)]
+    if missing:
+        raise EnvironmentError(f'Missing required env vars: {missing}')
+    return os.environ.get('DB_HOST'), os.environ.get('DB_PORT'), os.environ.get('DB_NAME')",Subscript:os.environ,"os.environ.get,EnvironmentError",ast,No os.environ['key'] subscript access; os.environ.get() used; EnvironmentError raised for missing vars
+25,"cache = {}
+
+def get_user(user_id):
+    if user_id not in cache:
+        cache[user_id] = db.fetch(user_id)
+    return cache[user_id]",manual if-not-in-cache dict pattern,@functools.lru_cache(maxsize=256) decorator,"import functools
+
+@functools.lru_cache(maxsize=256)
+def get_user(user_id):
+    return db.fetch(user_id)","If,Subscript:cache,Dict:cache",functools.lru_cache,ast,lru_cache decorator applied; no manual cache dict or if-guard in function body
+26,"def apply_all(funcs, value):
+    result = value
+    for f in funcs:
+        result = f(result)
+    return result",explicit for-loop accumulating result through function list,functools.reduce() with a lambda,"import functools
+
+def apply_all(funcs, value):
+    return functools.reduce(lambda acc, f: f(acc), funcs, value)","For,Assign:result","functools.reduce,Lambda",ast+exec,"functools.reduce with lambda; exec: apply_all([lambda x:x+1, lambda x:x*2], 3)==8"
+27,"lines = []
+with open('data.txt') as f:
+    for line in f:
+        lines.append(line.strip())
+lines = [l for l in lines if l]",two-pass read-then-filter with intermediate list,single-pass generator expression passed to list(),"with open('data.txt') as f:
+    lines = [line.strip() for line in f if line.strip()]","For,Attribute:append",ListComp,ast,Single ListComp with strip() and if-guard inside the with block; no intermediate list or second pass
+28,"def chunk(lst, size):
+    result = []
+    for i in range(0, len(lst), size):
+        result.append(lst[i:i+size])
+    return result",manual chunking loop with append,list comprehension with slicing,"def chunk(lst, size):
+    return [lst[i:i+size] for i in range(0, len(lst), size)]","For,Attribute:append,Assign:result",ListComp,ast+exec,"Single ListComp return; exec: chunk([1..9],3)==[[1,2,3],[4,5,6],[7,8,9]]"
+29,"scores = {'alice': 95, 'bob': 82, 'carol': 91}
+best = None
+for name, score in scores.items():
+    if best is None or score > scores[best]:
+        best = name",manual argmax loop over dict,max() with key=scores.get,"best = max(scores, key=scores.get)","For,If,Assign:best=None","max,Attr:get",ast+exec,Single max() call with key=scores.get; exec: best=='alice'
+30,"def safe_divide(a, b):
+    if b == 0:
+        return None
+    return a / b",returning None as error sentinel,raising ZeroDivisionError with a descriptive message,"def safe_divide(a, b):
+    if b == 0:
+        raise ZeroDivisionError(f'Cannot divide {a} by zero')
+    return a / b",Return:None,Raise:ZeroDivisionError,ast+exec,"Raise ZeroDivisionError instead of return None; exec: raises on b=0, returns correctly otherwise"

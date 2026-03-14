@@ -1,0 +1,817 @@
+id,prompt,completed
+1,"// Description: Compute the sum of all numbers in a vector.
+#include <iostream>
+#include <vector>
+
+int sumVector(const std::vector<int>& nums) {
+    int total = 0;","// Description: Compute the sum of all numbers in a vector.
+#include <iostream>
+#include <vector>
+
+int sumVector(const std::vector<int>& nums) {
+    int total = 0;
+    for (int n : nums) {
+        total += n;
+    }
+    return total;
+}
+
+int main() {
+    std::cout << sumVector({1, 2, 3, 4}) << std::endl;
+    return 0;
+}"
+2,"// Description: Count vowels in a string.
+#include <iostream>
+#include <string>
+#include <cctype>
+
+int countVowels(const std::string& s) {
+    int count = 0;
+    for (char ch : s) {","// Description: Count vowels in a string.
+#include <iostream>
+#include <string>
+#include <cctype>
+
+int countVowels(const std::string& s) {
+    int count = 0;
+    for (char ch : s) {
+        char c = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+        if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u') {
+            ++count;
+        }
+    }
+    return count;
+}
+
+int main() {
+    std::cout << countVowels(""Hello World"") << std::endl;
+    return 0;
+}"
+3,"// Description: Check if a number is prime.
+#include <iostream>
+
+bool isPrime(int n) {
+    if (n < 2) return false;
+    for (int i = 2; i * i <= n; ++i) {","// Description: Check if a number is prime.
+#include <iostream>
+
+bool isPrime(int n) {
+    if (n < 2) return false;
+    for (int i = 2; i * i <= n; ++i) {
+        if (n % i == 0) return false;
+    }
+    return true;
+}
+
+int main() {
+    std::cout << std::boolalpha << isPrime(29) << std::endl;
+    return 0;
+}"
+4,"// Description: Reverse a vector in place.
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+void reverseVector(std::vector<int>& v) {","// Description: Reverse a vector in place.
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+void reverseVector(std::vector<int>& v) {
+    std::reverse(v.begin(), v.end());
+}
+
+int main() {
+    std::vector<int> v{1, 2, 3, 4, 5};
+    reverseVector(v);
+    for (int x : v) std::cout << x << ' ';
+    std::cout << std::endl;
+    return 0;
+}"
+5,"// Description: Compute factorial iteratively.
+#include <iostream>
+
+long long factorial(int n) {
+    long long result = 1;
+    for (int i = 2; i <= n; ++i) {","// Description: Compute factorial iteratively.
+#include <iostream>
+
+long long factorial(int n) {
+    long long result = 1;
+    for (int i = 2; i <= n; ++i) {
+        result *= i;
+    }
+    return result;
+}
+
+int main() {
+    std::cout << factorial(6) << std::endl;
+    return 0;
+}"
+6,"// Description: Find the maximum value in a vector.
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+
+int maxValue(const std::vector<int>& v) {
+    if (v.empty()) throw std::invalid_argument(""empty vector"");","// Description: Find the maximum value in a vector.
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+
+int maxValue(const std::vector<int>& v) {
+    if (v.empty()) throw std::invalid_argument(""empty vector"");
+    int best = v[0];
+    for (int x : v) {
+        if (x > best) best = x;
+    }
+    return best;
+}
+
+int main() {
+    std::cout << maxValue({4, 9, 1, 7}) << std::endl;
+    return 0;
+}"
+7,"// Description: Remove duplicates while preserving order.
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+
+std::vector<int> uniqueOrdered(const std::vector<int>& nums) {
+    std::unordered_set<int> seen;
+    std::vector<int> out;
+    for (int n : nums) {
+        if (!seen.count(n)) {
+            seen.insert(n);","// Description: Remove duplicates while preserving order.
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+
+std::vector<int> uniqueOrdered(const std::vector<int>& nums) {
+    std::unordered_set<int> seen;
+    std::vector<int> out;
+    for (int n : nums) {
+        if (!seen.count(n)) {
+            seen.insert(n);
+            out.push_back(n);
+        }
+    }
+    return out;
+}
+
+int main() {
+    auto out = uniqueOrdered({1, 2, 2, 3, 1, 4});
+    for (int x : out) std::cout << x << ' ';
+    std::cout << std::endl;
+    return 0;
+}"
+8,"// Description: Convert a string to uppercase.
+#include <iostream>
+#include <string>
+#include <cctype>
+
+std::string toUpper(std::string s) {","// Description: Convert a string to uppercase.
+#include <iostream>
+#include <string>
+#include <cctype>
+
+std::string toUpper(std::string s) {
+    for (char& ch : s) {
+        ch = static_cast<char>(std::toupper(static_cast<unsigned char>(ch)));
+    }
+    return s;
+}
+
+int main() {
+    std::cout << toUpper(""cpp dataset"") << std::endl;
+    return 0;
+}"
+9,"// Description: Compute the average of numeric values.
+#include <iostream>
+#include <vector>
+#include <numeric>
+
+double average(const std::vector<int>& nums) {
+    if (nums.empty()) return 0.0;","// Description: Compute the average of numeric values.
+#include <iostream>
+#include <vector>
+#include <numeric>
+
+double average(const std::vector<int>& nums) {
+    if (nums.empty()) return 0.0;
+    int total = std::accumulate(nums.begin(), nums.end(), 0);
+    return static_cast<double>(total) / nums.size();
+}
+
+int main() {
+    std::cout << average({2, 4, 6, 8}) << std::endl;
+    return 0;
+}"
+10,"// Description: Determine if a string is a palindrome.
+#include <iostream>
+#include <string>
+
+bool isPalindrome(const std::string& s) {
+    int i = 0;","// Description: Determine if a string is a palindrome.
+#include <iostream>
+#include <string>
+
+bool isPalindrome(const std::string& s) {
+    int i = 0;
+    int j = static_cast<int>(s.size()) - 1;
+    while (i < j) {
+        if (s[i] != s[j]) return false;
+        ++i;
+        --j;
+    }
+    return true;
+}
+
+int main() {
+    std::cout << std::boolalpha << isPalindrome(""level"") << std::endl;
+    return 0;
+}"
+11,"// Description: Merge two sorted vectors.
+#include <iostream>
+#include <vector>
+
+std::vector<int> mergeSorted(const std::vector<int>& a, const std::vector<int>& b) {
+    std::vector<int> out;
+    size_t i = 0, j = 0;
+    while (i < a.size() && j < b.size()) {","// Description: Merge two sorted vectors.
+#include <iostream>
+#include <vector>
+
+std::vector<int> mergeSorted(const std::vector<int>& a, const std::vector<int>& b) {
+    std::vector<int> out;
+    size_t i = 0, j = 0;
+    while (i < a.size() && j < b.size()) {
+        if (a[i] <= b[j]) out.push_back(a[i++]);
+        else out.push_back(b[j++]);
+    }
+    while (i < a.size()) out.push_back(a[i++]);
+    while (j < b.size()) out.push_back(b[j++]);
+    return out;
+}
+
+int main() {
+    auto merged = mergeSorted({1, 3, 5}, {2, 4, 6});
+    for (int x : merged) std::cout << x << ' ';
+    std::cout << std::endl;
+    return 0;
+}"
+12,"// Description: Count word frequency in a sentence.
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <unordered_map>
+
+std::unordered_map<std::string, int> wordCount(const std::string& line) {
+    std::unordered_map<std::string, int> freq;","// Description: Count word frequency in a sentence.
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <unordered_map>
+
+std::unordered_map<std::string, int> wordCount(const std::string& line) {
+    std::unordered_map<std::string, int> freq;
+    std::istringstream iss(line);
+    std::string word;
+    while (iss >> word) {
+        ++freq[word];
+    }
+    return freq;
+}
+
+int main() {
+    auto freq = wordCount(""red blue red green red"");
+    std::cout << freq[""red""] << std::endl;
+    return 0;
+}"
+13,"// Description: Implement binary search on a sorted vector.
+#include <iostream>
+#include <vector>
+
+int binarySearch(const std::vector<int>& nums, int target) {
+    int left = 0;
+    int right = static_cast<int>(nums.size()) - 1;","// Description: Implement binary search on a sorted vector.
+#include <iostream>
+#include <vector>
+
+int binarySearch(const std::vector<int>& nums, int target) {
+    int left = 0;
+    int right = static_cast<int>(nums.size()) - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (nums[mid] == target) return mid;
+        if (nums[mid] < target) left = mid + 1;
+        else right = mid - 1;
+    }
+    return -1;
+}
+
+int main() {
+    std::cout << binarySearch({1, 3, 5, 7, 9}, 7) << std::endl;
+    return 0;
+}"
+14,"// Description: Rotate a vector left by k positions.
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+void rotateLeft(std::vector<int>& nums, int k) {
+    if (nums.empty()) return;","// Description: Rotate a vector left by k positions.
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+void rotateLeft(std::vector<int>& nums, int k) {
+    if (nums.empty()) return;
+    k %= static_cast<int>(nums.size());
+    std::rotate(nums.begin(), nums.begin() + k, nums.end());
+}
+
+int main() {
+    std::vector<int> nums{1, 2, 3, 4, 5};
+    rotateLeft(nums, 2);
+    for (int x : nums) std::cout << x << ' ';
+    std::cout << std::endl;
+    return 0;
+}"
+15,"// Description: Validate balanced parentheses.
+#include <iostream>
+#include <stack>
+#include <string>
+
+bool isBalanced(const std::string& s) {
+    std::stack<char> st;
+    for (char ch : s) {
+        if (ch == '(') st.push(ch);
+        else if (ch == ')') {","// Description: Validate balanced parentheses.
+#include <iostream>
+#include <stack>
+#include <string>
+
+bool isBalanced(const std::string& s) {
+    std::stack<char> st;
+    for (char ch : s) {
+        if (ch == '(') st.push(ch);
+        else if (ch == ')') {
+            if (st.empty()) return false;
+            st.pop();
+        }
+    }
+    return st.empty();
+}
+
+int main() {
+    std::cout << std::boolalpha << isBalanced(""(()())"") << std::endl;
+    return 0;
+}"
+16,"// Description: Compute nth Fibonacci number iteratively.
+#include <iostream>
+
+long long fibonacci(int n) {
+    if (n <= 1) return n;
+    long long a = 0, b = 1;","// Description: Compute nth Fibonacci number iteratively.
+#include <iostream>
+
+long long fibonacci(int n) {
+    if (n <= 1) return n;
+    long long a = 0, b = 1;
+    for (int i = 2; i <= n; ++i) {
+        long long c = a + b;
+        a = b;
+        b = c;
+    }
+    return b;
+}
+
+int main() {
+    std::cout << fibonacci(10) << std::endl;
+    return 0;
+}"
+17,"// Description: Trim leading and trailing spaces.
+#include <iostream>
+#include <string>
+
+std::string trim(const std::string& s) {
+    size_t start = s.find_first_not_of(' ');","// Description: Trim leading and trailing spaces.
+#include <iostream>
+#include <string>
+
+std::string trim(const std::string& s) {
+    size_t start = s.find_first_not_of(' ');
+    if (start == std::string::npos) return """";
+    size_t end = s.find_last_not_of(' ');
+    return s.substr(start, end - start + 1);
+}
+
+int main() {
+    std::cout << '[' << trim(""   hello cpp   "") << ']' << std::endl;
+    return 0;
+}"
+18,"// Description: Compute intersection of two vectors.
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+
+std::vector<int> intersection(const std::vector<int>& a, const std::vector<int>& b) {
+    std::unordered_set<int> sa(a.begin(), a.end());
+    std::vector<int> out;","// Description: Compute intersection of two vectors.
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+
+std::vector<int> intersection(const std::vector<int>& a, const std::vector<int>& b) {
+    std::unordered_set<int> sa(a.begin(), a.end());
+    std::vector<int> out;
+    for (int x : b) {
+        if (sa.count(x)) out.push_back(x);
+    }
+    return out;
+}
+
+int main() {
+    auto out = intersection({1, 2, 3, 4}, {3, 4, 5});
+    for (int x : out) std::cout << x << ' ';
+    std::cout << std::endl;
+    return 0;
+}"
+19,"// Description: Parse CSV cells from a line.
+#include <iostream>
+#include <string>
+#include <vector>
+#include <sstream>
+
+std::vector<std::string> splitCsv(const std::string& line) {
+    std::vector<std::string> cells;
+    std::stringstream ss(line);
+    std::string cell;","// Description: Parse CSV cells from a line.
+#include <iostream>
+#include <string>
+#include <vector>
+#include <sstream>
+
+std::vector<std::string> splitCsv(const std::string& line) {
+    std::vector<std::string> cells;
+    std::stringstream ss(line);
+    std::string cell;
+    while (std::getline(ss, cell, ',')) {
+        cells.push_back(cell);
+    }
+    return cells;
+}
+
+int main() {
+    auto cells = splitCsv(""a,b,c"");
+    std::cout << cells.size() << std::endl;
+    return 0;
+}"
+20,"// Description: Check if two strings are anagrams.
+#include <iostream>
+#include <string>
+#include <array>
+
+bool isAnagram(const std::string& a, const std::string& b) {
+    if (a.size() != b.size()) return false;","// Description: Check if two strings are anagrams.
+#include <iostream>
+#include <string>
+#include <array>
+
+bool isAnagram(const std::string& a, const std::string& b) {
+    if (a.size() != b.size()) return false;
+    std::array<int, 256> freq{};
+    for (unsigned char ch : a) ++freq[ch];
+    for (unsigned char ch : b) --freq[ch];
+    for (int x : freq) {
+        if (x != 0) return false;
+    }
+    return true;
+}
+
+int main() {
+    std::cout << std::boolalpha << isAnagram(""listen"", ""silent"") << std::endl;
+    return 0;
+}"
+21,"// Description: Compute prefix sums of a vector.
+#include <iostream>
+#include <vector>
+
+std::vector<int> prefixSums(const std::vector<int>& nums) {
+    std::vector<int> out;
+    int running = 0;
+    for (int n : nums) {
+        running += n;","// Description: Compute prefix sums of a vector.
+#include <iostream>
+#include <vector>
+
+std::vector<int> prefixSums(const std::vector<int>& nums) {
+    std::vector<int> out;
+    int running = 0;
+    for (int n : nums) {
+        running += n;
+        out.push_back(running);
+    }
+    return out;
+}
+
+int main() {
+    auto out = prefixSums({1, 2, 3, 4});
+    for (int x : out) std::cout << x << ' ';
+    std::cout << std::endl;
+    return 0;
+}"
+22,"// Description: Find the first non-repeating character.
+#include <iostream>
+#include <string>
+#include <unordered_map>
+
+char firstUnique(const std::string& s) {
+    std::unordered_map<char, int> count;
+    for (char ch : s) ++count[ch];","// Description: Find the first non-repeating character.
+#include <iostream>
+#include <string>
+#include <unordered_map>
+
+char firstUnique(const std::string& s) {
+    std::unordered_map<char, int> count;
+    for (char ch : s) ++count[ch];
+    for (char ch : s) {
+        if (count[ch] == 1) return ch;
+    }
+    return '\0';
+}
+
+int main() {
+    std::cout << firstUnique(""swiss"") << std::endl;
+    return 0;
+}"
+23,"// Description: Sort vector in descending order.
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+void sortDesc(std::vector<int>& nums) {","// Description: Sort vector in descending order.
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+void sortDesc(std::vector<int>& nums) {
+    std::sort(nums.begin(), nums.end(), std::greater<int>());
+}
+
+int main() {
+    std::vector<int> nums{5, 1, 4, 2};
+    sortDesc(nums);
+    for (int x : nums) std::cout << x << ' ';
+    std::cout << std::endl;
+    return 0;
+}"
+24,"// Description: Compute greatest common divisor.
+#include <iostream>
+
+int gcd(int a, int b) {
+    while (b != 0) {","// Description: Compute greatest common divisor.
+#include <iostream>
+
+int gcd(int a, int b) {
+    while (b != 0) {
+        int t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}
+
+int main() {
+    std::cout << gcd(48, 18) << std::endl;
+    return 0;
+}"
+25,"// Description: Check whether a vector is sorted.
+#include <iostream>
+#include <vector>
+
+bool isSorted(const std::vector<int>& nums) {
+    for (size_t i = 1; i < nums.size(); ++i) {","// Description: Check whether a vector is sorted.
+#include <iostream>
+#include <vector>
+
+bool isSorted(const std::vector<int>& nums) {
+    for (size_t i = 1; i < nums.size(); ++i) {
+        if (nums[i] < nums[i - 1]) return false;
+    }
+    return true;
+}
+
+int main() {
+    std::cout << std::boolalpha << isSorted({1, 2, 2, 4}) << std::endl;
+    return 0;
+}"
+26,"// Description: Convert integer to binary string.
+#include <iostream>
+#include <string>
+
+std::string toBinary(unsigned int n) {
+    if (n == 0) return ""0"";
+    std::string out;
+    while (n > 0) {","// Description: Convert integer to binary string.
+#include <iostream>
+#include <string>
+
+std::string toBinary(unsigned int n) {
+    if (n == 0) return ""0"";
+    std::string out;
+    while (n > 0) {
+        out.push_back((n & 1U) ? '1' : '0');
+        n >>= 1U;
+    }
+    std::reverse(out.begin(), out.end());
+    return out;
+}
+
+int main() {
+    std::cout << toBinary(13) << std::endl;
+    return 0;
+}"
+27,"// Description: Compute running product of vector elements.
+#include <iostream>
+#include <vector>
+
+std::vector<long long> runningProduct(const std::vector<int>& nums) {
+    std::vector<long long> out;","// Description: Compute running product of vector elements.
+#include <iostream>
+#include <vector>
+
+std::vector<long long> runningProduct(const std::vector<int>& nums) {
+    std::vector<long long> out;
+    long long product = 1;
+    for (int n : nums) {
+        product *= n;
+        out.push_back(product);
+    }
+    return out;
+}
+
+int main() {
+    auto out = runningProduct({2, 3, 4});
+    for (long long x : out) std::cout << x << ' ';
+    std::cout << std::endl;
+    return 0;
+}"
+28,"// Description: Find index of target in vector.
+#include <iostream>
+#include <vector>
+
+int findIndex(const std::vector<int>& nums, int target) {","// Description: Find index of target in vector.
+#include <iostream>
+#include <vector>
+
+int findIndex(const std::vector<int>& nums, int target) {
+    for (size_t i = 0; i < nums.size(); ++i) {
+        if (nums[i] == target) return static_cast<int>(i);
+    }
+    return -1;
+}
+
+int main() {
+    std::cout << findIndex({10, 20, 30}, 20) << std::endl;
+    return 0;
+}"
+29,"// Description: Count even numbers in a vector.
+#include <iostream>
+#include <vector>
+
+int countEven(const std::vector<int>& nums) {
+    int count = 0;
+    for (int n : nums) {","// Description: Count even numbers in a vector.
+#include <iostream>
+#include <vector>
+
+int countEven(const std::vector<int>& nums) {
+    int count = 0;
+    for (int n : nums) {
+        if (n % 2 == 0) ++count;
+    }
+    return count;
+}
+
+int main() {
+    std::cout << countEven({1, 2, 3, 4, 6}) << std::endl;
+    return 0;
+}"
+30,"// Description: Replace spaces with underscores.
+#include <iostream>
+#include <string>
+
+std::string replaceSpaces(std::string s) {
+    for (char& ch : s) {","// Description: Replace spaces with underscores.
+#include <iostream>
+#include <string>
+
+std::string replaceSpaces(std::string s) {
+    for (char& ch : s) {
+        if (ch == ' ') ch = '_';
+    }
+    return s;
+}
+
+int main() {
+    std::cout << replaceSpaces(""cpp code completion"") << std::endl;
+    return 0;
+}"
+31,"// Description: Compute dot product of two vectors.
+#include <iostream>
+#include <vector>
+
+int dotProduct(const std::vector<int>& a, const std::vector<int>& b) {
+    int total = 0;
+    size_t n = std::min(a.size(), b.size());","// Description: Compute dot product of two vectors.
+#include <iostream>
+#include <vector>
+
+int dotProduct(const std::vector<int>& a, const std::vector<int>& b) {
+    int total = 0;
+    size_t n = std::min(a.size(), b.size());
+    for (size_t i = 0; i < n; ++i) {
+        total += a[i] * b[i];
+    }
+    return total;
+}
+
+int main() {
+    std::cout << dotProduct({1, 2, 3}, {4, 5, 6}) << std::endl;
+    return 0;
+}"
+32,"// Description: Remove negative numbers from a vector.
+#include <iostream>
+#include <vector>
+
+std::vector<int> nonNegative(const std::vector<int>& nums) {
+    std::vector<int> out;
+    for (int n : nums) {
+        if (n >= 0) out.push_back(n);","// Description: Remove negative numbers from a vector.
+#include <iostream>
+#include <vector>
+
+std::vector<int> nonNegative(const std::vector<int>& nums) {
+    std::vector<int> out;
+    for (int n : nums) {
+        if (n >= 0) out.push_back(n);
+    }
+    return out;
+}
+
+int main() {
+    auto out = nonNegative({-2, 0, 3, -1, 5});
+    for (int x : out) std::cout << x << ' ';
+    std::cout << std::endl;
+    return 0;
+}"
+33,"// Description: Concatenate two vectors.
+#include <iostream>
+#include <vector>
+
+std::vector<int> concat(const std::vector<int>& a, const std::vector<int>& b) {
+    std::vector<int> out = a;","// Description: Concatenate two vectors.
+#include <iostream>
+#include <vector>
+
+std::vector<int> concat(const std::vector<int>& a, const std::vector<int>& b) {
+    std::vector<int> out = a;
+    out.insert(out.end(), b.begin(), b.end());
+    return out;
+}
+
+int main() {
+    auto out = concat({1, 2}, {3, 4});
+    for (int x : out) std::cout << x << ' ';
+    std::cout << std::endl;
+    return 0;
+}"
+34,"// Description: Compute absolute differences of adjacent elements.
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+
+std::vector<int> adjacentDiff(const std::vector<int>& nums) {
+    std::vector<int> out;
+    for (size_t i = 1; i < nums.size(); ++i) {","// Description: Compute absolute differences of adjacent elements.
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+
+std::vector<int> adjacentDiff(const std::vector<int>& nums) {
+    std::vector<int> out;
+    for (size_t i = 1; i < nums.size(); ++i) {
+        out.push_back(std::abs(nums[i] - nums[i - 1]));
+    }
+    return out;
+}
+
+int main() {
+    auto out = adjacentDiff({1, 4, 2, 7});
+    for (int x : out) std::cout << x << ' ';
+    std::cout << std::endl;
+    return 0;
+}"

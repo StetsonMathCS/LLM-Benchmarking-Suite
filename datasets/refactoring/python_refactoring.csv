@@ -1,0 +1,1172 @@
+id,original_code,refactoring_task,output_expected
+1,"import psycopg2
+
+def get_user(user_id):
+    conn = psycopg2.connect('postgresql://localhost/mydb')
+    cursor = conn.cursor()
+    cursor.execute(f'SELECT id, name, email FROM users WHERE id = {user_id}')
+    row = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return row
+
+def get_all_users():
+    conn = psycopg2.connect('postgresql://localhost/mydb')
+    cursor = conn.cursor()
+    cursor.execute('SELECT id, name, email FROM users')
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return rows
+
+def create_user(name, email):
+    conn = psycopg2.connect('postgresql://localhost/mydb')
+    cursor = conn.cursor()
+    cursor.execute(f'INSERT INTO users (name, email) VALUES ({name}, {email})')
+    conn.commit()
+    cursor.close()
+    conn.close()","Extract duplicated DB connection logic into a context manager and fix SQL injection","import psycopg2
+from contextlib import contextmanager
+
+DB_URL = 'postgresql://localhost/mydb'
+
+@contextmanager
+def get_connection():
+    conn = psycopg2.connect(DB_URL)
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+def get_user(user_id):
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute('SELECT id, name, email FROM users WHERE id = %s', (user_id,))
+            return cursor.fetchone()
+
+def get_all_users():
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute('SELECT id, name, email FROM users')
+            return cursor.fetchall()
+
+def create_user(name, email):
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute('INSERT INTO users (name, email) VALUES (%s, %s)', (name, email))"
+2,"def process_order(order):
+    if order is None:
+        return None
+    if order['status'] != 'pending':
+        return None
+    if order['items'] is None or len(order['items']) == 0:
+        return None
+    if order['user_id'] is None:
+        return None
+    total = 0
+    for item in order['items']:
+        if item['price'] is None:
+            return None
+        if item['quantity'] is None:
+            return None
+        total += item['price'] * item['quantity']
+    return {'order_id': order['id'], 'total': total, 'user_id': order['user_id']}","Replace nested None-guard if-returns with early validation using a dedicated validator function and a dataclass result type","from dataclasses import dataclass
+from typing import Optional
+
+@dataclass
+class OrderResult:
+    order_id: int
+    total: float
+    user_id: int
+
+def _validate_order(order: dict) -> Optional[str]:
+    if order is None:
+        return 'order is None'
+    if order.get('status') != 'pending':
+        return f'invalid status: {order.get(""status"")}'
+    if not order.get('items'):
+        return 'order has no items'
+    if order.get('user_id') is None:
+        return 'missing user_id'
+    for i, item in enumerate(order['items']):
+        if item.get('price') is None:
+            return f'item {i} missing price'
+        if item.get('quantity') is None:
+            return f'item {i} missing quantity'
+    return None
+
+def process_order(order: dict) -> Optional[OrderResult]:
+    error = _validate_order(order)
+    if error:
+        return None
+    total = sum(item['price'] * item['quantity'] for item in order['items'])
+    return OrderResult(order_id=order['id'], total=total, user_id=order['user_id'])"
+3,"class Logger:
+    def log_info(self, message):
+        import datetime
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(f'[{timestamp}] INFO: {message}')
+
+    def log_warning(self, message):
+        import datetime
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(f'[{timestamp}] WARNING: {message}')
+
+    def log_error(self, message):
+        import datetime
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(f'[{timestamp}] ERROR: {message}')
+
+    def log_debug(self, message):
+        import datetime
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(f'[{timestamp}] DEBUG: {message}')","Eliminate method duplication by extracting a private _log(level, message) method and remove repeated datetime imports","import datetime
+
+class Logger:
+    def _log(self, level: str, message: str) -> None:
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(f'[{timestamp}] {level}: {message}')
+
+    def log_info(self, message: str) -> None:
+        self._log('INFO', message)
+
+    def log_warning(self, message: str) -> None:
+        self._log('WARNING', message)
+
+    def log_error(self, message: str) -> None:
+        self._log('ERROR', message)
+
+    def log_debug(self, message: str) -> None:
+        self._log('DEBUG', message)"
+4,"def calculate_discount(price, user_type, is_member, years_active):
+    discount = 0
+    if user_type == 'student':
+        discount = 0.2
+        if is_member:
+            discount = 0.25
+            if years_active > 5:
+                discount = 0.3
+    elif user_type == 'senior':
+        discount = 0.15
+        if is_member:
+            discount = 0.2
+            if years_active > 5:
+                discount = 0.25
+    elif user_type == 'regular':
+        discount = 0.0
+        if is_member:
+            discount = 0.1
+            if years_active > 5:
+                discount = 0.15
+    return price * (1 - discount)","Replace deeply nested if/elif discount logic with a lookup table driven approach using a dict of base discounts and membership/loyalty modifiers","DISCOUNT_TABLE = {
+    'student': {'base': 0.20, 'member': 0.05, 'loyal': 0.05},
+    'senior':  {'base': 0.15, 'member': 0.05, 'loyal': 0.05},
+    'regular': {'base': 0.00, 'member': 0.10, 'loyal': 0.05},
+}
+
+def calculate_discount(price: float, user_type: str, is_member: bool, years_active: int) -> float:
+    rates = DISCOUNT_TABLE.get(user_type, {'base': 0.0, 'member': 0.0, 'loyal': 0.0})
+    discount = rates['base']
+    if is_member:
+        discount += rates['member']
+        if years_active > 5:
+            discount += rates['loyal']
+    return price * (1 - discount)"
+5,"class Animal:
+    def __init__(self, name, animal_type):
+        self.name = name
+        self.animal_type = animal_type
+
+    def speak(self):
+        if self.animal_type == 'dog':
+            return f'{self.name} says Woof'
+        elif self.animal_type == 'cat':
+            return f'{self.name} says Meow'
+        elif self.animal_type == 'cow':
+            return f'{self.name} says Moo'
+        else:
+            return f'{self.name} says ...'
+
+    def move(self):
+        if self.animal_type == 'dog':
+            return f'{self.name} runs'
+        elif self.animal_type == 'cat':
+            return f'{self.name} slinks'
+        elif self.animal_type == 'cow':
+            return f'{self.name} plods'
+        else:
+            return f'{self.name} moves'","Replace type-string dispatch with a proper class hierarchy using abstract base class and subclasses","from abc import ABC, abstractmethod
+
+class Animal(ABC):
+    def __init__(self, name: str):
+        self.name = name
+
+    @abstractmethod
+    def speak(self) -> str: ...
+
+    @abstractmethod
+    def move(self) -> str: ...
+
+class Dog(Animal):
+    def speak(self) -> str:
+        return f'{self.name} says Woof'
+    def move(self) -> str:
+        return f'{self.name} runs'
+
+class Cat(Animal):
+    def speak(self) -> str:
+        return f'{self.name} says Meow'
+    def move(self) -> str:
+        return f'{self.name} slinks'
+
+class Cow(Animal):
+    def speak(self) -> str:
+        return f'{self.name} says Moo'
+    def move(self) -> str:
+        return f'{self.name} plods'"
+6,"def send_notification(user, message, channel):
+    if channel == 'email':
+        print(f'Sending email to {user[""email""]}: {message}')
+        # smtp logic here
+    elif channel == 'sms':
+        print(f'Sending SMS to {user[""phone""]}: {message}')
+        # twilio logic here
+    elif channel == 'push':
+        print(f'Sending push to {user[""device_token""]}: {message}')
+        # firebase logic here
+    elif channel == 'slack':
+        print(f'Sending slack to {user[""slack_id""]}: {message}')
+        # slack api logic here
+    else:
+        raise ValueError(f'Unknown channel: {channel}')","Refactor channel dispatch into a Strategy pattern with a NotificationSender protocol and a registry","from typing import Protocol
+
+class NotificationSender(Protocol):
+    def send(self, user: dict, message: str) -> None: ...
+
+class EmailSender:
+    def send(self, user: dict, message: str) -> None:
+        print(f'Sending email to {user[""email""]}: {message}')
+
+class SmsSender:
+    def send(self, user: dict, message: str) -> None:
+        print(f'Sending SMS to {user[""phone""]}: {message}')
+
+class PushSender:
+    def send(self, user: dict, message: str) -> None:
+        print(f'Sending push to {user[""device_token""]}: {message}')
+
+class SlackSender:
+    def send(self, user: dict, message: str) -> None:
+        print(f'Sending slack to {user[""slack_id""]}: {message}')
+
+SENDERS: dict[str, NotificationSender] = {
+    'email': EmailSender(),
+    'sms':   SmsSender(),
+    'push':  PushSender(),
+    'slack': SlackSender(),
+}
+
+def send_notification(user: dict, message: str, channel: str) -> None:
+    sender = SENDERS.get(channel)
+    if sender is None:
+        raise ValueError(f'Unknown channel: {channel}')
+    sender.send(user, message)"
+7,"results = []
+for user in users:
+    orders = []
+    for order in all_orders:
+        if order['user_id'] == user['id']:
+            items = []
+            for item in all_items:
+                if item['order_id'] == order['id']:
+                    items.append({
+                        'name': item['name'],
+                        'price': item['price']
+                    })
+            orders.append({
+                'order_id': order['id'],
+                'items': items
+            })
+    results.append({
+        'user_id': user['id'],
+        'name': user['name'],
+        'orders': orders
+    })","Eliminate O(n³) nested loops by pre-building index dicts for O(n) grouping","from collections import defaultdict
+
+items_by_order = defaultdict(list)
+for item in all_items:
+    items_by_order[item['order_id']].append({'name': item['name'], 'price': item['price']})
+
+orders_by_user = defaultdict(list)
+for order in all_orders:
+    orders_by_user[order['user_id']].append({
+        'order_id': order['id'],
+        'items': items_by_order[order['id']],
+    })
+
+results = [
+    {'user_id': user['id'], 'name': user['name'], 'orders': orders_by_user[user['id']]}
+    for user in users
+]"
+8,"class UserManager:
+    def __init__(self):
+        self.users = []
+        self.db = Database()
+        self.emailer = Emailer()
+        self.sms = SMSService()
+        self.cache = {}
+        self.logger = Logger()
+        self.analytics = Analytics()
+
+    def register(self, name, email, phone):
+        user = {'id': len(self.users)+1, 'name': name, 'email': email, 'phone': phone}
+        self.users.append(user)
+        self.db.save(user)
+        self.cache[user['id']] = user
+        self.emailer.send(email, 'Welcome!')
+        self.sms.send(phone, 'Welcome!')
+        self.logger.log(f'Registered {name}')
+        self.analytics.track('register', user)
+        return user
+
+    def deactivate(self, user_id):
+        user = self.cache.get(user_id) or self.db.find(user_id)
+        user['active'] = False
+        self.db.save(user)
+        self.cache[user_id] = user
+        self.emailer.send(user['email'], 'Account deactivated')
+        self.logger.log(f'Deactivated {user_id}')
+        self.analytics.track('deactivate', user)
+        return user","Decompose the God Class into focused classes: UserRepository, NotificationService, and UserService with dependency injection","class UserRepository:
+    def __init__(self, db, cache):
+        self.db = db
+        self.cache = cache
+
+    def save(self, user: dict) -> None:
+        self.db.save(user)
+        self.cache[user['id']] = user
+
+    def find(self, user_id: int) -> dict:
+        return self.cache.get(user_id) or self.db.find(user_id)
+
+    def next_id(self) -> int:
+        return len(self.cache) + 1
+
+
+class NotificationService:
+    def __init__(self, emailer, sms):
+        self.emailer = emailer
+        self.sms = sms
+
+    def welcome(self, user: dict) -> None:
+        self.emailer.send(user['email'], 'Welcome!')
+        self.sms.send(user['phone'], 'Welcome!')
+
+    def deactivation(self, user: dict) -> None:
+        self.emailer.send(user['email'], 'Account deactivated')
+
+
+class UserService:
+    def __init__(self, repo: UserRepository, notifications: NotificationService, logger, analytics):
+        self.repo = repo
+        self.notifications = notifications
+        self.logger = logger
+        self.analytics = analytics
+
+    def register(self, name: str, email: str, phone: str) -> dict:
+        user = {'id': self.repo.next_id(), 'name': name, 'email': email, 'phone': phone}
+        self.repo.save(user)
+        self.notifications.welcome(user)
+        self.logger.log(f'Registered {name}')
+        self.analytics.track('register', user)
+        return user
+
+    def deactivate(self, user_id: int) -> dict:
+        user = self.repo.find(user_id)
+        user['active'] = False
+        self.repo.save(user)
+        self.notifications.deactivation(user)
+        self.logger.log(f'Deactivated {user_id}')
+        self.analytics.track('deactivate', user)
+        return user"
+9,"def parse_config(path):
+    config = {}
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if line == '' or line.startswith('#'):
+                continue
+            if '=' not in line:
+                continue
+            key, value = line.split('=', 1)
+            key = key.strip()
+            value = value.strip()
+            if value.lower() == 'true':
+                value = True
+            elif value.lower() == 'false':
+                value = False
+            elif value.isdigit():
+                value = int(value)
+            else:
+                try:
+                    value = float(value)
+                except ValueError:
+                    pass
+            config[key] = value
+    return config","Refactor the inline type-coercion chain into a separate _coerce_value(s) function and replace the manual file loop with a generator pipeline","def _coerce_value(raw: str):
+    stripped = raw.strip()
+    low = stripped.lower()
+    if low == 'true':
+        return True
+    if low == 'false':
+        return False
+    try:
+        return int(stripped)
+    except ValueError:
+        pass
+    try:
+        return float(stripped)
+    except ValueError:
+        return stripped
+
+def _config_lines(path: str):
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                yield line
+
+def parse_config(path: str) -> dict:
+    return {
+        (parts := line.split('=', 1))[0].strip(): _coerce_value(parts[1])
+        for line in _config_lines(path)
+    }"
+10,"class Pipeline:
+    def __init__(self, data):
+        self.data = data
+
+    def run(self):
+        # Step 1: filter nulls
+        step1 = []
+        for item in self.data:
+            if item is not None:
+                step1.append(item)
+
+        # Step 2: normalize strings
+        step2 = []
+        for item in step1:
+            step2.append(item.strip().lower() if isinstance(item, str) else item)
+
+        # Step 3: deduplicate
+        step3 = []
+        seen = set()
+        for item in step2:
+            if item not in seen:
+                seen.add(item)
+                step3.append(item)
+
+        # Step 4: sort
+        step4 = sorted(step3)
+
+        return step4","Refactor sequential pipeline steps into composable named transform functions wired through a generic pipe() runner","from typing import Callable, Any
+
+def pipe(*funcs: Callable) -> Callable:
+    def _pipe(data):
+        for fn in funcs:
+            data = fn(data)
+        return data
+    return _pipe
+
+def filter_nulls(data):
+    return [x for x in data if x is not None]
+
+def normalize_strings(data):
+    return [x.strip().lower() if isinstance(x, str) else x for x in data]
+
+def deduplicate(data):
+    seen = set()
+    result = []
+    for item in data:
+        if item not in seen:
+            seen.add(item)
+            result.append(item)
+    return result
+
+def sort_items(data):
+    return sorted(data)
+
+class Pipeline:
+    def __init__(self, data):
+        self.data = data
+        self._run = pipe(filter_nulls, normalize_strings, deduplicate, sort_items)
+
+    def run(self):
+        return self._run(self.data)"
+11,"import json
+import os
+
+def load_users():
+    if not os.path.exists('users.json'):
+        return []
+    with open('users.json') as f:
+        return json.load(f)
+
+def save_users(users):
+    with open('users.json', 'w') as f:
+        json.dump(users, f)
+
+def add_user(name, email):
+    users = load_users()
+    users.append({'id': len(users)+1, 'name': name, 'email': email})
+    save_users(users)
+
+def remove_user(user_id):
+    users = load_users()
+    users = [u for u in users if u['id'] != user_id]
+    save_users(users)
+
+def find_user(email):
+    users = load_users()
+    for user in users:
+        if user['email'] == email:
+            return user
+    return None","Wrap the flat file-backed store in a JsonFileRepository class that loads once on init, maintains an in-memory list, and flushes on mutation","import json
+import os
+from typing import Optional
+
+class JsonFileRepository:
+    def __init__(self, path: str):
+        self.path = path
+        self._data: list = self._load()
+
+    def _load(self) -> list:
+        if not os.path.exists(self.path):
+            return []
+        with open(self.path) as f:
+            return json.load(f)
+
+    def _flush(self) -> None:
+        with open(self.path, 'w') as f:
+            json.dump(self._data, f, indent=2)
+
+    def _next_id(self) -> int:
+        return max((u['id'] for u in self._data), default=0) + 1
+
+    def add(self, name: str, email: str) -> dict:
+        user = {'id': self._next_id(), 'name': name, 'email': email}
+        self._data.append(user)
+        self._flush()
+        return user
+
+    def remove(self, user_id: int) -> None:
+        self._data = [u for u in self._data if u['id'] != user_id]
+        self._flush()
+
+    def find_by_email(self, email: str) -> Optional[dict]:
+        return next((u for u in self._data if u['email'] == email), None)
+
+    def all(self) -> list:
+        return list(self._data)"
+12,"def validate_user_input(data):
+    errors = []
+    if 'name' not in data:
+        errors.append('name is required')
+    elif len(data['name']) < 2:
+        errors.append('name must be at least 2 characters')
+    elif len(data['name']) > 100:
+        errors.append('name must be at most 100 characters')
+    if 'email' not in data:
+        errors.append('email is required')
+    elif '@' not in data['email']:
+        errors.append('email must contain @')
+    elif len(data['email']) > 254:
+        errors.append('email is too long')
+    if 'age' not in data:
+        errors.append('age is required')
+    elif not isinstance(data['age'], int):
+        errors.append('age must be an integer')
+    elif data['age'] < 0 or data['age'] > 150:
+        errors.append('age must be between 0 and 150')
+    if 'role' not in data:
+        errors.append('role is required')
+    elif data['role'] not in ('admin', 'user', 'moderator'):
+        errors.append('role must be admin, user, or moderator')
+    return errors","Refactor the monolithic validator into composable per-field validator functions collected in a FIELD_VALIDATORS registry","from typing import Callable
+
+Validator = Callable[[dict], list[str]]
+
+def _validate_name(data: dict) -> list[str]:
+    if 'name' not in data:
+        return ['name is required']
+    if len(data['name']) < 2:
+        return ['name must be at least 2 characters']
+    if len(data['name']) > 100:
+        return ['name must be at most 100 characters']
+    return []
+
+def _validate_email(data: dict) -> list[str]:
+    if 'email' not in data:
+        return ['email is required']
+    if '@' not in data['email']:
+        return ['email must contain @']
+    if len(data['email']) > 254:
+        return ['email is too long']
+    return []
+
+def _validate_age(data: dict) -> list[str]:
+    if 'age' not in data:
+        return ['age is required']
+    if not isinstance(data['age'], int):
+        return ['age must be an integer']
+    if not (0 <= data['age'] <= 150):
+        return ['age must be between 0 and 150']
+    return []
+
+def _validate_role(data: dict) -> list[str]:
+    if 'role' not in data:
+        return ['role is required']
+    if data['role'] not in ('admin', 'user', 'moderator'):
+        return ['role must be admin, user, or moderator']
+    return []
+
+FIELD_VALIDATORS: list[Validator] = [_validate_name, _validate_email, _validate_age, _validate_role]
+
+def validate_user_input(data: dict) -> list[str]:
+    return [err for validate in FIELD_VALIDATORS for err in validate(data)]"
+13,"class ReportGenerator:
+    def generate(self, data, format):
+        if format == 'csv':
+            lines = []
+            header = ','.join(data[0].keys())
+            lines.append(header)
+            for row in data:
+                lines.append(','.join(str(v) for v in row.values()))
+            return '\n'.join(lines)
+        elif format == 'json':
+            import json
+            return json.dumps(data, indent=2)
+        elif format == 'html':
+            rows_html = ''
+            for row in data:
+                cells = ''.join(f'<td>{v}</td>' for v in row.values())
+                rows_html += f'<tr>{cells}</tr>'
+            headers = ''.join(f'<th>{k}</th>' for k in data[0].keys())
+            return f'<table><thead><tr>{headers}</tr></thead><tbody>{rows_html}</tbody></table>'
+        else:
+            raise ValueError(f'Unknown format: {format}')","Extract each format branch into its own renderer class implementing a common Renderer protocol, registered in a FORMAT_REGISTRY dict","import json as _json
+from typing import Protocol
+
+class Renderer(Protocol):
+    def render(self, data: list[dict]) -> str: ...
+
+class CsvRenderer:
+    def render(self, data: list[dict]) -> str:
+        if not data:
+            return ''
+        header = ','.join(data[0].keys())
+        rows = [','.join(str(v) for v in row.values()) for row in data]
+        return '\n'.join([header] + rows)
+
+class JsonRenderer:
+    def render(self, data: list[dict]) -> str:
+        return _json.dumps(data, indent=2)
+
+class HtmlRenderer:
+    def render(self, data: list[dict]) -> str:
+        if not data:
+            return '<table></table>'
+        headers = ''.join(f'<th>{k}</th>' for k in data[0].keys())
+        rows = ''.join(
+            '<tr>' + ''.join(f'<td>{v}</td>' for v in row.values()) + '</tr>'
+            for row in data
+        )
+        return f'<table><thead><tr>{headers}</tr></thead><tbody>{rows}</tbody></table>'
+
+FORMAT_REGISTRY: dict[str, Renderer] = {
+    'csv':  CsvRenderer(),
+    'json': JsonRenderer(),
+    'html': HtmlRenderer(),
+}
+
+class ReportGenerator:
+    def generate(self, data: list[dict], format: str) -> str:
+        renderer = FORMAT_REGISTRY.get(format)
+        if renderer is None:
+            raise ValueError(f'Unknown format: {format}')
+        return renderer.render(data)"
+14,"def fetch_and_process(url):
+    import urllib.request
+    try:
+        response = urllib.request.urlopen(url)
+        raw = response.read()
+        data = raw.decode('utf-8')
+        import json
+        parsed = json.loads(data)
+        results = []
+        for item in parsed:
+            if item.get('active'):
+                results.append({
+                    'id': item['id'],
+                    'name': item['name'].strip().title(),
+                    'score': round(item.get('score', 0), 2)
+                })
+        results.sort(key=lambda x: x['score'], reverse=True)
+        return results
+    except Exception as e:
+        print(f'Error: {e}')
+        return []","Separate concerns into fetch(url), parse(raw), transform(items), and orchestrate them in fetch_and_process with proper exception types","import json
+import urllib.request
+from typing import Optional
+
+def fetch(url: str) -> str:
+    response = urllib.request.urlopen(url)
+    return response.read().decode('utf-8')
+
+def parse(raw: str) -> list[dict]:
+    return json.loads(raw)
+
+def transform(items: list[dict]) -> list[dict]:
+    result = [
+        {
+            'id': item['id'],
+            'name': item['name'].strip().title(),
+            'score': round(item.get('score', 0), 2),
+        }
+        for item in items
+        if item.get('active')
+    ]
+    return sorted(result, key=lambda x: x['score'], reverse=True)
+
+def fetch_and_process(url: str) -> list[dict]:
+    try:
+        raw = fetch(url)
+    except OSError as e:
+        raise ConnectionError(f'Failed to fetch {url}') from e
+    try:
+        items = parse(raw)
+    except json.JSONDecodeError as e:
+        raise ValueError(f'Invalid JSON from {url}') from e
+    return transform(items)"
+15,"class Cart:
+    def __init__(self):
+        self.items = []
+        self.discount_code = None
+
+    def add_item(self, name, price, qty):
+        self.items.append({'name': name, 'price': price, 'qty': qty})
+
+    def get_subtotal(self):
+        total = 0
+        for item in self.items:
+            total += item['price'] * item['qty']
+        return total
+
+    def get_discount(self):
+        subtotal = self.get_subtotal()
+        if self.discount_code == 'SAVE10':
+            return subtotal * 0.10
+        elif self.discount_code == 'SAVE20':
+            return subtotal * 0.20
+        elif self.discount_code == 'HALFOFF':
+            return subtotal * 0.50
+        return 0
+
+    def get_tax(self):
+        return (self.get_subtotal() - self.get_discount()) * 0.08
+
+    def get_total(self):
+        return self.get_subtotal() - self.get_discount() + self.get_tax()","Replace magic-string discount codes with a DiscountCode dataclass registry and refactor Cart to use it; replace repeated subtotal calls with a computed property","from dataclasses import dataclass
+from typing import Optional
+
+@dataclass(frozen=True)
+class DiscountCode:
+    code: str
+    rate: float
+
+DISCOUNT_CODES: dict[str, DiscountCode] = {
+    'SAVE10':  DiscountCode('SAVE10',  0.10),
+    'SAVE20':  DiscountCode('SAVE20',  0.20),
+    'HALFOFF': DiscountCode('HALFOFF', 0.50),
+}
+
+TAX_RATE = 0.08
+
+class Cart:
+    def __init__(self):
+        self.items: list[dict] = []
+        self._discount_code: Optional[DiscountCode] = None
+
+    def add_item(self, name: str, price: float, qty: int) -> None:
+        self.items.append({'name': name, 'price': price, 'qty': qty})
+
+    def apply_discount(self, code: str) -> None:
+        if code not in DISCOUNT_CODES:
+            raise ValueError(f'Unknown discount code: {code}')
+        self._discount_code = DISCOUNT_CODES[code]
+
+    @property
+    def subtotal(self) -> float:
+        return sum(i['price'] * i['qty'] for i in self.items)
+
+    @property
+    def discount(self) -> float:
+        if self._discount_code is None:
+            return 0.0
+        return self.subtotal * self._discount_code.rate
+
+    @property
+    def tax(self) -> float:
+        return (self.subtotal - self.discount) * TAX_RATE
+
+    @property
+    def total(self) -> float:
+        return self.subtotal - self.discount + self.tax"
+16,"def run_etl(source_path, dest_path):
+    import csv, json, os
+    # Read
+    records = []
+    with open(source_path) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            records.append(row)
+    # Transform
+    transformed = []
+    for r in records:
+        try:
+            transformed.append({
+                'id': int(r['id']),
+                'name': r['name'].strip().title(),
+                'age': int(r['age']),
+                'score': float(r['score']),
+                'active': r['active'].lower() == 'true'
+            })
+        except (KeyError, ValueError):
+            continue
+    # Write
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    with open(dest_path, 'w') as f:
+        json.dump(transformed, f, indent=2)
+    return len(transformed)","Split ETL into extract(path)->records, transform_record(row)->Optional[dict], load(records, path)->None functions; wire in run_etl","import csv
+import json
+import os
+from typing import Optional
+
+def extract(source_path: str) -> list[dict]:
+    with open(source_path, newline='', encoding='utf-8') as f:
+        return list(csv.DictReader(f))
+
+def transform_record(row: dict) -> Optional[dict]:
+    try:
+        return {
+            'id':     int(row['id']),
+            'name':   row['name'].strip().title(),
+            'age':    int(row['age']),
+            'score':  float(row['score']),
+            'active': row['active'].lower() == 'true',
+        }
+    except (KeyError, ValueError):
+        return None
+
+def load(records: list[dict], dest_path: str) -> None:
+    os.makedirs(os.path.dirname(dest_path) or '.', exist_ok=True)
+    with open(dest_path, 'w', encoding='utf-8') as f:
+        json.dump(records, f, indent=2)
+
+def run_etl(source_path: str, dest_path: str) -> int:
+    raw = extract(source_path)
+    transformed = [r for row in raw if (r := transform_record(row)) is not None]
+    load(transformed, dest_path)
+    return len(transformed)"
+17,"class EventSystem:
+    def __init__(self):
+        self.listeners = {}
+
+    def on(self, event, callback):
+        if event not in self.listeners:
+            self.listeners[event] = []
+        self.listeners[event].append(callback)
+
+    def off(self, event, callback):
+        if event in self.listeners:
+            self.listeners[event] = [cb for cb in self.listeners[event] if cb != callback]
+            if not self.listeners[event]:
+                del self.listeners[event]
+
+    def emit(self, event, *args, **kwargs):
+        if event in self.listeners:
+            for callback in self.listeners[event]:
+                callback(*args, **kwargs)
+
+    def once(self, event, callback):
+        def wrapper(*args, **kwargs):
+            self.off(event, wrapper)
+            callback(*args, **kwargs)
+        self.on(event, wrapper)","Refactor listeners dict to use defaultdict(list), add emit_async for awaitable callbacks, and add listener_count(event) helper","import asyncio
+from collections import defaultdict
+from typing import Callable
+
+class EventSystem:
+    def __init__(self):
+        self.listeners: defaultdict[str, list[Callable]] = defaultdict(list)
+
+    def on(self, event: str, callback: Callable) -> None:
+        self.listeners[event].append(callback)
+
+    def off(self, event: str, callback: Callable) -> None:
+        self.listeners[event] = [cb for cb in self.listeners[event] if cb != callback]
+        if not self.listeners[event]:
+            del self.listeners[event]
+
+    def emit(self, event: str, *args, **kwargs) -> None:
+        for callback in list(self.listeners.get(event, [])):
+            callback(*args, **kwargs)
+
+    def once(self, event: str, callback: Callable) -> None:
+        def wrapper(*args, **kwargs):
+            self.off(event, wrapper)
+            callback(*args, **kwargs)
+        self.on(event, wrapper)
+
+    async def emit_async(self, event: str, *args, **kwargs) -> None:
+        coros = []
+        for callback in list(self.listeners.get(event, [])):
+            result = callback(*args, **kwargs)
+            if asyncio.iscoroutine(result):
+                coros.append(result)
+        if coros:
+            await asyncio.gather(*coros)
+
+    def listener_count(self, event: str) -> int:
+        return len(self.listeners.get(event, []))"
+18,"def generate_report(orders):
+    total_revenue = 0
+    total_orders = 0
+    total_items = 0
+    max_order = 0
+    min_order = float('inf')
+    status_counts = {}
+    product_revenue = {}
+
+    for order in orders:
+        val = order['value']
+        total_revenue += val
+        total_orders += 1
+        total_items += len(order['items'])
+        if val > max_order:
+            max_order = val
+        if val < min_order:
+            min_order = val
+        status = order['status']
+        status_counts[status] = status_counts.get(status, 0) + 1
+        for item in order['items']:
+            pid = item['product_id']
+            product_revenue[pid] = product_revenue.get(pid, 0) + item['price'] * item['qty']
+
+    return {
+        'total_revenue': total_revenue,
+        'total_orders': total_orders,
+        'total_items': total_items,
+        'avg_order_value': total_revenue / total_orders if total_orders else 0,
+        'max_order': max_order,
+        'min_order': min_order if min_order != float('inf') else 0,
+        'status_counts': status_counts,
+        'top_products': sorted(product_revenue.items(), key=lambda x: x[1], reverse=True)[:5]
+    }","Refactor into a ReportAccumulator class with an update(order) method and a summary() property, replacing raw loop with a clean API","from collections import defaultdict
+from dataclasses import dataclass, field
+
+@dataclass
+class ReportAccumulator:
+    _total_revenue: float = field(default=0.0, init=False)
+    _total_orders: int = field(default=0, init=False)
+    _total_items: int = field(default=0, init=False)
+    _max_order: float = field(default=0.0, init=False)
+    _min_order: float = field(default=float('inf'), init=False)
+    _status_counts: dict = field(default_factory=lambda: defaultdict(int), init=False)
+    _product_revenue: dict = field(default_factory=lambda: defaultdict(float), init=False)
+
+    def update(self, order: dict) -> None:
+        val = order['value']
+        self._total_revenue += val
+        self._total_orders += 1
+        self._total_items += len(order['items'])
+        self._max_order = max(self._max_order, val)
+        self._min_order = min(self._min_order, val)
+        self._status_counts[order['status']] += 1
+        for item in order['items']:
+            self._product_revenue[item['product_id']] += item['price'] * item['qty']
+
+    @property
+    def summary(self) -> dict:
+        n = self._total_orders
+        return {
+            'total_revenue':   self._total_revenue,
+            'total_orders':    n,
+            'total_items':     self._total_items,
+            'avg_order_value': self._total_revenue / n if n else 0.0,
+            'max_order':       self._max_order,
+            'min_order':       self._min_order if self._min_order != float('inf') else 0.0,
+            'status_counts':   dict(self._status_counts),
+            'top_products':    sorted(self._product_revenue.items(), key=lambda x: x[1], reverse=True)[:5],
+        }
+
+def generate_report(orders: list[dict]) -> dict:
+    acc = ReportAccumulator()
+    for order in orders:
+        acc.update(order)
+    return acc.summary"
+19,"def process(data, operation, extra=None):
+    if operation == 'filter':
+        result = []
+        for item in data:
+            if extra and item.get(extra['field']) == extra['value']:
+                result.append(item)
+        return result
+    elif operation == 'sort':
+        key = extra.get('key') if extra else None
+        reverse = extra.get('reverse', False) if extra else False
+        return sorted(data, key=lambda x: x.get(key), reverse=reverse)
+    elif operation == 'group':
+        groups = {}
+        field = extra.get('field') if extra else None
+        for item in data:
+            k = item.get(field)
+            if k not in groups:
+                groups[k] = []
+            groups[k].append(item)
+        return groups
+    elif operation == 'aggregate':
+        field = extra.get('field') if extra else None
+        func = extra.get('func', 'sum') if extra else 'sum'
+        values = [item.get(field, 0) for item in data]
+        if func == 'sum': return sum(values)
+        elif func == 'avg': return sum(values) / len(values) if values else 0
+        elif func == 'min': return min(values) if values else None
+        elif func == 'max': return max(values) if values else None
+    raise ValueError(f'Unknown operation: {operation}')","Replace the operation string-dispatch monolith with individual typed functions filter_data, sort_data, group_data, aggregate_data and a DataProcessor class exposing them","from collections import defaultdict
+from typing import Any, Optional
+
+def filter_data(data: list[dict], field: str, value: Any) -> list[dict]:
+    return [item for item in data if item.get(field) == value]
+
+def sort_data(data: list[dict], key: str, reverse: bool = False) -> list[dict]:
+    return sorted(data, key=lambda x: x.get(key), reverse=reverse)
+
+def group_data(data: list[dict], field: str) -> dict[Any, list[dict]]:
+    groups: dict = defaultdict(list)
+    for item in data:
+        groups[item.get(field)].append(item)
+    return dict(groups)
+
+_AGG_FUNCS = {
+    'sum': sum,
+    'avg': lambda vals: sum(vals) / len(vals) if vals else 0,
+    'min': lambda vals: min(vals) if vals else None,
+    'max': lambda vals: max(vals) if vals else None,
+}
+
+def aggregate_data(data: list[dict], field: str, func: str = 'sum') -> Any:
+    if func not in _AGG_FUNCS:
+        raise ValueError(f'Unknown aggregation function: {func}')
+    values = [item.get(field, 0) for item in data]
+    return _AGG_FUNCS[func](values)
+
+class DataProcessor:
+    def __init__(self, data: list[dict]):
+        self.data = data
+
+    def filter(self, field: str, value: Any) -> 'DataProcessor':
+        return DataProcessor(filter_data(self.data, field, value))
+
+    def sort(self, key: str, reverse: bool = False) -> 'DataProcessor':
+        return DataProcessor(sort_data(self.data, key, reverse))
+
+    def group(self, field: str) -> dict:
+        return group_data(self.data, field)
+
+    def aggregate(self, field: str, func: str = 'sum') -> Any:
+        return aggregate_data(self.data, field, func)
+
+    def to_list(self) -> list[dict]:
+        return self.data"
+20,"class TaskRunner:
+    def __init__(self):
+        self.tasks = []
+        self.results = []
+        self.errors = []
+        self.running = False
+
+    def add_task(self, func, *args, **kwargs):
+        self.tasks.append((func, args, kwargs))
+
+    def run(self):
+        self.running = True
+        self.results = []
+        self.errors = []
+        for func, args, kwargs in self.tasks:
+            try:
+                result = func(*args, **kwargs)
+                self.results.append({'status': 'ok', 'result': result})
+            except Exception as e:
+                self.errors.append({'status': 'error', 'error': str(e), 'func': func.__name__})
+                self.results.append({'status': 'error', 'error': str(e)})
+        self.running = False
+        return self.results
+
+    def get_errors(self):
+        return self.errors
+
+    def get_successes(self):
+        return [r for r in self.results if r['status'] == 'ok']","Refactor TaskRunner to use a TaskResult dataclass, add an async run_async method using asyncio.gather, and expose a summary property","import asyncio
+from dataclasses import dataclass, field
+from typing import Any, Callable, Optional
+
+@dataclass
+class TaskResult:
+    func_name: str
+    status: str
+    result: Any = None
+    error: Optional[str] = None
+
+    @property
+    def ok(self) -> bool:
+        return self.status == 'ok'
+
+class TaskRunner:
+    def __init__(self):
+        self._tasks: list[tuple[Callable, tuple, dict]] = []
+        self._results: list[TaskResult] = []
+
+    def add_task(self, func: Callable, *args, **kwargs) -> None:
+        self._tasks.append((func, args, kwargs))
+
+    def _execute(self, func: Callable, args: tuple, kwargs: dict) -> TaskResult:
+        try:
+            return TaskResult(func_name=func.__name__, status='ok', result=func(*args, **kwargs))
+        except Exception as e:
+            return TaskResult(func_name=func.__name__, status='error', error=str(e))
+
+    def run(self) -> list[TaskResult]:
+        self._results = [self._execute(f, a, kw) for f, a, kw in self._tasks]
+        return self._results
+
+    async def run_async(self) -> list[TaskResult]:
+        async def _run_one(func, args, kwargs):
+            try:
+                result = func(*args, **kwargs)
+                if asyncio.iscoroutine(result):
+                    result = await result
+                return TaskResult(func_name=func.__name__, status='ok', result=result)
+            except Exception as e:
+                return TaskResult(func_name=func.__name__, status='error', error=str(e))
+        self._results = list(await asyncio.gather(*[_run_one(f, a, kw) for f, a, kw in self._tasks]))
+        return self._results
+
+    @property
+    def summary(self) -> dict:
+        ok = [r for r in self._results if r.ok]
+        err = [r for r in self._results if not r.ok]
+        return {'total': len(self._results), 'succeeded': len(ok), 'failed': len(err), 'errors': [{'func': r.func_name, 'error': r.error} for r in err]}"

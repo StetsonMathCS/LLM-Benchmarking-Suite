@@ -1,0 +1,62 @@
+id,code_snippet,description
+1,"def add(a, b):
+    return a + b",Simple addition function
+2,"def factorial(n):
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)",Recursive factorial calculation
+3,"def is_palindrome(s):
+    s = s.replace(' ', '').lower()
+    return s == s[::-1]",Check if string is palindrome
+4,"def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)",Generate fibonacci number
+5,"def reverse_list(lst):
+    return lst[::-1]",Reverse a list
+6,"def count_vowels(text):
+    vowels = 'aeiouAEIOU'
+    return sum(1 for char in text if char in vowels)",Count vowels in string
+7,"def merge_dicts(dict1, dict2):
+    result = dict1.copy()
+    result.update(dict2)
+    return result",Merge two dictionaries
+8,"def is_even(n):
+    return n % 2 == 0",Check if number is even
+9,"def find_max(lst):
+    if not lst:
+        return None
+    return max(lst)",Find maximum in list
+10,"def remove_duplicates(lst):
+    return list(set(lst))",Remove duplicates from list
+11,"def square_numbers(lst):
+    return [x**2 for x in lst]",Square all numbers in list
+12,"def string_to_list(s):
+    return list(s.split())",Convert string to word list
+13,"def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return False
+    return True",Check if number is prime
+14,"def sum_of_digits(n):
+    return sum(int(digit) for digit in str(abs(n)))",Calculate sum of digits
+15,"def celsius_to_fahrenheit(c):
+    return (c * 9/5) + 32",Convert celsius to fahrenheit
+16,"def is_anagram(s1, s2):
+    return sorted(s1.lower()) == sorted(s2.lower())",Check if strings are anagrams
+17,"def flatten_list(nested_list):
+    result = []
+    for item in nested_list:
+        if isinstance(item, list):
+            result.extend(flatten_list(item))
+        else:
+            result.append(item)
+    return result",Flatten nested list
+18,"def count_occurrences(lst, item):
+    return lst.count(item)",Count item occurrences in list
+19,"def capitalize_words(s):
+    return ' '.join(word.capitalize() for word in s.split())",Capitalize first letter of words
+20,"def is_sorted(lst):
+    return lst == sorted(lst)",Check if list is sorted
