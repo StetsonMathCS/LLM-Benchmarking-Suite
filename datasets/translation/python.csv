@@ -1,4 +1,4 @@
-id,code_snippet,code_output
+id,code_snippet,expected_ouput
 1,"def add(a, b):
     return a + b
 print(add(3, 5))","8"

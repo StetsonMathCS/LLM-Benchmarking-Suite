@@ -9,7 +9,7 @@ from core.base import (
     BenchmarkResult,
     BenchmarkStatus
 )
-import matrix
+from benchmarks import matrix
 from benchmarks.dimensions import (
     partial_transform
 )
@@ -50,10 +50,22 @@ class PartialTransformBenchmark(BaseBenchmark):
         status = BenchmarkStatus.PASSED
         for cls in dimensions:
             dimension = cls()
-            result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=generated_code, **kwargs)
+            try:
+                result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=transformed_code, **kwargs)
+            except Exception as e:
+                # Dimension evaluation failed - create error result
+                from core.base import DimensionResult
+                result = DimensionResult(
+                    dimension_name=dimension.name,
+                    score=0.0,
+                    passed=False,
+                    details={"error": str(e)},
+                    issues=[str(e)]
+                )
+            
             if not result.passed :
                 status = BenchmarkStatus.ERROR
-                issues[dimension.name] = result.details["error"]
+                issues[dimension.name] = result.details.get("error", "Unknown error")
             results[dimension.name] = result
             # Calculating scores
             combined_score += (weights[dimension.name]*result.score) if result.score else 0.00

@@ -11,14 +11,11 @@ same            → 0.5
 both zero       → 1.0
 orig zero       → 0.0
 """
-import time
-import tracemalloc
 import sys
 from core.base import (
     BaseDimension,
     DimensionResult
 )
-import resource
 import os
 import subprocess
 import tempfile
@@ -76,7 +73,7 @@ class RuntimeAnalysisDimension(BaseDimension):
     def run_javascript(code):
         return RuntimeAnalysisDimension.subprocess_run(['node', '--max-old-space-size=128', '-e', code])
 
-    def evaluate(self, language: str, original_code: Optional[str], generated_code: str, **kwargs) -> DimensionResult:
+    def evaluate(self, language: str, generated_code: str, original_code: Optional[str] = None, **kwargs) -> DimensionResult:
         try:
             # If no original code, just analyze generated code
             if not original_code:

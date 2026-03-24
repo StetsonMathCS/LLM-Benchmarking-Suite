@@ -12,7 +12,7 @@ from core.base import (
     BenchmarkStatus,
     LLMResponse,
 )
-import matrix
+from benchmarks import matrix
 
 class CodeReviewBenchmark(BaseBenchmark):
     name = "Code Review Benchmark"
@@ -52,10 +52,22 @@ class CodeReviewBenchmark(BaseBenchmark):
         status = BenchmarkStatus.PASSED
         for cls in dimensions:
             dimension = cls()
-            result = dimension.evaluate(generated_reviews=review, **kwargs)
+            try:
+                result = dimension.evaluate(generated_reviews=review, **kwargs)
+            except Exception as e:
+                # Dimension evaluation failed - create error result
+                from core.base import DimensionResult
+                result = DimensionResult(
+                    dimension_name=dimension.name,
+                    score=0.0,
+                    passed=False,
+                    details={"error": str(e)},
+                    issues=[str(e)]
+                )
+            
             if not result.passed :
                 status = BenchmarkStatus.ERROR
-                issues[dimension.name] = result.details["error"]
+                issues[dimension.name] = result.details.get("error", "Unknown error")
             results[dimension.name] = result
             # Calculating scores
             combined_score += (weights[dimension.name]*result.score) if result.score else 0.00

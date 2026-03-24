@@ -42,8 +42,8 @@ class ModelConfig:
     model_name: str
     api_key: Optional[str]=None
     base_url: Optional[str]=None
-    temperature: float=0.7
-    max_tokens: int=4096
+    temperature: Optional[str]=None
+    max_tokens: Optional[str]=None
     system_prompt: Optional[str]=None  # User-defined system instruction
     extra_params: dict = field(default_factory=dict)
 
@@ -202,8 +202,8 @@ class BaseDimension(ABC):
     def evaluate(
         self,
         language:str,
-        original_code: str,
         generated_code: str,
+        original_code: Optional[str] = None,
         **kwargs,
     ) -> DimensionResult:
         """Score the generated output on this quality dimension."""

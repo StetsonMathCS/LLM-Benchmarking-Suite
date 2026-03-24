@@ -13,10 +13,11 @@ class FunctionalCorrectnessDimension(BaseDimension):
     name = "Functional Correctness"
     description = "Does generated code produce same output as original?"
 
-    def evaluate(self, language: str, original_code: Optional[str], generated_code: str, **kwargs) -> DimensionResult:
+    def evaluate(self, language: str, generated_code: str, original_code: Optional[str] = None, **kwargs) -> DimensionResult:
         """When you have only outputs and no original code (e.g. when you're checking for code generation) omit original_code and provide expected output in kwargs as original_output."""
-        if not original_code:
+        if not original_code or kwargs['expected_output']:
             expected_output = kwargs['expected_output']
+            original_code=None
         try:
             if language == "python":
                 orig_output = CodeRunner.run_python(original_code) if original_code else expected_output

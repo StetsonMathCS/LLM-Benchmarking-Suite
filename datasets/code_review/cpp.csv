@@ -1,0 +1,167 @@
+id,code_snippet,review,expected_reviews
+1,"int* createArray(int size) {
+    int arr[size];
+    return arr;
+}","[BUGS] Returns a pointer to a variable-length array (VLA) allocated on the stack — the array's lifetime ends when the function returns, so the caller receives a dangling pointer. Any access to the returned pointer is undefined behavior. [STANDARDS] VLAs (variable-length arrays) are not part of standard C++ (they are a C99 feature and a GCC extension); this code is non-portable and ill-formed in strict C++. [FIX] Allocate on the heap with new int[size] (and require the caller to delete[]), or preferably return a std::vector<int>(size) which manages lifetime automatically. [DESIGN] Returning raw owning pointers forces the caller to manually manage memory and is error-prone; prefer RAII types.",BUGS|STANDARDS|FIX|DESIGN
+2,"class MyClass {
+public:
+    MyClass(int* data, int size) : data_(data), size_(size) {}
+    ~MyClass() { delete[] data_; }
+private:
+    int* data_;
+    int size_;
+};","[BUGS] Violates the Rule of Three: a destructor is defined but no copy constructor or copy assignment operator is provided. The compiler-generated copy will shallow-copy the pointer, leading to a double-free when both objects are destroyed. [BUGS] If MyClass a = b is performed, both a and b will own the same pointer — the second destructor to run triggers undefined behavior. [FIX] Either delete the copy constructor and copy assignment operator (= delete) to make the class move-only, or implement deep-copy semantics. [DESIGN] Prefer std::unique_ptr<int[]> as the member — it enforces single ownership, eliminates the manual destructor, and correctly deletes the copy constructor. [MODERN C++] Apply the Rule of Zero: use RAII wrappers so that you need not define any of destructor/copy/move manually.",BUGS|BUGS|FIX|DESIGN|MODERN C++
+3,"std::string getName() {
+    std::string name = ""Alice"";
+    return std::move(name);
+}","[PERFORMANCE] std::move() on a return value actively prevents Named Return Value Optimization (NRVO). The compiler can elide the copy/move entirely under NRVO, constructing the result directly in the caller's stack frame — but only if the return expression is a bare variable name. Adding std::move() forces a move construction instead, which is strictly worse. [CORRECTNESS] The code is not wrong in result (the string is returned), but it is a common anti-pattern that pessimizes performance while appearing to optimize it. [FIX] Return the variable directly: return name; — the compiler will apply NRVO or at minimum treat it as an implicit move from a local variable (guaranteed move semantics in C++17+). [STYLE] Reserve std::move on return only for cases where you are returning a non-local variable (e.g., a parameter or member) that cannot benefit from NRVO.",PERFORMANCE|CORRECTNESS|FIX|STYLE
+4,"void processInput(char* buffer) {
+    char local[64];
+    strcpy(local, buffer);
+    printf(buffer);
+}","[SECURITY] Buffer overflow: strcpy copies until a null terminator with no bounds checking — if buffer is longer than 63 bytes, local is overflowed, corrupting the stack and enabling arbitrary code execution. Use strncpy(local, buffer, sizeof(local) - 1) and manually null-terminate, or prefer std::string and std::snprintf. [SECURITY] Format string vulnerability: printf(buffer) passes user-controlled data as the format string. An attacker can inject %s, %x, %n specifiers to read memory or write arbitrary values. Always use printf(""%s"", buffer) or puts(buffer). [DESIGN] The function accepts a raw char* with no size parameter, making safe use impossible without knowing the caller's intent. [MODERN C++] Prefer std::string, std::string_view, and std::cout to avoid the entire class of C-string vulnerabilities.",SECURITY|SECURITY|DESIGN|MODERN C++
+5,"template<typename T>
+T* getObject() {
+    static T obj;
+    return &obj;
+}","[CONCURRENCY] Static local variables are initialized on first call — in C++11 and later this initialization is thread-safe, but subsequent reads and writes to *obj are not protected. If T has mutable state and multiple threads call through this pointer, all accesses are data races (undefined behavior). [DESIGN] Returns a raw pointer to a static — callers may store or dereference the pointer after the static's lifetime, but more critically there is no indication of ownership. Callers may incorrectly delete the pointer. [DESIGN] This is an implicit Singleton pattern. Singletons are notoriously hard to test (no reset mechanism) and create hidden global state. Prefer dependency injection. [LIFETIME] If T's destructor has side effects and the static is destroyed at program exit, the destruction order relative to other statics is unspecified, risking use-after-destruction.",CONCURRENCY|DESIGN|DESIGN|LIFETIME
+6,"int divide(int a, int b) {
+    return a / b;
+}","[CORRECTNESS] No check for b == 0 — integer division by zero is undefined behavior in C++ (not an exception, not a signal on all platforms; it may crash, return garbage, or silently produce wrong results depending on CPU and OS). [CORRECTNESS] INT_MIN / -1 is also undefined behavior in C++ because the mathematical result (INT_MAX + 1) overflows signed integer representation. This is a frequently forgotten edge case. [DESIGN] The function should either assert(b != 0) with a precondition contract, return std::optional<int>, or throw a std::invalid_argument. [ROBUSTNESS] No documentation of preconditions — callers have no indication that b must be non-zero.",CORRECTNESS|CORRECTNESS|DESIGN|ROBUSTNESS
+7,"class Animal {
+public:
+    ~Animal() { std::cout << ""Animal destroyed\n""; }
+    virtual void speak() = 0;
+};
+
+class Dog : public Animal {
+public:
+    void speak() override { std::cout << ""Woof\n""; }
+};
+
+int main() {
+    Animal* a = new Dog();
+    delete a;
+}","[BUGS] Animal's destructor is not virtual — when delete a is called on a base class pointer, only ~Animal() is invoked; ~Dog() is never called. This is undefined behavior and a resource leak if Dog owns any resources. [FIX] Declare the destructor virtual: virtual ~Animal() = default; — this ensures the most-derived destructor is called through any base pointer. [BEST PRACTICE] Any class designed for polymorphic use (has virtual functions) must have a virtual destructor, or explicitly delete the copy constructor and use a non-owning base pointer. [DESIGN] Prefer smart pointers (std::unique_ptr<Animal>) over raw new/delete — unique_ptr with a virtual destructor correctly calls the derived destructor. [STYLE] Pure virtual function correctly models the abstraction; the oversight is solely the non-virtual destructor.",BUGS|FIX|BEST PRACTICE|DESIGN|STYLE
+8,"std::vector<int> v = {1, 2, 3, 4, 5};
+for (auto it = v.begin(); it != v.end(); ++it) {
+    if (*it % 2 == 0) {
+        v.erase(it);
+    }
+}","[BUGS] Iterator invalidation: std::vector::erase() invalidates all iterators at and after the erased position. After erase(it), it is a dangling iterator — incrementing it in the loop (++it in the for statement) is undefined behavior. [FIX] Use the erase-remove idiom: v.erase(std::remove_if(v.begin(), v.end(), [](int x){ return x % 2 == 0; }), v.end()); — or in C++20: std::erase_if(v, [](int x){ return x % 2 == 0; }). [ALTERNATIVE FIX] If manual iteration is needed, use the return value of erase: it = v.erase(it); and only increment it when not erasing. [PERFORMANCE] The naive erase-in-loop is O(n²) due to shifting elements on each erasure; the erase-remove idiom is O(n).",BUGS|FIX|ALTERNATIVE FIX|PERFORMANCE
+9,"void copyString(const std::string& src) {
+    char* buf = new char[src.size()];
+    memcpy(buf, src.c_str(), src.size());
+    // ... use buf ...
+    delete[] buf;
+}","[BUGS] Off-by-one: src.size() does not include the null terminator. buf is not null-terminated, so any C string function applied to it will read past the buffer end (undefined behavior). Allocate src.size() + 1 bytes and copy src.size() + 1 bytes, or manually set buf[src.size()] = '\0'. [DESIGN] Manual new[]/delete[] in the same function is fragile — if any exception is thrown between allocation and deletion, the buffer leaks. Use std::unique_ptr<char[]> buf(new char[src.size()+1]) or simply std::string copy = src. [DESIGN] Copying a std::string into a raw char buffer to 'use' it is almost always unnecessary — the original std::string or a std::string_view already provides contiguous character access. [ROBUSTNESS] No null check is needed for new (it throws std::bad_alloc on failure), but the overall pattern should be replaced with RAII.",BUGS|src.size()|DESIGN|src.size()+1|DESIGN|ROBUSTNESS
+10,"struct Node {
+    int value;
+    Node* next;
+};
+
+Node* reverseList(Node* head) {
+    Node* prev = nullptr;
+    Node* curr = head;
+    while (curr) {
+        Node* next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+    }
+    return prev;
+}","[CORRECTNESS] The algorithm itself is correct for an in-memory singly linked list reversal. [OWNERSHIP] The function returns a raw pointer with no documentation of ownership semantics — the caller cannot tell if they now own the list, share it, or merely observe it. [ROBUSTNESS] No handling of cycles — if the list is circular, the while loop runs forever. Consider documenting the precondition that the list is acyclic. [DESIGN] A raw linked list in modern C++ is almost always the wrong data structure. Prefer std::list, std::deque, or std::vector with std::reverse(). [MEMORY SAFETY] No RAII — nothing manages the lifetime of Node objects. A single early return or exception anywhere in the caller leaks the entire list. [MODERN C++] If a custom linked list is truly required, wrap Nodes in std::unique_ptr to enforce ownership: using NodePtr = std::unique_ptr<Node>.",CORRECTNESS|OWNERSHIP|ROBUSTNESS|DESIGN|MEMORY SAFETY|MODERN C++
+11,"class ResourceManager {
+public:
+    ResourceManager() { resource_ = allocateResource(); }
+    ResourceManager(const ResourceManager&) = delete;
+    ResourceManager& operator=(const ResourceManager&) = delete;
+    ~ResourceManager() { freeResource(resource_); }
+private:
+    Resource* resource_;
+};","[CORRECTNESS] The class correctly deletes copy construction and copy assignment — good Rule of Three/Five discipline. [BUGS] No move constructor or move assignment operator is defined. Without them, ResourceManager cannot be stored in standard containers (std::vector requires movability) or returned efficiently from functions. Since copy is deleted, the class is neither copyable nor movable, which severely limits usability. [FIX] Define a move constructor: ResourceManager(ResourceManager&& other) noexcept : resource_(std::exchange(other.resource_, nullptr)) {} and a corresponding move assignment operator. [BUGS] If allocateResource() throws in the constructor, resource_ is in an indeterminate state and ~ResourceManager() will call freeResource(nullptr) — verify that freeResource handles nullptr safely, or initialize resource_ = nullptr before the allocation call. [MODERN C++] Consider wrapping resource_ in a custom deleter + std::unique_ptr to eliminate the manual destructor entirely.",CORRECTNESS|BUGS|FIX|BUGS|MODERN C++
+12,"double computeAverage(std::vector<double>& values) {
+    double sum = 0;
+    for (int i = 0; i <= values.size(); i++) {
+        sum += values[i];
+    }
+    return sum / values.size();
+}","[BUGS] Off-by-one error: loop condition is i <= values.size() — the final iteration accesses values[values.size()] which is one past the end, producing undefined behavior. Should be i < values.size(). [BUGS] values.size() returns std::size_t (unsigned) — comparing signed int i with unsigned size_t causes a signed/unsigned comparison warning and is undefined behavior if size_t exceeds INT_MAX. Use std::size_t i or a range-based for loop. [BUGS] Division by zero: if values is empty, values.size() == 0 and the division is undefined behavior (floating-point division by zero yields infinity, but this is still a logic bug). Check for empty input. [PERFORMANCE] values is taken by non-const reference — should be const std::vector<double>& since the function does not modify it. [STYLE] Prefer a range-based for loop or std::accumulate: return std::accumulate(values.begin(), values.end(), 0.0) / values.size();",BUGS|values.size()|BUGS|BUGS|PERFORMANCE|STYLE
+13,"void logMessage(const char* format, ...) {
+    char buffer[256];
+    va_list args;
+    va_start(args, format);
+    vsprintf(buffer, format, args);
+    va_end(args);
+    std::cout << buffer;
+}","[SECURITY] vsprintf writes to buffer with no size limit — a format string that expands beyond 255 characters overflows buffer, corrupting the stack. Use vsnprintf(buffer, sizeof(buffer), format, args) which truncates safely. [SECURITY] The format string is caller-controlled, but since this is a logging function it is likely trusted; still, passing user-supplied data as format is dangerous at call sites. [DESIGN] Fixed-size stack buffer is fragile — any message longer than 255 bytes is silently truncated (with vsnprintf) or a vulnerability (with vsprintf). Consider using vasprintf (POSIX) or formatting into a std::string via C++20 std::vformat. [MODERN C++] Variadic C-style functions are not type-safe. Prefer variadic templates or std::format (C++20) / fmtlib for type-safe, overflow-safe formatted logging. [PORTABILITY] va_list usage is correct but verbose; modern C++ has superseded this pattern.",SECURITY|SECURITY|DESIGN|MODERN C++|PORTABILITY
+14,"std::shared_ptr<A> a = std::make_shared<A>();
+std::shared_ptr<B> b = std::make_shared<B>();
+a->partner = b;
+b->partner = a;","[BUGS] Classic shared_ptr cycle: a holds a reference to b and b holds a reference to a — the reference counts for both objects will never reach zero, causing a memory leak for the lifetime of the program. [FIX] One direction of the cycle should use std::weak_ptr. Typically the 'back-pointer' or 'observer' side uses weak_ptr: std::weak_ptr<A> partner; in B, breaking the cycle. [DESIGN] Cycles in reference-counted ownership graphs are the primary failure mode of shared_ptr. Ownership should form a DAG (directed acyclic graph); any back-edges must use weak_ptr. [DETECTION] This leak is silent — no crash, no error, just growing memory usage. Valgrind or AddressSanitizer with leak detection will catch it. [DESIGN] Reconsider whether shared ownership is even needed here — often unique_ptr with raw observer pointers (non-owning) is sufficient and clearer.",BUGS|FIX|DESIGN|DETECTION|DESIGN
+15,"int main() {
+    int x;
+    if (x > 0) {
+        std::cout << ""Positive\n"";
+    }
+}","[BUGS] x is an uninitialized local variable — reading it before assignment is undefined behavior. The compiler may produce any value, and the behavior of the if branch is entirely unpredictable. In practice, x may hold stack garbage, a prior frame's data, or zero depending on build config. [BUGS] This is not caught at runtime — undefined behavior due to uninitialized reads is a silent correctness bug that can also enable security exploits via compiler optimizations that assume UB does not occur. [FIX] Initialize all variables at declaration: int x = 0; or int x{}; (value-initializes to zero). [TOOLING] Enable compiler warnings: -Wall -Wextra -Wuninitialized (GCC/Clang) catches this at compile time. AddressSanitizer and UBSan also detect reads of uninitialized memory. [STYLE] In modern C++, prefer declaring variables at point of first meaningful use rather than at the top of scope.",BUGS|BUGS|FIX|TOOLING|STYLE
+16,"class Base {
+public:
+    virtual void process() {
+        std::cout << ""Base\n"";
+    }
+    void run() {
+        process();
+    }
+};
+
+class Derived : public Base {
+public:
+    void process() override {
+        std::cout << ""Derived\n"";
+    }
+    void run() {
+        Base::run();
+        process();
+    }
+};","[DESIGN] Derived::run() calls Base::run() which internally calls the virtual process() — due to dynamic dispatch, this calls Derived::process(), then Derived::run() calls process() again directly. The result is that Derived::process() runs twice when Derived::run() is called — almost certainly unintended. [DESIGN] This is the classic problem of calling virtual functions inside base class methods — the Template Method Pattern works correctly, but callers must understand that Base::run() already dispatches polymorphically. [DESIGN] Hiding Base::run() with Derived::run() (non-virtual override) is almost always a design error — it breaks the Liskov Substitution Principle since Base* ptr = new Derived(); ptr->run() calls Base::run() not Derived::run(). [FIX] Either make run() virtual so it dispatches correctly, or do not define Derived::run() at all and let Base::run() call the overridden process() via virtual dispatch. [STYLE] Non-virtual hiding of inherited functions should generate a compiler warning (-Woverloaded-virtual); treat as error.",DESIGN|DESIGN|DESIGN|FIX|STYLE
+17,"template<typename T>
+class Stack {
+public:
+    void push(T val) { data_.push_back(val); }
+    T pop() {
+        T val = data_.back();
+        data_.pop_back();
+        return val;
+    }
+    bool empty() { return data_.empty(); }
+private:
+    std::vector<T> data_;
+};","[BUGS] pop() calls data_.back() on a potentially empty vector — undefined behavior if the stack is empty (no bounds check). Must check empty() before accessing back(). Either throw std::underflow_error, or assert(!empty()). [EXCEPTION SAFETY] pop() is not exception-safe: T val = data_.back() copies the top element (may throw if T's copy constructor throws), and if it does, pop_back() has not yet been called — the element is still present. This is the classic std::stack design problem. [FIX] Separate top() (returns reference) and pop() (void, just removes) like std::stack does. If a combined value-returning pop is needed, use std::move and noexcept. [PERFORMANCE] push(T val) takes by value — should be void push(T val) { data_.push_back(std::move(val)); } or provide push(const T&) and push(T&&) overloads. [DESIGN] empty() should be const: bool empty() const.",BUGS|EXCEPTION SAFETY|FIX|PERFORMANCE|DESIGN
+18,"void writeToFile(const std::string& filename, const std::string& data) {
+    FILE* f = fopen(filename.c_str(), ""w"");
+    fputs(data.c_str(), f);
+    fclose(f);
+}","[BUGS] No check for fopen failure — if the file cannot be opened (bad path, permissions, disk full), fopen returns nullptr. fputs(data.c_str(), nullptr) is undefined behavior (segfault). Always check if (f == nullptr) and handle the error. [BUGS] If fputs fails or throws, fclose is never called — resource leak. (fputs doesn't throw, but future code additions might.) [ERROR HANDLING] No error return value or exception — the caller has no way to know if the write succeeded. [MODERN C++] Use std::ofstream with RAII: std::ofstream f(filename); if (!f) throw ...; f << data; — the file is automatically closed when f goes out of scope, even if an exception is thrown. [ROBUSTNESS] Writing to a file non-atomically (open, write, close) can leave a partial file if the process is killed mid-write. For critical data, write to a temp file and rename (atomic on POSIX).",BUGS|BUGS|ERROR HANDLING|MODERN C++|ROBUSTNESS
+19,"#include <iostream>
+using namespace std;
+
+int main() {
+    int arr[] = {5, 3, 1, 4, 2};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    for(int i = 0; i < n-1; i++)
+        for(int j = 0; j < n-i-1; j++)
+            if(arr[j] > arr[j+1])
+                swap(arr[j], arr[j+1]);
+    for(int i = 0; i < n; i++)
+        cout << arr[i] << "" "";
+}","[STYLE] using namespace std; is considered bad practice in all but the most trivial examples — it pollutes the global namespace and can cause silent name collisions (e.g., std::distance, std::count clashing with user-defined names). Always qualify: std::cout, std::swap. [PERFORMANCE] Bubble sort is O(n²) — use std::sort (introsort, O(n log n)) for any real use. [BUGS] n is declared as int but sizeof returns std::size_t (unsigned). n-1 when n==0 would underflow to a huge positive number for an unsigned type — here n is int so it's safe, but the pattern is fragile. [STYLE] Braces omitted on if and for bodies — legal but error-prone; adding code to the body later can introduce logic bugs silently. [DESIGN] The algorithm has no early-exit optimization: if no swaps occurred in a pass, the array is already sorted. Adding a swapped flag makes best-case O(n).",STYLE|PERFORMANCE|BUGS|STYLE|DESIGN
+20,"std::string& getGlobalName() {
+    static std::string name = ""default"";
+    return name;
+}
+
+void processName() {
+    std::string& ref = getGlobalName();
+    ref = ""modified"";
+}","[CONCURRENCY] The static local variable name is shared across all threads. Concurrent calls to processName() create a data race on name — reading and writing a std::string from multiple threads without synchronization is undefined behavior. Protect with std::mutex. [DESIGN] Returning a non-const reference to a static allows any caller to silently mutate global state — this is hidden mutable global state, the hardest category of bug to track down. Prefer returning const std::string& or passing the string as a parameter. [INITIALIZATION ORDER] Static local initialization in C++11+ is thread-safe (magic statics), but only for the initialization — subsequent mutation is not protected. [DESIGN] If the intent is a configurable global, use a proper singleton with a mutex-protected setter/getter or a thread_local if per-thread state is desired. [TESTING] Functions that depend on or mutate global state are untestable in isolation — tests can interfere with each other depending on execution order.",CONCURRENCY|DESIGN|INITIALIZATION ORDER|DESIGN|TESTING

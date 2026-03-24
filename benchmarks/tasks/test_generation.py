@@ -12,10 +12,8 @@ from core.base import (
     BenchmarkStatus,
     LLMResponse,
 )
-import matrix
-from benchmarks.dimensions import (
-    test_pass_rate
-)
+from benchmarks import matrix
+from benchmarks.dimensions.test_pass_rate import TestPassRateDimension
 class TestGenerationBenchmark(BaseBenchmark):
     name = "Test Generation Benchmark"
     desc = "Evaluate the Language Model on test generation tasks."
@@ -56,13 +54,25 @@ class TestGenerationBenchmark(BaseBenchmark):
         status = BenchmarkStatus.PASSED
         for cls in dimensions:
             dimension = cls()
-            if isinstance(dimension, test_pass_rate):
-                result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=generated_tests, **kwargs)
-            else:
-                result = dimension.evaluate(language=self.language, generated_code=generated_tests, **kwargs)
+            try:
+                if isinstance(dimension, TestPassRateDimension):
+                    result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=generated_tests, **kwargs)
+                else:
+                    result = dimension.evaluate(language=self.language, generated_code=generated_tests, **kwargs)
+            except Exception as e:
+                # Dimension evaluation failed - create error result
+                from core.base import DimensionResult
+                result = DimensionResult(
+                    dimension_name=dimension.name,
+                    score=0.0,
+                    passed=False,
+                    details={"error": str(e)},
+                    issues=[str(e)]
+                )
+            
             if not result.passed :
                 status = BenchmarkStatus.ERROR
-                issues[dimension.name] = result.details["error"]
+                issues[dimension.name] = result.details.get("error", "Unknown error")
             results[dimension.name] = result
             # Calculating scores
             combined_score += (weights[dimension.name]*result.score) if result.score else 0.00

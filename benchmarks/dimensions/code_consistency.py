@@ -139,7 +139,7 @@ class CodeConsistencyDimension(BaseDimension):
         score = max(0.0, 1.0 - (issues / max(1, total_checks)))
         return score
 
-    def evaluate(self, language: str, original_code: Optional[str], generated_code: str, **kwargs) -> DimensionResult:
+    def evaluate(self, language: str, generated_code: str, original_code: Optional[str] = None, **kwargs) -> DimensionResult:
         language = language.lower().strip()
         try:
                 

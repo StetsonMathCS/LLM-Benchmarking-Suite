@@ -17,7 +17,7 @@ class VulnerabilitiesDimension(BaseDimension):
     name = "Vulnerabilities"
     description = "Security issues: bandit (Python), cppcheck (C++), npm audit (JS)."
 
-    def evaluate(self, language: str, original_code: Optional[str], generated_code: str, **kwargs) -> DimensionResult:
+    def evaluate(self, language: str, generated_code: str, original_code: Optional[str] = None, **kwargs) -> DimensionResult:
         try:
             # If no original code provided, only scan generated code and return 1.0
             if not original_code:

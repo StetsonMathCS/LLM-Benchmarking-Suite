@@ -10,13 +10,13 @@ from core.base import BaseProvider, LLMResponse
 @ProviderRegistry.register("ollama")
 class OllamaProvider(BaseProvider):
 
-    DEFAULT_BASE_URL = "http://localhost:11434"
+    DEFAULT_BASE_URL = "http://localhost:11454"
 
     def connect(self) -> bool:
         try:
             import ollama
-            self._lib = ollama
             self._base_url = self.config.base_url or self.DEFAULT_BASE_URL
+            self._lib = ollama.Client(host=self._base_url)
             return True
         except ImportError:
             raise RuntimeError("ollama package is not installed. Run: pip install ollama")
@@ -63,6 +63,7 @@ class OllamaProvider(BaseProvider):
         """Return list of models pulled in Ollama."""
         try:
             result = self._lib.list()
-            return [m["name"] for m in result.get("models", [])]
-        except Exception:
+            return [m.model for m in result.models]
+        except Exception as e:
+            print("Error occured:",e)
             return []

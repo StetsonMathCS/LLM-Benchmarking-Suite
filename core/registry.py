@@ -30,12 +30,28 @@ class ProviderRegistry:
         instance.connect()
         return instance
     
-    @classmethod
-    def available(cls) -> list[str]:
-        return list(cls._registry.keys())
-    
 # Auto-Register all providers on import
 def _register_all():
-    # TO DO
+    """Import all provider implementations to trigger their @register decorators."""
+    try:
+        from providers.openai.provider import OpenAIProvider
+    except Exception as e:
+        print(f"Warning: Could not auto-register OpenAI provider: {e}")
+    
+    try:
+        from providers.anthropic.provider import AnthropicProvider
+    except Exception as e:
+        print(f"Warning: Could not auto-register Anthropic provider: {e}")
+    
+    try:
+        from providers.ollama.provider import OllamaProvider
+    except Exception as e:
+        print(f"Warning: Could not auto-register Ollama provider: {e}")
+    
+    try:
+        from providers.huggingface.provider import HuggingFaceProvider
+    except Exception as e:
+        print(f"Warning: Could not auto-register HuggingFace provider: {e}")
+
 
 _register_all()

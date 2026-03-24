@@ -1,0 +1,77 @@
+Screen {
+    layout: vertical;
+}
+
+#main-tabs {
+    height: 1fr;
+}
+
+.pane-root {
+    height: 1fr;
+    padding: 1 2;
+}
+
+.card-row {
+    height: auto;
+    margin-bottom: 1;
+}
+
+.card {
+    width: 1fr;
+    height: auto;
+    border: round $accent;
+    padding: 1;
+    margin-right: 1;
+}
+
+.card:last-child {
+    margin-right: 0;
+}
+
+.section-title {
+    text-style: bold;
+    color: $text;
+    margin: 1 0 0 0;
+}
+
+#benchmark-table {
+    height: 14;
+    margin-top: 1;
+}
+
+#results-table {
+    height: 16;
+    margin-top: 1;
+}
+
+#results-preview {
+    height: 1fr;
+    border: round $primary;
+    padding: 1;
+    margin-top: 1;
+    overflow-y: auto;
+}
+
+.form-row {
+    height: auto;
+    margin-bottom: 1;
+}
+
+.form-label {
+    width: 24;
+    color: $text-muted;
+}
+
+.form-field {
+    width: 1fr;
+}
+
+#model-actions {
+    margin-top: 1;
+    height: auto;
+}
+
+#dashboard-actions {
+    margin-top: 1;
+    height: auto;
+}

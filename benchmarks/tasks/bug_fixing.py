@@ -12,11 +12,9 @@ from core.base import (
     BenchmarkStatus,
     LLMResponse,
 )
-import matrix
-from benchmarks.dimensions import (
-    code_consistency,
-    semantic_drift,
-)
+from benchmarks import matrix
+from benchmarks.dimensions.semantic_drift import SemanticDriftDimension
+from benchmarks.dimensions.code_consistency import CodeConsistencyDimension
 
 class BugFixingBenchmark(BaseBenchmark):
     """Must provide expected output for the program as 'expected_output' arguement"""
@@ -55,13 +53,25 @@ class BugFixingBenchmark(BaseBenchmark):
         status = BenchmarkStatus.PASSED
         for cls in dimensions:
             dimension = cls()
-            if isinstance(dimension, semantic_drift):
-                result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=fixed_code, **kwargs)
-            else:
-                result = dimension.evaluate(language=self.language, generated_code=fixed_code, **kwargs)
+            try:
+                if isinstance(dimension, SemanticDriftDimension):
+                    result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=fixed_code, **kwargs)
+                else:
+                    result = dimension.evaluate(language=self.language, generated_code=fixed_code, **kwargs)
+            except Exception as e:
+                # Dimension evaluation failed - create error result
+                from core.base import DimensionResult
+                result = DimensionResult(
+                    dimension_name=dimension.name,
+                    score=0.0,
+                    passed=False,
+                    details={"error": str(e)},
+                    issues=[str(e)]
+                )
+            
             if not result.passed :
                 status = BenchmarkStatus.ERROR
-                issues[dimension.name] = result.details["error"]
+                issues[dimension.name] = result.details.get("error", "Unknown error")
             results[dimension.name] = result
             # Calculating scores
             combined_score += (weights[dimension.name]*result.score) if result.score else 0.00

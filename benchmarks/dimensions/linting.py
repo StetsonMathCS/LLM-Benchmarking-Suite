@@ -16,7 +16,7 @@ class LintingDimension(BaseDimension):
     name = "Linting"
     description = "Code quality violations: pylint (Python), cppcheck (C++), eslint (JS)."
 
-    def evaluate(self, language: str, original_code: Optional[str], generated_code: str, **kwargs) -> DimensionResult:
+    def evaluate(self, language: str, generated_code: str, original_code: Optional[str] = None, **kwargs) -> DimensionResult:
         try:
             # If no original code provided, only lint generated code and return 1.0
             if not original_code:

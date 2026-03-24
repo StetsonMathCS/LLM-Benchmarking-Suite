@@ -2,7 +2,12 @@ import subprocess
 import os
 import tempfile
 import sys
-import resource
+
+# resource module is Unix/Linux only
+try:
+    import resource
+except ImportError:
+    resource = None
 
 class CodeRunner():
 

@@ -29,7 +29,6 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
         RuntimeAnalysisDimension,
     ],
     "code_completion" : [
-        SemanticDriftDimension,
         CodeConsistencyDimension,
         FunctionalCorrectnessDimension,
         LintingDimension,
@@ -68,7 +67,6 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
     "partial_transform" : [
         PartialTransformationDimension,
         FunctionalCorrectnessDimension,
-        SemanticDriftDimension,
         LintingDimension,
         VulnerabilitiesDimension,
         RuntimeAnalysisDimension
@@ -131,11 +129,6 @@ DIMENSION_WEIGHTS = {
         "Runtime Analysis": 0.10,
     }
 }
-
-# Calculate
-weights = DIMENSION_WEIGHTS["bug_fixing"]
-weighted_sum = sum(results[name].score * weights[name] for name in weights)
-final_score = weighted_sum  # Already sums to 1.0 if weights sum to 1.0
 
 def get_dimensions_for_task(task_name: str) -> list[type]:
     """Return the dimension classes mapped to a given task name."""

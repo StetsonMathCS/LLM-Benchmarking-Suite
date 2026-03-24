@@ -1,4 +1,4 @@
-id,instruction,generated_code,expected output
+id,instruction,generated_code,expected_output
 1,"Write C++ code to sum {1,2,3,4,5} and print result.","#include <iostream>
 #include <vector>
 int main(){std::vector<int> v{1,2,3,4,5};int s=0;for(int x:v)s+=x;std::cout<<s<<'\n';}",15

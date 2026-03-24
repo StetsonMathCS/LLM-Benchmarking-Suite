@@ -12,8 +12,8 @@ from core.base import (
     BenchmarkStatus,
     LLMResponse
 )
-import matrix
-from dimensions import (
+from benchmarks import matrix
+from benchmarks.dimensions import (
     semantic_drift
 )
 class CodeCompletionBenchmark(BaseBenchmark):
@@ -52,13 +52,22 @@ class CodeCompletionBenchmark(BaseBenchmark):
         status = BenchmarkStatus.PASSED
         for cls in dimensions:
             dimension = cls()
-            if isinstance(dimension, semantic_drift):
+            try:
                 result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=completed_code, **kwargs)
-            else:
-                result = dimension.evaluate(language=self.language, generated_code=completed_code, **kwargs)
-            if not result.passed:
+            except Exception as e:
+                # Dimension evaluation failed - create error result
+                from core.base import DimensionResult
+                result = DimensionResult(
+                    dimension_name=dimension.name,
+                    score=0.0,
+                    passed=False,
+                    details={"error": str(e)},
+                    issues=[str(e)]
+                )
+            
+            if not result.passed :
                 status = BenchmarkStatus.ERROR
-                issues[dimension.name]=result.details["error"]
+                issues[dimension.name] = result.details.get("error", "Unknown error")
             results[dimension.name]=result
             # Calculating Scores
             combined_score += (weights[dimension.name]*result.score) if result.score else 0.00

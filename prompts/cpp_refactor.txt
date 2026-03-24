@@ -35,6 +35,8 @@ End Example
 
 Your turn now.
 
+refactoring task: {{TASK}}
+
 Return ONLY the refactored C++ code.
 
 Code to refactor:

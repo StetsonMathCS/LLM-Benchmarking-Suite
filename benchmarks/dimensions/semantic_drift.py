@@ -9,10 +9,11 @@ from core.base import (
     DimensionResult
 )
 import ast
+import textwrap
+import re
 from apted import APTED, Config
 from apted.helpers import Tree
 from clang.cindex import Index, Cursor
-from tree_edit_distance import edit_distance
 from tree_sitter import Language, Parser
 import tree_sitter_cpp as tscpp
 import subprocess
@@ -21,10 +22,82 @@ from typing import Optional
 
 class SemanticDriftDimension(BaseDimension):
 
-    name = "Semantic Dimension"
+    name = "Semantic Drift"
     description = "Dimension that tests the code snippet for semantic drift. Returns the percentage similarity"
     _CPP_LANGUAGE = Language(tscpp.language())
     _cpp_parser = Parser(_CPP_LANGUAGE)
+
+    @staticmethod
+    def extract_code_block(code: str, language: str = None) -> str:
+        """Extract code from markdown blocks if present. Works for any language."""
+        if "```" not in code:
+            return code
+        
+        try:
+            # Try language-specific block first (```python, ```cpp, etc.)
+            if language:
+                pattern = rf'```{language}\n(.*?)\n```'
+                match = re.search(pattern, code, re.DOTALL)
+                if match:
+                    return match.group(1)
+            
+            # Try generic code block (```)
+            match = re.search(r'```(?:\w+)?\n(.*?)\n```', code, re.DOTALL)
+            if match:
+                return match.group(1)
+        except Exception:
+            pass
+        
+        return code
+
+    @staticmethod
+    def safe_parse_python(code: str) -> ast.Module:
+        """Safely parse Python code, handling indentation errors gracefully."""
+        # Extract markdown code block if present
+        code = SemanticDriftDimension.extract_code_block(code, "python")
+        
+        # Strategy 1: Try as-is
+        try:
+            return ast.parse(code)
+        except (IndentationError, SyntaxError):
+            pass
+        
+        # Strategy 2: Dedent
+        try:
+            dedented = textwrap.dedent(code)
+            return ast.parse(dedented)
+        except (IndentationError, SyntaxError):
+            pass
+        
+        # Strategy 3: Strip and dedent
+        try:
+            stripped = code.strip()
+            dedented = textwrap.dedent(stripped)
+            return ast.parse(dedented)
+        except (IndentationError, SyntaxError):
+            pass
+        
+        # Strategy 4: Wrap in a function if it looks like a code fragment
+        try:
+            wrapped = f"def _temp():\n{textwrap.indent(code, '    ')}"
+            ast.parse(wrapped)
+            # If wrapping worked, return the original dedented code as Module
+            return ast.parse(textwrap.dedent(code.strip()) or "pass")
+        except (IndentationError, SyntaxError):
+            pass
+        
+        # Strategy 5: Try wrapping in class definition
+        try:
+            wrapped = f"class _Temp:\n{textwrap.indent(code.strip(), '    ')}"
+            ast.parse(wrapped)
+            return ast.parse("pass")  # Return minimal valid code
+        except (IndentationError, SyntaxError):
+            pass
+        
+        # Strategy 6: Ultimate fallback - return minimal valid AST
+        # This ensures we always have a parseable result, even for broken code
+        return ast.parse("pass")
+
 
     @staticmethod
     def ast_to_bracket(node) -> str:
@@ -38,8 +111,12 @@ class SemanticDriftDimension(BaseDimension):
     @staticmethod
     def measure_similarity_python(original_code: str, generated_code: str) -> float:
         """Measures the percentage of semantic similarity in python code. returns a score from 0.0 to 1.0"""
-        orig_code = ast.parse(original_code)
-        gen_code = ast.parse(generated_code)
+        try:
+            orig_code = SemanticDriftDimension.safe_parse_python(original_code)
+            gen_code = SemanticDriftDimension.safe_parse_python(generated_code)
+        except SyntaxError as e:
+            raise ValueError(f"Failed to parse code: {e}")
+        
         orig_children = SemanticDriftDimension.ast_to_bracket(orig_code)
         gen_children = SemanticDriftDimension.ast_to_bracket(gen_code)
         tree1 = Tree.from_text(orig_children)
@@ -59,6 +136,10 @@ class SemanticDriftDimension(BaseDimension):
     @staticmethod
     def measure_similarity_cpp(original_code: str, generated_code: str) -> float:
         """Measures semantic similarity between two C++ snippets. Returns a score from 0.0 to 1.0."""
+        # Extract markdown code blocks if present
+        original_code = SemanticDriftDimension.extract_code_block(original_code, "cpp")
+        generated_code = SemanticDriftDimension.extract_code_block(generated_code, "cpp")
+        
         def node_to_bracket(node) -> str:
             node_type = node.type.replace("{", "").replace("}", "")
             children = [c for c in node.children if not c.is_extra]
@@ -70,8 +151,8 @@ class SemanticDriftDimension(BaseDimension):
             children = [c for c in node.children if not c.is_extra]
             return 1 + sum(count_nodes(c) for c in children)
 
-        root1 = _cpp_parser.parse(original_code.encode()).root_node
-        root2 = _cpp_parser.parse(generated_code.encode()).root_node
+        root1 = SemanticDriftDimension._cpp_parser.parse(original_code.encode()).root_node
+        root2 = SemanticDriftDimension._cpp_parser.parse(generated_code.encode()).root_node
 
         tree1 = Tree.from_text(node_to_bracket(root1))
         tree2 = Tree.from_text(node_to_bracket(root2))
@@ -117,14 +198,18 @@ class SemanticDriftDimension(BaseDimension):
         return json.loads(result.stdout)
 
     @staticmethod
-    def measure_similarity_javascript(original_code:str, generated_code:str) -> float:
+    def measure_similarity_javascript(original_code: str, generated_code: str) -> float:
             """Measures semantic similarity between two Javascript code snippets. Returns a score from 0.0 to 1.0"""
-            # Install eprisma in nodejs
-            subprocess.run(['npm','install','esprima'])
-            bracket1=SemanticDriftDimension.js_ast_to_bracket(parse_js(original_code, "/tmp/one.js"))
-            bracket2=SemanticDriftDimension.js_ast_to_bracket(parse_js(generated_code, "/tmp/two.js"))
-            tree1=Tree.from_text(bracket1) 
-            tree2=Tree.from_text(bracket2)
+            # Extract markdown code blocks if present
+            original_code = SemanticDriftDimension.extract_code_block(original_code, "javascript")
+            generated_code = SemanticDriftDimension.extract_code_block(generated_code, "javascript")
+            
+            # Install esprima in nodejs
+            subprocess.run(['npm','install','esprima'], capture_output=True)
+            bracket1 = SemanticDriftDimension.js_ast_to_bracket(SemanticDriftDimension.parse_js(original_code, "/tmp/one.js"))
+            bracket2 = SemanticDriftDimension.js_ast_to_bracket(SemanticDriftDimension.parse_js(generated_code, "/tmp/two.js"))
+            tree1 = Tree.from_text(bracket1) 
+            tree2 = Tree.from_text(bracket2)
             distance = APTED(tree1, tree2, Config()).compute_edit_distance()
 
             def calc_max_distance(tree):
@@ -143,8 +228,24 @@ class SemanticDriftDimension(BaseDimension):
                 result = self.measure_similarity_javascript(original_code, generated_code)
             else:
                 raise RuntimeError(f"Cannot benchmark {language} on semantic drift.")
+        except ValueError as e:
+            # Handle parse errors - return low score rather than failing
+            print(f"Warning: Parse error in semantic drift: {e}")
+            return DimensionResult(
+                dimension_name=self.name,
+                score=0.0,  # Return 0 score for unparseable code
+                passed=False,  # Mark as failed
+                details={"error": str(e)}  # Include error message
+            )
         except Exception as e:
-            raise RuntimeError(f"Error occured while semantic drift: {e}")
+            error_msg = f"Error in semantic drift evaluation: {e}"
+            print(f"DEBUG: {error_msg}")
+            return DimensionResult(
+                dimension_name=self.name,
+                score=0.0,
+                passed=False,
+                details={"error": error_msg}
+            )        
         return DimensionResult(
             dimension_name=self.name,
             score=result,

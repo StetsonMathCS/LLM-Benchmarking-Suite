@@ -12,7 +12,7 @@ from core.base import (
     BenchmarkStatus,
     LLMResponse,
 )    
-import matrix
+from benchmarks import matrix
 class RefactoringBenchmark(BaseBenchmark):
     name = "Refactoring Benchmark"
     desc = "Evaluate the Language Model on code refactoring tasks."
@@ -24,9 +24,10 @@ class RefactoringBenchmark(BaseBenchmark):
             "cpp": "cpp_refactor.txt",
             "javascript": "javascript_refactor.txt"
         }
+        refactoring_task = kwargs.get("refactoring_task", "")
         template = self._load_prompt_template(language, filename_map)
         if template:
-            return template.replace("{{CODE}}", code_input)
+            return template.replace("{{CODE}}", code_input).replace("{{TASK}}", refactoring_task)
         else:
             raise RuntimeError(f"Code refactoring {language} template not available.")
 
@@ -52,10 +53,22 @@ class RefactoringBenchmark(BaseBenchmark):
         status = BenchmarkStatus.PASSED
         for cls in dimensions:
             dimension = cls()
-            result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=refactored_code, **kwargs)
+            try:
+                result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=refactored_code, **kwargs)
+            except Exception as e:
+                # Dimension evaluation failed - create error result
+                from core.base import DimensionResult
+                result = DimensionResult(
+                    dimension_name=dimension.name,
+                    score=0.0,
+                    passed=False,
+                    details={"error": str(e)},
+                    issues=[str(e)]
+                )
+            print(result)
             if not result.passed :
                 status = BenchmarkStatus.ERROR
-                issues[dimension.name] = result.details["error"]
+                issues[dimension.name] = result.details.get("error", "Unknown error")
             results[dimension.name] = result
             # Calculating scores
             combined_score += (weights[dimension.name]*result.score) if result.score else 0.00
