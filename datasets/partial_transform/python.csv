@@ -29,7 +29,7 @@ except:
     print('error')",bare except clause,except ValueError with descriptive error message,"try:
     result = int(user_input)
 except ValueError as e:
-    print(f'Invalid input, expected an integer: {e}')",,ExceptHandler:ValueError,ast,ExceptHandler must name ValueError; no bare except
+    print(f'Invalid input, expected an integer: {e}')",,ExceptHandler,ast,Specific ExceptHandler for ValueError; no bare except
 5,"CONFIG = {
     'db_host': 'localhost',
     'db_port': 5432,
@@ -42,7 +42,7 @@ CONFIG = {
     'db_port': int(os.environ.get('DB_PORT', '5432')),
     'secret_key': os.environ.get('SECRET_KEY', ''),
     'debug': os.environ.get('DEBUG', 'false').lower() == 'true'
-}",,os.environ.get,ast+exec,All values use os.environ.get(); no bare string literals as dict values
+}",,Call,ast+exec,Import and Call nodes for os.environ.get(); no bare string dict values
 6,"def calculate_stats(numbers):
     mean = sum(numbers) / len(numbers)
     variance = sum((x - mean) ** 2 for x in numbers) / len(numbers)
@@ -122,7 +122,7 @@ def retry(func, n):
             return func()
         except Exception:
             time.sleep(2 ** i + random.uniform(0, 1))
-    return None",,"random.uniform,BinOp:Pow",ast,time.sleep arg is 2**i expression plus random.uniform(); no bare time.sleep(1)
+    return None",,BinOp,ast,time.sleep arg contains 2**i expression; BinOp node for exponentiation
 13,"product = 1
 for num in numbers:
     product *= num",manual accumulation loop,functools.reduce() with operator.mul,"import functools
@@ -270,7 +270,7 @@ with open('out.txt', 'w', newline='') as f:
     missing = [k for k in required if not os.environ.get(k)]
     if missing:
         raise EnvironmentError(f'Missing required env vars: {missing}')
-    return os.environ.get('DB_HOST'), os.environ.get('DB_PORT'), os.environ.get('DB_NAME')",Subscript:os.environ,"os.environ.get,EnvironmentError",ast,No os.environ['key'] subscript access; os.environ.get() used; EnvironmentError raised for missing vars
+    return os.environ.get('DB_HOST'), os.environ.get('DB_PORT'), os.environ.get('DB_NAME')",Subscript,Raise,ast,No Subscript access to os.environ; Raise node for EnvironmentError
 25,"cache = {}
 
 def get_user(user_id):

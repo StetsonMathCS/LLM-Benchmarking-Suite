@@ -25,6 +25,7 @@ class SuiteConfig:
     output_dir: str = f"./reports/outputs/{language}"
     parallel: bool = False
     progress_callback: Optional[Callable] = None
+    target_language: Optional[str] = None  # For translation tasks
 
 class TestSuite:
     """
@@ -86,6 +87,10 @@ class TestSuite:
                     try:
                         # Convert record to benchmark kwargs
                         kwargs = self._mapper.map_record_to_benchmark_kwargs(record)
+                        
+                        # Add target_language for translation tasks
+                        if task_name == "translation" and self.config.target_language:
+                            kwargs["target_language"] = self.config.target_language
                         
                         # Extract code_input and run benchmark
                         code_input = kwargs.pop("code_input", "")

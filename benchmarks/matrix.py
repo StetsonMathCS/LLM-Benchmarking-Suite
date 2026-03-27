@@ -14,6 +14,7 @@ from benchmarks.dimensions.partial_transform import PartialTransformationDimensi
 from benchmarks.dimensions.test_pass_rate import TestPassRateDimension
 from benchmarks.dimensions.vulnerabilities import VulnerabilitiesDimension
 from benchmarks.dimensions.code_review import CodeReviewDimension
+from benchmarks.dimensions.code_completion_tests import CodeCompletionTestsDimension
 
 # Matrix Definition 
 # Keys   = task names (must match BaseBenchmark.name on each task)
@@ -30,14 +31,14 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
     ],
     "code_completion" : [
         CodeConsistencyDimension,
-        FunctionalCorrectnessDimension,
+        CodeCompletionTestsDimension,
         LintingDimension,
         VulnerabilitiesDimension,
         RuntimeAnalysisDimension
     ],
     "code_generation" : [
         CodeConsistencyDimension,
-        FunctionalCorrectnessDimension,
+        CodeCompletionTestsDimension,
         LintingDimension,
         VulnerabilitiesDimension,
         RuntimeAnalysisDimension
@@ -85,21 +86,21 @@ DIMENSION_WEIGHTS = {
     },
     "code_completion" : {
         "Semantic Drift" : 0.00,
-        "Code Consistency" : 0.50,
-        "Functional Correctness" : 0.50,
+        "Code Consistency" : 0.25,
+        "Code Completion Tests" : 0.75,
         "Linting" : 0.00,
         "Vulnerabilities" : 0.00,
         "Runtime Analysis" : 0.00,
     },
     "code_generation" : {
         "Code Consistency" : 0.50,
-        "Functional Correctness" : 0.50,
+        "Code Completion Tests" : 0.50,
         "Linting" : 0.00,
         "Vulnerabilities" : 0.00,
         "Runtime Analysis" : 0.00,
     },
     "code_review" : {
-        "Code Review" : 1.00,
+        "Code Review Quality" : 1.00,
     },
     "refactoring": {
         "Functional Correctness": 0.30,
@@ -121,9 +122,8 @@ DIMENSION_WEIGHTS = {
         "Functional Correctness": 0.50,
     },
     "partial_transform": {
-        "Partial Transform": 0.40,
+        "Partial Transformation": 0.40,
         "Functional Correctness": 0.20,
-        "Semantic Drift": 0.10,
         "Linting": 0.10,
         "Vulnerabilities": 0.10,
         "Runtime Analysis": 0.10,

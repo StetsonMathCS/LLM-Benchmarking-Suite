@@ -53,7 +53,7 @@ class CodeReviewBenchmark(BaseBenchmark):
         for cls in dimensions:
             dimension = cls()
             try:
-                result = dimension.evaluate(generated_reviews=review, **kwargs)
+                result = dimension.evaluate(generated_review=review, **kwargs)
             except Exception as e:
                 # Dimension evaluation failed - create error result
                 from core.base import DimensionResult

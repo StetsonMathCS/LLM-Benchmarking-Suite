@@ -19,8 +19,9 @@ class PartialTransformationDimension(BaseDimension):
 
     @staticmethod
     def count_occurrences(code, word):
-        # Case insensitive regex matching
-        matches = [(m.start(), m.group()) for m in re.finditer(word, code, re.IGNORECASE)]
+        # Case insensitive regex matching with escaped special chars
+        escaped_word = re.escape(word)
+        matches = [(m.start(), m.group()) for m in re.finditer(escaped_word, code, re.IGNORECASE)]
         return len(matches)
 
     @staticmethod

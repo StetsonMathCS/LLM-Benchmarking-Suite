@@ -51,7 +51,7 @@ class PartialTransformBenchmark(BaseBenchmark):
         for cls in dimensions:
             dimension = cls()
             try:
-                result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=transformed_code, **kwargs)
+                result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=generated_code, **kwargs)
             except Exception as e:
                 # Dimension evaluation failed - create error result
                 from core.base import DimensionResult
@@ -62,7 +62,7 @@ class PartialTransformBenchmark(BaseBenchmark):
                     details={"error": str(e)},
                     issues=[str(e)]
                 )
-            
+            print(result)
             if not result.passed :
                 status = BenchmarkStatus.ERROR
                 issues[dimension.name] = result.details.get("error", "Unknown error")

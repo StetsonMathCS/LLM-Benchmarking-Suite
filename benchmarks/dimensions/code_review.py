@@ -14,35 +14,39 @@ from typing import Optional, List
 class CodeReviewDimension(BaseDimension):
     name = "Code Review Quality"
     description = "Semantic similarity between generated and expected code review using embeddings"
-    
-    # Default Ollama embedding model
-    EMBEDDING_MODEL = "nomic-embed-text"
-    OLLAMA_BASE_URL = "http://localhost:1561"
+    # Default Ollama embedding model and host
+    EMBEDDING_MODEL = "nomic-embed-text:latest"
+    DEFAULT_BASE_URL = "http://localhost:1561"
     
     def __init__(self):
-        """Initialize the dimension and check Ollama availability."""
+        """Initialize the dimension and create Ollama client."""
         super().__init__()
         self._embedding_cache = {}
-        self._ollama_available = self._check_ollama()
+        self._base_url = self.DEFAULT_BASE_URL
+        self._lib = None
+        self._ollama_available = self._connect_ollama()
     
-    def _check_ollama(self) -> bool:
-        """Check if Ollama is available and the embedding model is loaded."""
+    def _connect_ollama(self) -> bool:
+        """Create Ollama client and check availability."""
         try:
             import ollama
-            # Test basic connection
-            models = ollama.list()
-            model_names = [m['name'].split(':')[0] for m in models['models']]
-            if self.EMBEDDING_MODEL not in model_names:
+            self._lib = ollama.Client(host=self._base_url)
+            
+            # Test connection by listing models
+            models = self._lib.list()
+            model_names = [m.model.split(':')[0] for m in models.models]
+            
+            if self.EMBEDDING_MODEL.split(':')[0] not in model_names:
                 print(f"Warning: {self.EMBEDDING_MODEL} not found in Ollama. Available: {model_names}")
                 return False
             return True
         except Exception as e:
-            print(f"Warning: Ollama not available: {e}")
+            print(f"Warning: Ollama not available at {self._base_url}: {e}")
             return False
     
     def _get_embedding(self, text: str) -> Optional[List[float]]:
         """Get embedding for text using Ollama."""
-        if not text or not self._ollama_available:
+        if not text or not self._ollama_available or not self._lib:
             return None
         
         # Check cache first
@@ -50,12 +54,11 @@ class CodeReviewDimension(BaseDimension):
             return self._embedding_cache[text]
         
         try:
-            import ollama
-            response = ollama.embed(
+            response = self._lib.embed(
                 model=self.EMBEDDING_MODEL,
                 input=text
             )
-            embedding = response['embeddings'][0] if response['embeddings'] else None
+            embedding = response['embeddings'][0] if response.get('embeddings') else None
             
             if embedding:
                 self._embedding_cache[text] = embedding

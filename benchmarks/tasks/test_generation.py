@@ -56,9 +56,10 @@ class TestGenerationBenchmark(BaseBenchmark):
             dimension = cls()
             try:
                 if isinstance(dimension, TestPassRateDimension):
-                    result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=generated_tests, **kwargs)
+                    result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_tests=generated_tests, **kwargs)
                 else:
                     result = dimension.evaluate(language=self.language, generated_code=generated_tests, **kwargs)
+                print(result)
             except Exception as e:
                 # Dimension evaluation failed - create error result
                 from core.base import DimensionResult
@@ -69,7 +70,7 @@ class TestGenerationBenchmark(BaseBenchmark):
                     details={"error": str(e)},
                     issues=[str(e)]
                 )
-            
+
             if not result.passed :
                 status = BenchmarkStatus.ERROR
                 issues[dimension.name] = result.details.get("error", "Unknown error")

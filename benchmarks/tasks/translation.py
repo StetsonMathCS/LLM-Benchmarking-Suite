@@ -54,6 +54,7 @@ class TranslationBenchmark(BaseBenchmark):
             dimension = cls()
             try:
                 result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=translated_code, **kwargs)
+                print(result)
             except Exception as e:
                 # Dimension evaluation failed - create error result
                 from core.base import DimensionResult

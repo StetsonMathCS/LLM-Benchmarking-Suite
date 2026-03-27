@@ -39,7 +39,23 @@ class RuntimeAnalysisDimension(BaseDimension):
                 text=True,
                 timeout=5,
             )
-            return json.loads(wrapper.stdout)
+                    
+            # Check if wrapper itself failed
+            if wrapper.returncode != 0:
+                raise RuntimeError(f"Wrapper failed: {wrapper.stderr}")
+            
+            # Check if stdout is empty
+            if not wrapper.stdout or not wrapper.stdout.strip():
+                raise RuntimeError(f"No output from wrapper. stderr: {wrapper.stderr}")
+            
+            # Try to parse JSON
+            try:
+                return json.loads(wrapper.stdout)
+            except json.JSONDecodeError as je:
+                raise RuntimeError(f"Invalid JSON from wrapper: {wrapper.stdout[:100]}. stderr: {wrapper.stderr}")
+                
+        except subprocess.TimeoutExpired:
+            raise RuntimeError("Subprocess execution timed out")
         except Exception as e:
             raise RuntimeError(f"Error occurred while evaluating on runtime analysis: {e}")
 
@@ -60,11 +76,25 @@ class RuntimeAnalysisDimension(BaseDimension):
                 ['g++', src_path, '-o', out_path],
                 capture_output=True, text=True, timeout=10
             )
-            if compile_result.returncode!=0:
-                return compile_result.stderr
+            if compile_result.returncode != 0:
+                return {
+                    "stdout": "",
+                    "stderr": compile_result.stderr,
+                    "returncode": compile_result.returncode,
+                    "wall_time": 0,
+                    "total_cpu": 0,
+                    "peak_memory": 0
+                }
             return RuntimeAnalysisDimension.subprocess_run([out_path])
         except subprocess.TimeoutExpired:
-            return "Error: Compilation timed out."
+            return {
+                "stdout": "",
+                "stderr": "Compilation timed out.",
+                "returncode": 1,
+                "wall_time": 0,
+                "total_cpu": 0,
+                "peak_memory": 0
+            }
         finally:
             for p in [src_path, out_path]:
                 if os.path.exists(p): os.unlink(p)
@@ -91,51 +121,79 @@ class RuntimeAnalysisDimension(BaseDimension):
                     )
                 
                 if not generated_results.get("stdout"):
+                    # Code produced no output - return neutral score
+                    if generated_results.get("returncode") == 0:
+                        return DimensionResult(
+                            dimension_name=self.name,
+                            score=0.5,
+                            passed=True,
+                            details={
+                                "note": "Code executed but produced no output",
+                                "returncode": generated_results.get("returncode")
+                            }
+                        )
+                    else:
+                        return DimensionResult(
+                            dimension_name=self.name,
+                            score=0.0,
+                            passed=False,
+                            details={
+                                "error": generated_results.get("stderr") or "Error occurred",
+                                "returncode": generated_results.get("returncode")
+                            }
+                        )
+                
+                return DimensionResult(
+                    dimension_name=self.name,
+                    score=1.0,
+                    passed=True,
+                    details={
+                        "generated_code_runtime": generated_results.get("wall_time"),
+                        "generated_code_memory": generated_results.get("peak_memory"),
+                        "note": "No original code provided for comparison"
+                    }
+                )
+            
+            # Standard flow: compare original vs generated
+            if language == "python":
+                orig_results = RuntimeAnalysisDimension.run_python(original_code)
+                generated_results = RuntimeAnalysisDimension.run_python(generated_code)
+            elif language == "cpp":
+                orig_results = RuntimeAnalysisDimension.run_cpp(original_code)
+                generated_results = RuntimeAnalysisDimension.run_cpp(generated_code)
+            elif language == "javascript":
+                orig_results = RuntimeAnalysisDimension.run_javascript(original_code)
+                generated_results = RuntimeAnalysisDimension.run_javascript(generated_code)
+            else:
+                return DimensionResult(
+                    dimension_name=self.name,
+                    score=0.0,
+                    details={"error": "Evaluation error"}
+                )
+            
+            if not generated_results.get("stdout"):
+                # Generated code produced no output - return neutral score
+                if generated_results.get("returncode") == 0:
+                    return DimensionResult(
+                        dimension_name=self.name,
+                        score=0.5,
+                        passed=True,
+                        details={
+                            "note": "Generated code executed but produced no output",
+                            "returncode": generated_results.get("returncode")
+                        }
+                    )
+                else:
                     return DimensionResult(
                         dimension_name=self.name,
                         score=0.0,
                         passed=False,
                         details={
                             "error": generated_results.get("stderr") or "Error occurred",
+                            "returncode": generated_results.get("returncode")
                         }
                     )
-                
-                return DimensionResult(
-                    dimension_name=self.name,
-                    score=1.0,  # No comparison, return perfect score with metrics
-                    passed=True,
-                    details={
-                        "generated_code_runtime": generated_results["wall_time"],
-                        "generated_code_memory": generated_results["peak_memory"],
-                        "note": "No original code provided for comparison"
-                    }
-                )
             
-            # Standard flow: compare original vs generated
-            if language=="python":
-                orig_results=RuntimeAnalysisDimension.run_python(original_code)
-                generated_results=RuntimeAnalysisDimension.run_python(generated_code)
-            elif language=="cpp":
-                orig_results=RuntimeAnalysisDimension.run_cpp(original_code)
-                generated_results=RuntimeAnalysisDimension.run_cpp(generated_code)
-            elif language=="javascript":
-                orig_results=RuntimeAnalysisDimension.run_javascript(original_code)
-                generated_results=RuntimeAnalysisDimension.run_javascript(generated_code)
-            else:
-                return DimensionResult(
-                    dimension_name=self.name,
-                    score=0.0,
-                    details={"error":"Evaluation error"}
-                )
-            if not generated_results["stdout"]:
-                return DimensionResult(
-                    dimension_name=self.name,
-                    score=0.0,
-                    passed=False,
-                    details={
-                        "error" : generated_results["stderr"] or "Error occured",
-                    }
-                )
             def ratio_score(v1, v2):
                 """
                 Score based on ratio of generated (v2) to original (v1).
@@ -156,21 +214,21 @@ class RuntimeAnalysisDimension(BaseDimension):
                 return round(score, 4)
 
             memory_score = ratio_score(
-                orig_results["peak_memory"],
-                generated_results["peak_memory"]
+                orig_results.get("peak_memory", 0),
+                generated_results.get("peak_memory", 0)
             )
             time_score = ratio_score(
-                orig_results["wall_time"],
-                generated_results["wall_time"]  
+                orig_results.get("wall_time", 0),
+                generated_results.get("wall_time", 0)
             )
             # final score will be normalized sum of memory_score and time_score
-            final_score = (0.5*memory_score) + (0.5*time_score) 
+            final_score = (0.5 * memory_score) + (0.5 * time_score) 
             return DimensionResult(
                 dimension_name=self.name,
-                score = final_score,
+                score=final_score,
                 passed=True,
                 details={
-                    "original_code_results" : orig_results,
+                    "original_code_results": orig_results,
                     "generated_code_results": generated_results
                 }
             )
