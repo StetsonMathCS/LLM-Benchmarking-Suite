@@ -78,7 +78,7 @@ class CodeGenerationBenchmark(BaseBenchmark):
                         )
                 else:
                     result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=generated_code, **kwargs)
-                print(result)
+                # print(result)
             except Exception as e:
                 # Dimension evaluation failed - create error result
                 result = DimensionResult(

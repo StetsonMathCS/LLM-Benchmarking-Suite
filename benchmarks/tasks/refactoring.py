@@ -65,7 +65,7 @@ class RefactoringBenchmark(BaseBenchmark):
                     details={"error": str(e)},
                     issues=[str(e)]
                 )
-            print(result)
+            # print(result)
             if not result.passed :
                 status = BenchmarkStatus.ERROR
                 issues[dimension.name] = result.details.get("error", "Unknown error")

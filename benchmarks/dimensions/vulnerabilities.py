@@ -19,19 +19,22 @@ class VulnerabilitiesDimension(BaseDimension):
 
     def evaluate(self, language: str, generated_code: str, original_code: Optional[str] = None, **kwargs) -> DimensionResult:
         try:
+            # Get the language for the generated code (may differ from source language in translation tasks)
+            generated_code_language = kwargs.get('generated_code_language', language)
+            
             # If no original code provided, only scan generated code and return 1.0
             if not original_code:
-                if language == "python":
+                if generated_code_language == "python":
                     gen_vulns = self._scan_python(generated_code)
-                elif language == "cpp":
+                elif generated_code_language == "cpp":
                     gen_vulns = self._scan_cpp(generated_code)
-                elif language == "javascript":
+                elif generated_code_language == "javascript":
                     gen_vulns = self._scan_javascript(generated_code)
                 else:
                     return DimensionResult(
                         dimension_name=self.name,
                         score=0.0,
-                        details={"error": f"Unsupported language: {language}"}
+                        details={"error": f"Unsupported generated code language: {generated_code_language}"}
                     )
                 return DimensionResult(
                     dimension_name=self.name,
@@ -45,18 +48,29 @@ class VulnerabilitiesDimension(BaseDimension):
             # Standard flow: compare original vs generated
             if language == "python":
                 orig_vulns = self._scan_python(original_code)
-                gen_vulns = self._scan_python(generated_code)
             elif language == "cpp":
                 orig_vulns = self._scan_cpp(original_code)
-                gen_vulns = self._scan_cpp(generated_code)
             elif language == "javascript":
                 orig_vulns = self._scan_javascript(original_code)
+            else:
+                return DimensionResult(
+                    dimension_name=self.name,
+                    score=0.0,
+                    details={"error": f"Unsupported source language: {language}"}
+                )
+            
+            # Scan generated code using its own language
+            if generated_code_language == "python":
+                gen_vulns = self._scan_python(generated_code)
+            elif generated_code_language == "cpp":
+                gen_vulns = self._scan_cpp(generated_code)
+            elif generated_code_language == "javascript":
                 gen_vulns = self._scan_javascript(generated_code)
             else:
                 return DimensionResult(
                     dimension_name=self.name,
                     score=0.0,
-                    details={"error": f"Unsupported language: {language}"}
+                    details={"error": f"Unsupported generated code language: {generated_code_language}"}
                 )
 
             new_vulns = gen_vulns - orig_vulns

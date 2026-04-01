@@ -18,8 +18,10 @@ class FunctionalCorrectnessDimension(BaseDimension):
         
         For code transformations (partial_transform), compares against expected_output text.
         For other tasks, executes both original and generated code and compares outputs.
+        For translation tasks, uses generated_code_language for executing generated code.
         """
         expected_output = kwargs.get('expected_output', None)
+        generated_code_language = kwargs.get('generated_code_language', language)
         
         # If we have expected_output and no original_code (or for transformations),
         # do text-based comparison
@@ -38,20 +40,32 @@ class FunctionalCorrectnessDimension(BaseDimension):
         
         # Otherwise, try to execute both versions
         try:
+            # Execute original code using source language
             if language == "python":
                 orig_output = CodeRunner.run_python(original_code) if original_code else expected_output
-                gen_output = CodeRunner.run_python(generated_code)
             elif language == "javascript":
                 orig_output = CodeRunner.run_javascript(original_code) if original_code else expected_output
-                gen_output = CodeRunner.run_javascript(generated_code)
             elif language == "cpp":
                 orig_output = CodeRunner.run_cpp(original_code) if original_code else expected_output
+            else:
+                return DimensionResult(
+                    dimension_name=self.name,
+                    score=0.0,
+                    details={"error": f"Unsupported source language: {language}"}
+                )
+            
+            # Execute generated code using target language (may be different for translation tasks)
+            if generated_code_language == "python":
+                gen_output = CodeRunner.run_python(generated_code)
+            elif generated_code_language == "javascript":
+                gen_output = CodeRunner.run_javascript(generated_code)
+            elif generated_code_language == "cpp":
                 gen_output = CodeRunner.run_cpp(generated_code)
             else:
                 return DimensionResult(
                     dimension_name=self.name,
                     score=0.0,
-                    details={"error": f"Unsupported language: {language}"}
+                    details={"error": f"Unsupported generated code language: {generated_code_language}"}
                 )
 
             score = 1.0 if orig_output.strip() == gen_output.strip() else 0.0

@@ -18,19 +18,22 @@ class LintingDimension(BaseDimension):
 
     def evaluate(self, language: str, generated_code: str, original_code: Optional[str] = None, **kwargs) -> DimensionResult:
         try:
+            # Get the language for the generated code (may differ from source language in translation tasks)
+            generated_code_language = kwargs.get('generated_code_language', language)
+            
             # If no original code provided, only lint generated code and return 1.0
             if not original_code:
-                if language == "python":
+                if generated_code_language == "python":
                     gen_violations = self._lint_python(generated_code)
-                elif language == "cpp":
+                elif generated_code_language == "cpp":
                     gen_violations = self._lint_cpp(generated_code)
-                elif language == "javascript":
+                elif generated_code_language == "javascript":
                     gen_violations = self._lint_javascript(generated_code)
                 else:
                     return DimensionResult(
                         dimension_name=self.name,
                         score=0.0,
-                        details={"error": f"Unsupported language: {language}"}
+                        details={"error": f"Unsupported generated code language: {generated_code_language}"}
                     )
                 
                 return DimensionResult(
@@ -45,18 +48,29 @@ class LintingDimension(BaseDimension):
             # Standard flow: compare original vs generated
             if language == "python":
                 orig_violations = self._lint_python(original_code)
-                gen_violations = self._lint_python(generated_code)
             elif language == "cpp":
                 orig_violations = self._lint_cpp(original_code)
-                gen_violations = self._lint_cpp(generated_code)
             elif language == "javascript":
                 orig_violations = self._lint_javascript(original_code)
+            else:
+                return DimensionResult(
+                    dimension_name=self.name,
+                    score=0.0,
+                    details={"error": f"Unsupported source language: {language}"}
+                )
+            
+            # Lint generated code using its own language
+            if generated_code_language == "python":
+                gen_violations = self._lint_python(generated_code)
+            elif generated_code_language == "cpp":
+                gen_violations = self._lint_cpp(generated_code)
+            elif generated_code_language == "javascript":
                 gen_violations = self._lint_javascript(generated_code)
             else:
                 return DimensionResult(
                     dimension_name=self.name,
                     score=0.0,
-                    details={"error": f"Unsupported language: {language}"}
+                    details={"error": f"Unsupported generated code language: {generated_code_language}"}
                 )
 
             score = self._calculate_score(orig_violations, gen_violations)

@@ -140,14 +140,16 @@ class CodeConsistencyDimension(BaseDimension):
         return score
 
     def evaluate(self, language: str, generated_code: str, original_code: Optional[str] = None, **kwargs) -> DimensionResult:
-        language = language.lower().strip()
+        # Get the language for the generated code (may differ from source language in translation tasks)
+        generated_code_language = kwargs.get('generated_code_language', language).lower().strip()
+        
         try:
                 
-            if language == 'python':
+            if generated_code_language == 'python':
                 score = self._python_check(generated_code)
-            elif language in ['cpp', 'c++', 'cxx']:
+            elif generated_code_language in ['cpp', 'c++', 'cxx']:
                 score = self._cpp_check(generated_code)
-            elif language in ['javascript', 'js']:
+            elif generated_code_language in ['javascript', 'js']:
                 score = self._javascript_check(generated_code)
             else:
                 return DimensionResult(

@@ -1,5 +1,6 @@
 Screen {
     layout: vertical;
+    background: #0f1720;
 }
 
 #main-tabs {
@@ -8,18 +9,54 @@ Screen {
 
 .pane-root {
     height: 1fr;
-    padding: 1 2;
+    padding: 1 1;
+}
+
+.panel {
+    border: round #2c4958;
+    background: #12202b;
+    padding: 1;
+    margin: 0 1 1 0;
+}
+
+#controls {
+    width: 44;
+    min-width: 34;
+}
+
+#live-pane {
+    width: 1fr;
+    margin-right: 0;
+}
+
+.panel-title {
+    text-style: bold;
+    color: #f6d08f;
+    margin: 0 0 1 0;
+}
+
+.section-title {
+    margin-top: 1;
+    color: #9bc8d8;
+    text-style: bold;
+}
+
+#benchmark-picks {
+    height: auto;
+    border: round #37596b;
+    padding: 1;
 }
 
 .card-row {
     height: auto;
-    margin-bottom: 1;
+    margin: 1 0;
 }
 
 .card {
     width: 1fr;
     height: auto;
-    border: round $accent;
+    border: round #3f7083;
+    background: #0e2a37;
     padding: 1;
     margin-right: 1;
 }
@@ -28,28 +65,24 @@ Screen {
     margin-right: 0;
 }
 
-.section-title {
+.status-banner {
+    height: auto;
+    border: round #f6d08f;
+    background: #2d2a1d;
+    color: #f6d08f;
     text-style: bold;
-    color: $text;
-    margin: 1 0 0 0;
+    padding: 0 1;
 }
 
-#benchmark-table {
+#run-table {
     height: 14;
-    margin-top: 1;
+    margin-bottom: 1;
 }
 
-#results-table {
-    height: 16;
-    margin-top: 1;
-}
-
-#results-preview {
+#run-log {
     height: 1fr;
-    border: round $primary;
-    padding: 1;
-    margin-top: 1;
-    overflow-y: auto;
+    border: round #3f7083;
+    background: #09161e;
 }
 
 .form-row {
@@ -58,20 +91,29 @@ Screen {
 }
 
 .form-label {
-    width: 24;
-    color: $text-muted;
+    width: 13;
+    color: #9bc8d8;
 }
 
 .form-field {
     width: 1fr;
 }
 
-#model-actions {
+#run-actions {
     margin-top: 1;
     height: auto;
 }
 
-#dashboard-actions {
+#results-table {
+    height: 14;
     margin-top: 1;
-    height: auto;
+}
+
+#results-preview {
+    height: 1fr;
+    border: round #3f7083;
+    background: #09161e;
+    padding: 1;
+    margin-top: 1;
+    overflow-y: auto;
 }

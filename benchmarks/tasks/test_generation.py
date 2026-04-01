@@ -59,7 +59,7 @@ class TestGenerationBenchmark(BaseBenchmark):
                     result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_tests=generated_tests, **kwargs)
                 else:
                     result = dimension.evaluate(language=self.language, generated_code=generated_tests, **kwargs)
-                print(result)
+                # print(result)
             except Exception as e:
                 # Dimension evaluation failed - create error result
                 from core.base import DimensionResult

@@ -16,21 +16,27 @@ from benchmarks import matrix
 
 class TranslationBenchmark(BaseBenchmark):
     name = "Translation Benchmark"
-    desc = "Evaluate the Language Model on code translation tasks."
+    desc = "Evaluate the Language Model on Python to JavaScript to Python code translation tasks."
     category = "transformation"
 
     def build_prompt(self, language: str, code_input: str, **kwargs) -> str:
+        if language != "python":
+            raise RuntimeError(f"Translation task only supports Python source code. Received: {language}")
+        
+        target_language = kwargs.get("target_language", "javascript")
+        if target_language not in ["javascript", "python"]:
+            raise RuntimeError(f"Translation task only supports javascript and python as target languages. Received: {target_language}")
+        
         filename_map = {
             "python": "translate.txt",
             "cpp": "translate.txt",
             "javascript": "translate.txt"
         }
-        target_language = kwargs.get("target_language", "python")
         template = self._load_prompt_template(language, filename_map)
         if template:
             return template.replace("{{CODE}}", code_input).replace("{{TARGET}}", target_language)
         else:
-            raise RuntimeError(f"Code translation {language} template not available.")
+            raise RuntimeError(f"Code translation template not available.")
 
     def run(self, prompt: str, system_prompt: Optional[str], **kwargs) -> BenchmarkResult:
         llm_response = self.provider.complete(prompt, system_prompt)
@@ -43,6 +49,9 @@ class TranslationBenchmark(BaseBenchmark):
             )
 
         translated_code = llm_response.content
+        
+        # Get target language (what language the generated code is in)
+        target_language = kwargs.get("target_language", "javascript")
 
         weights = matrix.DIMENSION_WEIGHTS["translation"] 
         dimensions = matrix.get_dimensions_for_task("translation")
@@ -53,8 +62,15 @@ class TranslationBenchmark(BaseBenchmark):
         for cls in dimensions:
             dimension = cls()
             try:
-                result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=translated_code, **kwargs)
-                print(result)
+                # Pass both source and target languages so dimensions know which language each code is in
+                result = dimension.evaluate(
+                    language=self.language, 
+                    original_code=self.code_input, 
+                    generated_code=translated_code,
+                    generated_code_language=target_language,
+                    **kwargs
+                )
+                # print(result)
             except Exception as e:
                 # Dimension evaluation failed - create error result
                 from core.base import DimensionResult
