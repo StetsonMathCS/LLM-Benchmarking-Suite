@@ -122,7 +122,7 @@ DIMENSION_WEIGHTS = {
         "Functional Correctness": 0.50,
     },
     "partial_transform": {
-        "Partial Transformation": 0.40,
+        "Partial Transformation": 0.50,
         "Functional Correctness": 0.20,
         "Linting": 0.10,
         "Vulnerabilities": 0.10,

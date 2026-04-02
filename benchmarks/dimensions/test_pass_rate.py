@@ -4,6 +4,7 @@ benchmarks/dimensions/test_pass_rate.py
 Dimension that evaluates test pass rate for generated tests.
 """
 import subprocess
+import sys
 import tempfile
 import os
 from pathlib import Path
@@ -30,11 +31,11 @@ class TestPassRateDimension(BaseDimension):
                 # Create combined test file with original code + generated tests
                 combined_file = Path(tmpdir) / "test_combined.py"
                 combined_code = f"{original_code}\n\n{generated_tests}"
-                combined_file.write_text(combined_code)
+                combined_file.write_text(combined_code, encoding='utf-8')
 
                 # Try pytest first
                 result = subprocess.run(
-                    ["python", "-m", "pytest", str(combined_file), "-v", "--tb=short"],
+                    [sys.executable, "-m", "pytest", str(combined_file), "-v", "--tb=short"],
                     capture_output=True,
                     text=True,
                     timeout=30,
@@ -59,7 +60,7 @@ class TestPassRateDimension(BaseDimension):
                 
                 # Fallback: try unittest execution
                 result = subprocess.run(
-                    ["python", "-m", "unittest", "discover", "-s", tmpdir, "-p", "test_*.py", "-v"],
+                    [sys.executable, "-m", "unittest", "discover", "-s", tmpdir, "-p", "test_*.py", "-v"],
                     capture_output=True,
                     text=True,
                     timeout=30,

@@ -28,16 +28,16 @@ class PartialTransformationDimension(BaseDimension):
     def extract_ast_nodes(code):
         """
         Parse code and extract all AST node types present.
-        Returns a set of node type names.
+        Returns a tuple of (set of node type names, error message or None).
         """
         try:
             tree = ast.parse(code)
             node_types = set()
             for node in ast.walk(tree):
                 node_types.add(type(node).__name__)
-            return node_types
-        except SyntaxError:
-            return set()
+            return node_types, None
+        except SyntaxError as e:
+            return set(), f"SyntaxError: {e}"
 
     @staticmethod
     def parse_ast_nodes_list(ast_nodes_str):
@@ -79,8 +79,8 @@ class PartialTransformationDimension(BaseDimension):
             text_from_occurrences = generated_count_from
 
             # AST node verification
-            original_nodes = self.extract_ast_nodes(original_code)
-            generated_nodes = self.extract_ast_nodes(generated_code)
+            original_nodes, orig_parse_error = self.extract_ast_nodes(original_code)
+            generated_nodes, gen_parse_error = self.extract_ast_nodes(generated_code)
             
             nodes_removed_set = self.parse_ast_nodes_list(nodes_to_remove)
             nodes_added_set = self.parse_ast_nodes_list(nodes_to_add)
@@ -133,28 +133,34 @@ class PartialTransformationDimension(BaseDimension):
                 # Only text requirements
                 final_score = text_score
 
+            details = {
+                "text_pattern": {
+                    "target_added": text_to_occurrences,
+                    "source_remaining": text_from_occurrences,
+                    "score": text_score,
+                },
+                "ast_nodes": {
+                    "removed_correctly": nodes_correctly_removed,
+                    "removed_expected": total_removals_expected,
+                    "removed_incorrectly_remaining": nodes_incorrectly_remaining,
+                    "added_correctly": nodes_correctly_added,
+                    "added_expected": total_additions_expected,
+                    "added_missing": nodes_missing,
+                    "score": ast_score,
+                },
+                "original_ast_nodes": list(sorted(original_nodes)),
+                "generated_ast_nodes": list(sorted(generated_nodes)),
+            }
+            if orig_parse_error:
+                details["original_code_parse_error"] = orig_parse_error
+            if gen_parse_error:
+                details["generated_code_parse_error"] = gen_parse_error
+
             return DimensionResult(
                 dimension_name=self.name,
                 score=final_score,
                 passed=final_score >= 0.9,
-                details={
-                    "text_pattern": {
-                        "target_added": text_to_occurrences,
-                        "source_remaining": text_from_occurrences,
-                        "score": text_score,
-                    },
-                    "ast_nodes": {
-                        "removed_correctly": nodes_correctly_removed,
-                        "removed_expected": total_removals_expected,
-                        "removed_incorrectly_remaining": nodes_incorrectly_remaining,
-                        "added_correctly": nodes_correctly_added,
-                        "added_expected": total_additions_expected,
-                        "added_missing": nodes_missing,
-                        "score": ast_score,
-                    },
-                    "original_ast_nodes": list(sorted(original_nodes)),
-                    "generated_ast_nodes": list(sorted(generated_nodes)),
-                }
+                details=details,
             )
         except Exception as e:
             return DimensionResult(

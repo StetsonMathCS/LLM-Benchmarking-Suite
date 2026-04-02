@@ -104,7 +104,7 @@ class CodeReviewDimension(BaseDimension):
         Returns:
             DimensionResult with semantic similarity score
         """
-        expected_output = kwargs['expected_output']
+        expected_output = kwargs.get('expected_output')
         # Validate inputs
         if not expected_output or not generated_review:
             return DimensionResult(

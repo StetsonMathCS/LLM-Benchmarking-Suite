@@ -1,64 +1,5 @@
 id,original_code,refactoring_task,output_expected
-1,"import psycopg2
-
-def get_user(user_id):
-    conn = psycopg2.connect('postgresql://localhost/mydb')
-    cursor = conn.cursor()
-    cursor.execute(f'SELECT id, name, email FROM users WHERE id = {user_id}')
-    row = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    return row
-
-def get_all_users():
-    conn = psycopg2.connect('postgresql://localhost/mydb')
-    cursor = conn.cursor()
-    cursor.execute('SELECT id, name, email FROM users')
-    rows = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return rows
-
-def create_user(name, email):
-    conn = psycopg2.connect('postgresql://localhost/mydb')
-    cursor = conn.cursor()
-    cursor.execute(f'INSERT INTO users (name, email) VALUES ({name}, {email})')
-    conn.commit()
-    cursor.close()
-    conn.close()","Extract duplicated DB connection logic into a context manager and fix SQL injection","import psycopg2
-from contextlib import contextmanager
-
-DB_URL = 'postgresql://localhost/mydb'
-
-@contextmanager
-def get_connection():
-    conn = psycopg2.connect(DB_URL)
-    try:
-        yield conn
-        conn.commit()
-    except Exception:
-        conn.rollback()
-        raise
-    finally:
-        conn.close()
-
-def get_user(user_id):
-    with get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute('SELECT id, name, email FROM users WHERE id = %s', (user_id,))
-            return cursor.fetchone()
-
-def get_all_users():
-    with get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute('SELECT id, name, email FROM users')
-            return cursor.fetchall()
-
-def create_user(name, email):
-    with get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute('INSERT INTO users (name, email) VALUES (%s, %s)', (name, email))"
-2,"def process_order(order):
+1,"def process_order(order):
     if order is None:
         return None
     if order['status'] != 'pending':
@@ -74,7 +15,7 @@ def create_user(name, email):
         if item['quantity'] is None:
             return None
         total += item['price'] * item['quantity']
-    return {'order_id': order['id'], 'total': total, 'user_id': order['user_id']}","Replace nested None-guard if-returns with early validation using a dedicated validator function and a dataclass result type","from dataclasses import dataclass
+    return {'order_id': order['id'], 'total': total, 'user_id': order['user_id']}",Replace nested None-guard if-returns with early validation using a dedicated validator function and a dataclass result type,"from dataclasses import dataclass
 from typing import Optional
 
 @dataclass
@@ -105,7 +46,7 @@ def process_order(order: dict) -> Optional[OrderResult]:
         return None
     total = sum(item['price'] * item['quantity'] for item in order['items'])
     return OrderResult(order_id=order['id'], total=total, user_id=order['user_id'])"
-3,"class Logger:
+2,"class Logger:
     def log_info(self, message):
         import datetime
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -142,7 +83,7 @@ class Logger:
 
     def log_debug(self, message: str) -> None:
         self._log('DEBUG', message)"
-4,"def calculate_discount(price, user_type, is_member, years_active):
+3,"def calculate_discount(price, user_type, is_member, years_active):
     discount = 0
     if user_type == 'student':
         discount = 0.2
@@ -162,7 +103,7 @@ class Logger:
             discount = 0.1
             if years_active > 5:
                 discount = 0.15
-    return price * (1 - discount)","Replace deeply nested if/elif discount logic with a lookup table driven approach using a dict of base discounts and membership/loyalty modifiers","DISCOUNT_TABLE = {
+    return price * (1 - discount)",Replace deeply nested if/elif discount logic with a lookup table driven approach using a dict of base discounts and membership/loyalty modifiers,"DISCOUNT_TABLE = {
     'student': {'base': 0.20, 'member': 0.05, 'loyal': 0.05},
     'senior':  {'base': 0.15, 'member': 0.05, 'loyal': 0.05},
     'regular': {'base': 0.00, 'member': 0.10, 'loyal': 0.05},
@@ -176,7 +117,7 @@ def calculate_discount(price: float, user_type: str, is_member: bool, years_acti
         if years_active > 5:
             discount += rates['loyal']
     return price * (1 - discount)"
-5,"class Animal:
+4,"class Animal:
     def __init__(self, name, animal_type):
         self.name = name
         self.animal_type = animal_type
@@ -199,7 +140,7 @@ def calculate_discount(price: float, user_type: str, is_member: bool, years_acti
         elif self.animal_type == 'cow':
             return f'{self.name} plods'
         else:
-            return f'{self.name} moves'","Replace type-string dispatch with a proper class hierarchy using abstract base class and subclasses","from abc import ABC, abstractmethod
+            return f'{self.name} moves'",Replace type-string dispatch with a proper class hierarchy using abstract base class and subclasses,"from abc import ABC, abstractmethod
 
 class Animal(ABC):
     def __init__(self, name: str):
@@ -228,7 +169,7 @@ class Cow(Animal):
         return f'{self.name} says Moo'
     def move(self) -> str:
         return f'{self.name} plods'"
-6,"def send_notification(user, message, channel):
+5,"def send_notification(user, message, channel):
     if channel == 'email':
         print(f'Sending email to {user[""email""]}: {message}')
         # smtp logic here
@@ -242,7 +183,7 @@ class Cow(Animal):
         print(f'Sending slack to {user[""slack_id""]}: {message}')
         # slack api logic here
     else:
-        raise ValueError(f'Unknown channel: {channel}')","Refactor channel dispatch into a Strategy pattern with a NotificationSender protocol and a registry","from typing import Protocol
+        raise ValueError(f'Unknown channel: {channel}')",Refactor channel dispatch into a Strategy pattern with a NotificationSender protocol and a registry,"from typing import Protocol
 
 class NotificationSender(Protocol):
     def send(self, user: dict, message: str) -> None: ...
@@ -275,7 +216,7 @@ def send_notification(user: dict, message: str, channel: str) -> None:
     if sender is None:
         raise ValueError(f'Unknown channel: {channel}')
     sender.send(user, message)"
-7,"results = []
+6,"results = []
 for user in users:
     orders = []
     for order in all_orders:
@@ -295,7 +236,7 @@ for user in users:
         'user_id': user['id'],
         'name': user['name'],
         'orders': orders
-    })","Eliminate O(n³) nested loops by pre-building index dicts for O(n) grouping","from collections import defaultdict
+    })",Eliminate O(n³) nested loops by pre-building index dicts for O(n) grouping,"from collections import defaultdict
 
 items_by_order = defaultdict(list)
 for item in all_items:
@@ -312,7 +253,7 @@ results = [
     {'user_id': user['id'], 'name': user['name'], 'orders': orders_by_user[user['id']]}
     for user in users
 ]"
-8,"class UserManager:
+7,"class UserManager:
     def __init__(self):
         self.users = []
         self.db = Database()
@@ -393,7 +334,7 @@ class UserService:
         self.logger.log(f'Deactivated {user_id}')
         self.analytics.track('deactivate', user)
         return user"
-9,"def parse_config(path):
+8,"def parse_config(path):
     config = {}
     with open(path) as f:
         for line in f:
@@ -417,7 +358,7 @@ class UserService:
                 except ValueError:
                     pass
             config[key] = value
-    return config","Refactor the inline type-coercion chain into a separate _coerce_value(s) function and replace the manual file loop with a generator pipeline","def _coerce_value(raw: str):
+    return config",Refactor the inline type-coercion chain into a separate _coerce_value(s) function and replace the manual file loop with a generator pipeline,"def _coerce_value(raw: str):
     stripped = raw.strip()
     low = stripped.lower()
     if low == 'true':
@@ -445,7 +386,7 @@ def parse_config(path: str) -> dict:
         (parts := line.split('=', 1))[0].strip(): _coerce_value(parts[1])
         for line in _config_lines(path)
     }"
-10,"class Pipeline:
+9,"class Pipeline:
     def __init__(self, data):
         self.data = data
 
@@ -472,7 +413,7 @@ def parse_config(path: str) -> dict:
         # Step 4: sort
         step4 = sorted(step3)
 
-        return step4","Refactor sequential pipeline steps into composable named transform functions wired through a generic pipe() runner","from typing import Callable, Any
+        return step4",Refactor sequential pipeline steps into composable named transform functions wired through a generic pipe() runner,"from typing import Callable, Any
 
 def pipe(*funcs: Callable) -> Callable:
     def _pipe(data):
@@ -506,7 +447,7 @@ class Pipeline:
 
     def run(self):
         return self._run(self.data)"
-11,"import json
+10,"import json
 import os
 
 def load_users():
@@ -571,7 +512,7 @@ class JsonFileRepository:
 
     def all(self) -> list:
         return list(self._data)"
-12,"def validate_user_input(data):
+11,"def validate_user_input(data):
     errors = []
     if 'name' not in data:
         errors.append('name is required')
@@ -595,7 +536,7 @@ class JsonFileRepository:
         errors.append('role is required')
     elif data['role'] not in ('admin', 'user', 'moderator'):
         errors.append('role must be admin, user, or moderator')
-    return errors","Refactor the monolithic validator into composable per-field validator functions collected in a FIELD_VALIDATORS registry","from typing import Callable
+    return errors",Refactor the monolithic validator into composable per-field validator functions collected in a FIELD_VALIDATORS registry,"from typing import Callable
 
 Validator = Callable[[dict], list[str]]
 
@@ -637,7 +578,7 @@ FIELD_VALIDATORS: list[Validator] = [_validate_name, _validate_email, _validate_
 
 def validate_user_input(data: dict) -> list[str]:
     return [err for validate in FIELD_VALIDATORS for err in validate(data)]"
-13,"class ReportGenerator:
+12,"class ReportGenerator:
     def generate(self, data, format):
         if format == 'csv':
             lines = []
@@ -698,7 +639,7 @@ class ReportGenerator:
         if renderer is None:
             raise ValueError(f'Unknown format: {format}')
         return renderer.render(data)"
-14,"def fetch_and_process(url):
+13,"def fetch_and_process(url):
     import urllib.request
     try:
         response = urllib.request.urlopen(url)
@@ -751,7 +692,7 @@ def fetch_and_process(url: str) -> list[dict]:
     except json.JSONDecodeError as e:
         raise ValueError(f'Invalid JSON from {url}') from e
     return transform(items)"
-15,"class Cart:
+14,"class Cart:
     def __init__(self):
         self.items = []
         self.discount_code = None
@@ -779,7 +720,7 @@ def fetch_and_process(url: str) -> list[dict]:
         return (self.get_subtotal() - self.get_discount()) * 0.08
 
     def get_total(self):
-        return self.get_subtotal() - self.get_discount() + self.get_tax()","Replace magic-string discount codes with a DiscountCode dataclass registry and refactor Cart to use it; replace repeated subtotal calls with a computed property","from dataclasses import dataclass
+        return self.get_subtotal() - self.get_discount() + self.get_tax()",Replace magic-string discount codes with a DiscountCode dataclass registry and refactor Cart to use it; replace repeated subtotal calls with a computed property,"from dataclasses import dataclass
 from typing import Optional
 
 @dataclass(frozen=True)
@@ -825,7 +766,7 @@ class Cart:
     @property
     def total(self) -> float:
         return self.subtotal - self.discount + self.tax"
-16,"def run_etl(source_path, dest_path):
+15,"def run_etl(source_path, dest_path):
     import csv, json, os
     # Read
     records = []
@@ -881,7 +822,7 @@ def run_etl(source_path: str, dest_path: str) -> int:
     transformed = [r for row in raw if (r := transform_record(row)) is not None]
     load(transformed, dest_path)
     return len(transformed)"
-17,"class EventSystem:
+16,"class EventSystem:
     def __init__(self):
         self.listeners = {}
 
@@ -942,7 +883,7 @@ class EventSystem:
 
     def listener_count(self, event: str) -> int:
         return len(self.listeners.get(event, []))"
-18,"def generate_report(orders):
+17,"def generate_report(orders):
     total_revenue = 0
     total_orders = 0
     total_items = 0
@@ -1018,7 +959,7 @@ def generate_report(orders: list[dict]) -> dict:
     for order in orders:
         acc.update(order)
     return acc.summary"
-19,"def process(data, operation, extra=None):
+18,"def process(data, operation, extra=None):
     if operation == 'filter':
         result = []
         for item in data:
@@ -1092,7 +1033,7 @@ class DataProcessor:
 
     def to_list(self) -> list[dict]:
         return self.data"
-20,"class TaskRunner:
+19,"class TaskRunner:
     def __init__(self):
         self.tasks = []
         self.results = []

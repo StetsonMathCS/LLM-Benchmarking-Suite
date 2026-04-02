@@ -33,6 +33,5 @@ End Example
 
 Your turn now.
 
-Command: {{REVIEW_REQUEST}}
 Code to review:{{CODE}}
 

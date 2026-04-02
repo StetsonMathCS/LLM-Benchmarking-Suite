@@ -1,5 +1,6 @@
 import subprocess
 import os
+import re
 import tempfile
 import sys
 
@@ -8,6 +9,36 @@ try:
     import resource
 except ImportError:
     resource = None
+
+# All names exported from the typing module that generated code commonly uses
+_TYPING_NAMES = {
+    "Any", "Callable", "ClassVar", "Dict", "FrozenSet", "Generic",
+    "Iterable", "Iterator", "List", "Literal", "Mapping", "MutableMapping",
+    "MutableSequence", "NamedTuple", "NoReturn", "Optional", "Protocol",
+    "Sequence", "Set", "Tuple", "Type", "TypeVar", "Union",
+}
+
+def _inject_typing_imports(code: str) -> str:
+    """Prepend 'from typing import ...' for any typing names used but not imported."""
+    # Skip if already importing everything we need
+    needed = _TYPING_NAMES & set(re.findall(r'\b([A-Z][a-zA-Z]+)\b', code))
+    if not needed:
+        return code
+
+    # Check which ones are actually missing from existing imports
+    already_imported = set(re.findall(r'from typing import ([^\n]+)', code))
+    # Flatten any comma-separated names already on import lines
+    flat_imported: set = set()
+    for chunk in already_imported:
+        flat_imported.update(n.strip() for n in chunk.split(','))
+
+    missing = needed - flat_imported
+    if not missing:
+        return code
+
+    import_line = f"from typing import {', '.join(sorted(missing))}\n"
+    return import_line + code
+
 
 class CodeRunner():
 
@@ -21,6 +52,7 @@ class CodeRunner():
                 cmd,
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
                 timeout=CodeRunner.TIMEOUT,
                 input=input_data,
                 env={**os.environ, **(env or {})},
@@ -40,6 +72,7 @@ class CodeRunner():
 
     @staticmethod
     def run_python(code):
+        code = _inject_typing_imports(code)
         return CodeRunner._safe_run(
             [sys.executable, '-c', code],
             env={"PYTHONDONTWRITEBYTECODE": "1"}

@@ -96,7 +96,7 @@ class VulnerabilitiesDimension(BaseDimension):
     @staticmethod
     def _scan_python(code: str) -> int:
         try:
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False, encoding='utf-8') as f:
                 f.write(code)
                 f.flush()
                 filename = f.name
@@ -122,7 +122,7 @@ class VulnerabilitiesDimension(BaseDimension):
     @staticmethod
     def _scan_cpp(code: str) -> int:
         try:
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.cpp', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.cpp', delete=False, encoding='utf-8') as f:
                 f.write(code)
                 f.flush()
                 filename = f.name
@@ -148,7 +148,7 @@ class VulnerabilitiesDimension(BaseDimension):
     @staticmethod
     def _scan_javascript(code: str) -> int:
         try:
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.js', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.js', delete=False, encoding='utf-8') as f:
                 f.write(code)
                 f.flush()
                 filename = f.name

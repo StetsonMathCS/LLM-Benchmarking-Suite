@@ -5,6 +5,7 @@ Dimension that evaluates code completion by running tests against the generated 
 Uses entry_point and test fields from code completion datasets.
 """
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 from core.base import (
@@ -56,15 +57,15 @@ class CodeCompletionTestsDimension(BaseDimension):
                 test_file = Path(tmpdir) / "test_code.py"
 
                 # Write generated code to file
-                code_file.write_text(generated_code)
+                code_file.write_text(generated_code, encoding='utf-8')
 
                 # Create test file that imports and runs the tests
                 # The test code should contain assertions that use the entry_point function
                 combined_code = generated_code + "\n\n" + test_code
-                test_file.write_text(combined_code)
+                test_file.write_text(combined_code, encoding='utf-8')
 
                 result = subprocess.run(
-                    ["python", str(test_file)],
+                    [sys.executable, str(test_file)],
                     capture_output=True,
                     text=True,
                     timeout=30,

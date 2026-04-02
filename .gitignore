@@ -3,3 +3,6 @@ myenv/
 venv/
 test_openai.py
 __pycache__
+.claude
+reports
+config

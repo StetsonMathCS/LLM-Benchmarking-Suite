@@ -385,50 +385,7 @@ function buildReport(orders) {
   orders.forEach(o => builder.add(o));
   return builder.build();
 }"
-9,"var express = require('express');
-var router = express.Router();
-var db = require('./db');
-
-router.get('/users', function(req, res) {
-  db.query('SELECT * FROM users', function(err, results) {
-    if (err) { console.log(err); res.status(500).send('Error'); return; }
-    res.json(results);
-  });
-});
-
-router.get('/users/:id', function(req, res) {
-  db.query('SELECT * FROM users WHERE id = ' + req.params.id, function(err, results) {
-    if (err) { console.log(err); res.status(500).send('Error'); return; }
-    if (results.length === 0) { res.status(404).send('Not found'); return; }
-    res.json(results[0]);
-  });
-});","Convert callback-style DB calls to async/await, fix SQL injection with parameterized queries, replace console.log error handling with next(err), and extract a query helper","const express = require('express');
-const router  = express.Router();
-const db      = require('./db');
-
-async function dbQuery(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.query(sql, params, (err, results) => err ? reject(err) : resolve(results));
-  });
-}
-
-router.get('/users', async (req, res, next) => {
-  try {
-    const results = await dbQuery('SELECT id, name, email FROM users');
-    res.json(results);
-  } catch (err) { next(err); }
-});
-
-router.get('/users/:id', async (req, res, next) => {
-  try {
-    const results = await dbQuery('SELECT id, name, email FROM users WHERE id = ?', [req.params.id]);
-    if (!results.length) return res.status(404).json({ error: 'User not found' });
-    res.json(results[0]);
-  } catch (err) { next(err); }
-});
-
-module.exports = router;"
-10,"function fetchDashboardData(userId) {
+9,"function fetchDashboardData(userId) {
   return fetch('/api/user/' + userId)
     .then(function(r) { return r.json(); })
     .then(function(user) {
@@ -450,7 +407,7 @@ module.exports = router;"
   ]);
   return { user, orders, notifications };
 }"
-11,"class LinkedList {
+10,"class LinkedList {
   constructor() { this.head = null; this.size = 0; }
   append(value) {
     var node = { value: value, next: null };
@@ -526,7 +483,7 @@ module.exports = router;"
     };
   }
 }"
-12,"function parseCSV(text) {
+11,"function parseCSV(text) {
   var lines = text.split('\n');
   var headers = lines[0].split(',');
   var result = [];
@@ -591,7 +548,7 @@ function toCSV(data) {
     return [headers.join(','), ...rows].join('\n');
   }
 }"
-13,"function debounce(fn, wait) {
+12,"function debounce(fn, wait) {
   var timer;
   return function() {
     var self = this, args = arguments;
@@ -634,7 +591,7 @@ function throttle(fn, limit, { trailing = false } = {}) {
     } else if (trailing) { lastArgs = args; }
   };
 }"
-14,"class DataTable {
+13,"class DataTable {
   constructor(containerId, data) {
     this.container = document.getElementById(containerId);
     this.data = data; this.sortKey = null; this.sortDir = 'asc'; this.filterText = '';
@@ -728,7 +685,7 @@ class DataTable {
   }
   setFilter(text) { this.#state = { ...this.#state, filterText: text.toLowerCase() }; this.#render(); }
 }"
-15,"const EventBus = {
+14,"const EventBus = {
   events: {},
   on(event, handler) { (this.events[event] = this.events[event] || []).push(handler); },
   off(event, handler) { this.events[event] = (this.events[event] || []).filter(h => h !== handler); },
@@ -777,7 +734,7 @@ function clearCache() { cache = {}; }","Convert the global mutable EventBus and 
     else this.#cache.clear();
   }
 }"
-16,"function createMiddlewarePipeline(middlewares) {
+15,"function createMiddlewarePipeline(middlewares) {
   return function(req, res) {
     var index = 0;
     function next(err) {
@@ -817,7 +774,7 @@ function clearCache() { cache = {}; }","Convert the global mutable EventBus and 
     };
   }
 }"
-17,"class TaskQueue {
+16,"class TaskQueue {
   constructor() { this.queue = []; this.running = false; }
   add(task) {
     return new Promise((resolve, reject) => {
@@ -862,7 +819,7 @@ function clearCache() { cache = {}; }","Convert the global mutable EventBus and 
     }
   }
 }"
-18,"function deepMerge(target, source) {
+17,"function deepMerge(target, source) {
   var result = Object.assign({}, target);
   for (var key in source) {
     if (!source.hasOwnProperty(key)) continue;
@@ -899,7 +856,7 @@ function clearCache() { cache = {}; }","Convert the global mutable EventBus and 
   }
   return result;
 }"
-19,"function createPubSub() {
+18,"function createPubSub() {
   var subscribers = {};
   return {
     subscribe: function(topic, fn) {
@@ -944,7 +901,7 @@ function clearCache() { cache = {}; }","Convert the global mutable EventBus and 
     await Promise.all(fns.map(fn => Promise.resolve(fn(data))));
   }
 }"
-20,"function runPipeline(data, steps) {
+19,"function runPipeline(data, steps) {
   var current = data, log = [];
   for (var i = 0; i < steps.length; i++) {
     var step = steps[i];

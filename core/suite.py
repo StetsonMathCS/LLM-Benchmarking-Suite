@@ -14,18 +14,22 @@ from benchmarks.tasks.test_generation import TestGenerationBenchmark
 from benchmarks.tasks.translation import TranslationBenchmark
 from benchmarks.tasks.partial_transform import PartialTransformBenchmark
 from core.base import BaseProvider, BenchmarkResult, BaseBenchmark, BenchmarkStatus, ModelConfig
+from core.scoring import ScoringEngine
 from datasets.mapper import DatasetMapper
 
 @dataclass
 class SuiteConfig:
     """Top-level configuration for a test run."""
     name: str = "LLM Test Run"
-    selected_benchmarks: list[str] = field(default_factory=list) # empty = all
-    language: str = "python" # python | javascript | C++
-    output_dir: str = f"./reports/outputs/{language}"
+    selected_benchmarks: list[str] = field(default_factory=list)
+    language: str = "python"
+    output_dir: str = "./reports/outputs/python"
     parallel: bool = False
     progress_callback: Optional[Callable] = None
-    target_language: Optional[str] = None  # For translation tasks
+    target_language: Optional[str] = None
+    # Scoring overrides — if None, ScoringEngine defaults are used
+    task_weights: Optional[dict] = None
+    pass_threshold: Optional[float] = None
 
 class TestSuite:
     """
@@ -98,16 +102,20 @@ class TestSuite:
                             code_input=code_input,
                             **kwargs
                         )
-                        
+
+                        # Tag with task key so ScoringEngine can group correctly
+                        result.metadata["task_name"] = task_name
+
                         # Store result
                         self._results.append(result)
                         
                         # Call progress callback if defined
                         if self.config.progress_callback:
                             self.config.progress_callback(
-                                task_name, 
-                                record.record_id, 
-                                result.status
+                                task_name,
+                                record.record_id,
+                                result.status,
+                                result.combined_score,
                             )
                     
                     except Exception as e:
@@ -131,18 +139,29 @@ class TestSuite:
         return self._results
     
     def get_summary(self) -> dict:
-        total = len(self._results)
-        passed = sum(1 for r in self._results if r.status == BenchmarkStatus.PASSED)
-        failed = sum(1 for r in self._results if (r.status == BenchmarkStatus.ERROR or r.status == BenchmarkStatus.FAILED))
         elapsed = time.perf_counter() - self._start_time if self._start_time else 0
+
+        report = ScoringEngine(
+            self._results,
+            task_weights=self.config.task_weights,
+            pass_threshold=self.config.pass_threshold,
+        ).compute()
 
         return {
             "suite_name": self.config.name,
-            "total": total,
-            "passed": passed,
-            "failed": failed,
-            "pass_rate": passed / total if total else 0,
-            "elapsed_s": elapsed,
+            "elapsed_s": round(elapsed, 2),
+            # Core scoring outputs
+            "final_score": report.final_score,
+            "grade": report.grade,
+            "overall_pass_rate": report.overall_pass_rate,
+            "category_scores": report.category_scores,
+            "task_scores": {k: v.to_dict() for k, v in report.task_scores.items()},
+            # Raw counts (kept for backward-compat with TUI)
+            "total": report.total_records,
+            "passed": report.total_passed,
+            "failed": report.total_records - report.total_passed - report.total_errors,
+            "errors": report.total_errors,
+            "pass_rate": report.overall_pass_rate,  # alias
             "results": [r.to_dict() for r in self._results],
         }
 

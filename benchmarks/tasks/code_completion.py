@@ -18,6 +18,7 @@ from benchmarks.dimensions import (
     semantic_drift
 )
 from benchmarks.dimensions.code_completion_tests import CodeCompletionTestsDimension
+from core.scoring import PASS_THRESHOLD
 
 
 class CodeCompletionBenchmark(BaseBenchmark):
@@ -44,7 +45,8 @@ class CodeCompletionBenchmark(BaseBenchmark):
             return BenchmarkResult(
                 benchmark_name=self.name,
                 status=BenchmarkStatus.ERROR,
-                details={"error": llm_response.error},
+                details={"error": llm_response.error or "LLM returned empty response"},
+                llm_response=llm_response,
             )
 
         completed_code = llm_response.content
@@ -53,7 +55,6 @@ class CodeCompletionBenchmark(BaseBenchmark):
         results = {}
         issues = {}
         combined_score = 0.00
-        status = BenchmarkStatus.PASSED
         for cls in dimensions:
             dimension = cls()
             try:
@@ -92,12 +93,11 @@ class CodeCompletionBenchmark(BaseBenchmark):
                     details={"error": str(e)},
                     issues=[str(e)]
                 )
-            if not result.passed :
-                status = BenchmarkStatus.ERROR
-                issues[dimension.name] = result.details.get("error", "Unknown error")
-            results[dimension.name]=result
-            # Calculating Scores
+            if not result.passed:
+                issues[dimension.name] = result.details.get("error") or f"Score below threshold ({result.score:.2f})"
+            results[dimension.name] = result
             combined_score += (weights[dimension.name]*result.score) if result.score else 0.00
+        status = BenchmarkStatus.PASSED if combined_score >= PASS_THRESHOLD else BenchmarkStatus.FAILED
         return BenchmarkResult(
             benchmark_name=self.name,
             status=status,

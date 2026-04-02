@@ -1,16 +1,56 @@
+/* ============================================================
+   app.tcss  —  LLM Benchmark Suite
+   Old dark blue/teal theme with new UI elements
+   ============================================================ */
+
 Screen {
     layout: vertical;
     background: #0f1720;
 }
 
+Header {
+    background: #12202b;
+    color: #f6d08f;
+}
+
+Footer {
+    background: #12202b;
+    color: #4a7a8a;
+}
+
+/* ── Tabs ────────────────────────────────────────────────── */
+
 #main-tabs {
     height: 1fr;
 }
+
+Tabs {
+    background: #12202b;
+}
+
+Tab {
+    color: #4a7a8a;
+}
+
+Tab:focus,
+Tab.-active {
+    color: #f6d08f;
+    background: #0f1720;
+}
+
+TabbedContent > TabPane {
+    padding: 0;
+    height: 1fr;
+}
+
+/* ── Layout ──────────────────────────────────────────────── */
 
 .pane-root {
     height: 1fr;
     padding: 1 1;
 }
+
+/* ── Panels ──────────────────────────────────────────────── */
 
 .panel {
     border: round #2c4958;
@@ -20,14 +60,16 @@ Screen {
 }
 
 #controls {
-    width: 44;
-    min-width: 34;
+    width: 54;
+    min-width: 44;
 }
 
 #live-pane {
     width: 1fr;
     margin-right: 0;
 }
+
+/* ── Panel / section titles ──────────────────────────────── */
 
 .panel-title {
     text-style: bold;
@@ -41,15 +83,244 @@ Screen {
     text-style: bold;
 }
 
+Rule {
+    color: #2c4958;
+    margin: 0 0 1 0;
+}
+
+/* ── Forms ───────────────────────────────────────────────── */
+
+.form-row {
+    height: auto;
+    margin-bottom: 1;
+    align: left middle;
+}
+
+.form-label {
+    width: 14;
+    color: #9bc8d8;
+}
+
+.form-field {
+    width: 1fr;
+}
+
+Input {
+    background: #0e1e28;
+    border: tall #2c4958;
+    color: #c8dce6;
+}
+
+Input:focus {
+    border: tall #5fa8c0;
+}
+
+Select {
+    background: #0e1e28;
+    border: tall #2c4958;
+    color: #c8dce6;
+    width: 1fr;
+}
+
+Select:focus {
+    border: tall #5fa8c0;
+}
+
+SelectOverlay {
+    background: #12202b;
+    border: tall #5fa8c0;
+}
+
+SelectCurrent {
+    background: #0e1e28;
+    color: #c8dce6;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+
+Button {
+    margin: 0 1 0 0;
+}
+
+Button.-primary {
+    background: #1a6a8a;
+    color: #e8f4f8;
+    text-style: bold;
+}
+
+Button.-primary:hover {
+    background: #2080a0;
+}
+
+Button.-success {
+    background: #1d6645;
+    color: #c8f0da;
+    text-style: bold;
+}
+
+Button.-success:hover {
+    background: #248055;
+}
+
+.btn-danger {
+    background: transparent;
+    border: tall #8b3030;
+    color: #d07070;
+}
+
+.btn-danger:hover {
+    background: #8b3030;
+    color: #f0c0c0;
+}
+
+.btn-small {
+    min-width: 11;
+    padding: 0 1;
+    height: 3;
+    background: transparent;
+    border: round #37596b;
+    color: #9bc8d8;
+}
+
+.btn-small:hover {
+    border: round #5fa8c0;
+    color: #c8e8f4;
+}
+
+/* ── Benchmark picks (weight table) ──────────────────────── */
+
 #benchmark-picks {
     height: auto;
-    border: round #37596b;
+    border: round #2c4958;
     padding: 1;
+    margin: 0 0 1 0;
 }
+
+.wt-header {
+    height: auto;
+    color: #4a7a8a;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+.wt-row {
+    height: auto;
+    margin-bottom: 1;
+    align: left middle;
+}
+
+.wt-col-task {
+    width: 18;
+    color: #c8dce6;
+}
+
+.wt-col-on {
+    width: 5;
+    align: center middle;
+}
+
+.wt-col-weight {
+    width: 9;
+}
+
+.wt-col-weight Input {
+    width: 9;
+    height: 3;
+    background: #0e1e28;
+    border: tall #2c4958;
+}
+
+.wt-col-pct {
+    width: 7;
+    color: #4a7a8a;
+    text-align: right;
+    padding: 0 1 0 0;
+}
+
+.wt-footer {
+    height: auto;
+    align: left middle;
+    margin: 0 0 1 0;
+}
+
+.wt-sum-label {
+    color: #4a7a8a;
+    width: auto;
+    margin-right: 1;
+}
+
+.wt-sum-ok {
+    color: #5cb87a;
+    text-style: bold;
+}
+
+.wt-sum-bad {
+    color: #c87070;
+    text-style: bold;
+}
+
+Checkbox {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.weight-btns {
+    height: auto;
+    margin-bottom: 1;
+}
+
+/* ── Run actions row ─────────────────────────────────────── */
+
+#run-actions {
+    margin-top: 1;
+    height: auto;
+}
+
+/* ── Status banner ───────────────────────────────────────── */
+
+.status-banner {
+    height: auto;
+    border: round #f6d08f;
+    background: #2d2a1d;
+    color: #f6d08f;
+    text-style: bold;
+    padding: 0 1;
+    margin-bottom: 1;
+}
+
+.status-idle {
+    border: round #3f7083;
+    background: #0e2030;
+    color: #4a7a8a;
+}
+
+.status-running {
+    border: round #5fa8c0;
+    background: #0a1e2a;
+    color: #9bc8d8;
+    text-style: bold;
+}
+
+.status-done {
+    border: round #5cb87a;
+    background: #0a1e14;
+    color: #5cb87a;
+    text-style: bold;
+}
+
+.status-error {
+    border: round #c87070;
+    background: #1e0a0a;
+    color: #c87070;
+    text-style: bold;
+}
+
+/* ── Stat cards ──────────────────────────────────────────── */
 
 .card-row {
     height: auto;
-    margin: 1 0;
+    margin: 0 0 1 0;
 }
 
 .card {
@@ -59,24 +330,76 @@ Screen {
     background: #0e2a37;
     padding: 1;
     margin-right: 1;
+    text-align: center;
+    color: #9bc8d8;
+    text-style: bold;
 }
 
-.card:last-child {
+.card:last-of-type {
     margin-right: 0;
 }
 
-.status-banner {
-    height: auto;
-    border: round #f6d08f;
-    background: #2d2a1d;
-    color: #f6d08f;
-    text-style: bold;
-    padding: 0 1;
+.card-pass {
+    border: round #3a7a55;
+    color: #5cb87a;
 }
+
+.card-fail {
+    border: round #7a3a3a;
+    color: #c87070;
+}
+
+.card-score {
+    border: round #2c6080;
+    color: #7ac8e0;
+}
+
+.card-grade {
+    border: round #806028;
+    color: #f6d08f;
+}
+
+/* ── Progress bar ────────────────────────────────────────── */
+
+#run-progress {
+    width: 1fr;
+    margin-bottom: 1;
+}
+
+ProgressBar {
+    width: 1fr;
+}
+
+ProgressBar > .bar--bar {
+    color: #5fa8c0;
+}
+
+ProgressBar > .bar--complete {
+    color: #5cb87a;
+}
+
+/* ── Run table & log ─────────────────────────────────────── */
 
 #run-table {
     height: 14;
     margin-bottom: 1;
+    border: round #2c4958;
+    background: #09161e;
+}
+
+DataTable > .datatable--header {
+    background: #12202b;
+    color: #9bc8d8;
+    text-style: bold;
+}
+
+DataTable > .datatable--cursor {
+    background: #1a3040;
+    color: #c8dce6;
+}
+
+DataTable > .datatable--hover {
+    background: #0f2230;
 }
 
 #run-log {
@@ -85,35 +408,32 @@ Screen {
     background: #09161e;
 }
 
-.form-row {
-    height: auto;
-    margin-bottom: 1;
+RichLog {
+    padding: 0 1;
 }
 
-.form-label {
-    width: 13;
-    color: #9bc8d8;
+/* ── Ollama status ───────────────────────────────────────── */
+
+#ollama-status.ollama-ok {
+    color: #5cb87a;
 }
 
-.form-field {
-    width: 1fr;
+#ollama-status.ollama-err {
+    color: #c87070;
 }
 
-#run-actions {
-    margin-top: 1;
-    height: auto;
-}
+/* ── Results tab ─────────────────────────────────────────── */
 
 #results-table {
     height: 14;
     margin-top: 1;
+    border: round #2c4958;
+    background: #09161e;
 }
 
 #results-preview {
     height: 1fr;
     border: round #3f7083;
     background: #09161e;
-    padding: 1;
     margin-top: 1;
-    overflow-y: auto;
 }

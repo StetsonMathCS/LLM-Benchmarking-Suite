@@ -17,6 +17,7 @@ from clang.cindex import Index, Cursor
 from tree_sitter import Language, Parser
 import tree_sitter_cpp as tscpp
 import subprocess
+import tempfile
 import json
 from typing import Optional
 
@@ -182,16 +183,17 @@ class SemanticDriftDimension(BaseDimension):
     @staticmethod
     def parse_js(code: str, tmp_path: str) -> dict:
         """Write code to a temp file and parse it with esprima to avoid string escaping issues."""
-        with open(tmp_path, "w") as f:
+        with open(tmp_path, "w", encoding='utf-8') as f:
             f.write(code)
+        tmp_path_escaped = tmp_path.replace('\\', '\\\\')
         result = subprocess.run(
             ["node", "-e", f"""
                 const esprima = require('esprima');
                 const fs = require('fs');
-                const code = fs.readFileSync('{tmp_path}', 'utf8');
+                const code = fs.readFileSync('{tmp_path_escaped}', 'utf8');
                 console.log(JSON.stringify(esprima.parseScript(code)));
             """],
-            capture_output=True, text=True
+            capture_output=True, text=True, encoding='utf-8'
         )
         if result.returncode != 0 or not result.stdout.strip():
             raise ValueError(f"esprima parse error:\n{result.stderr.strip()}")
@@ -203,11 +205,14 @@ class SemanticDriftDimension(BaseDimension):
             # Extract markdown code blocks if present
             original_code = SemanticDriftDimension.extract_code_block(original_code, "javascript")
             generated_code = SemanticDriftDimension.extract_code_block(generated_code, "javascript")
-            
+
             # Install esprima in nodejs
             subprocess.run(['npm','install','esprima'], capture_output=True)
-            bracket1 = SemanticDriftDimension.js_ast_to_bracket(SemanticDriftDimension.parse_js(original_code, "/tmp/one.js"))
-            bracket2 = SemanticDriftDimension.js_ast_to_bracket(SemanticDriftDimension.parse_js(generated_code, "/tmp/two.js"))
+            with tempfile.NamedTemporaryFile(suffix='_one.js', delete=False) as f1, \
+                 tempfile.NamedTemporaryFile(suffix='_two.js', delete=False) as f2:
+                tmp1, tmp2 = f1.name, f2.name
+            bracket1 = SemanticDriftDimension.js_ast_to_bracket(SemanticDriftDimension.parse_js(original_code, tmp1))
+            bracket2 = SemanticDriftDimension.js_ast_to_bracket(SemanticDriftDimension.parse_js(generated_code, tmp2))
             tree1 = Tree.from_text(bracket1) 
             tree2 = Tree.from_text(bracket2)
             distance = APTED(tree1, tree2, Config()).compute_edit_distance()

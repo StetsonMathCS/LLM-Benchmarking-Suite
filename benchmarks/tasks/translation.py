@@ -13,6 +13,7 @@ from core.base import (
     LLMResponse,
 )
 from benchmarks import matrix
+from core.scoring import PASS_THRESHOLD
 
 class TranslationBenchmark(BaseBenchmark):
     name = "Translation Benchmark"
@@ -45,7 +46,8 @@ class TranslationBenchmark(BaseBenchmark):
             return BenchmarkResult(
                 benchmark_name=self.name,
                 status=BenchmarkStatus.ERROR,
-                details={"error": llm_response.error},
+                details={"error": llm_response.error or "LLM returned empty response"},
+                llm_response=llm_response,
             )
 
         translated_code = llm_response.content
@@ -53,26 +55,22 @@ class TranslationBenchmark(BaseBenchmark):
         # Get target language (what language the generated code is in)
         target_language = kwargs.get("target_language", "javascript")
 
-        weights = matrix.DIMENSION_WEIGHTS["translation"] 
+        weights = matrix.DIMENSION_WEIGHTS["translation"]
         dimensions = matrix.get_dimensions_for_task("translation")
         results = {}
         issues = {}
         combined_score = 0.00
-        status = BenchmarkStatus.PASSED
         for cls in dimensions:
             dimension = cls()
             try:
-                # Pass both source and target languages so dimensions know which language each code is in
                 result = dimension.evaluate(
-                    language=self.language, 
-                    original_code=self.code_input, 
+                    language=self.language,
+                    original_code=self.code_input,
                     generated_code=translated_code,
                     generated_code_language=target_language,
                     **kwargs
                 )
-                # print(result)
             except Exception as e:
-                # Dimension evaluation failed - create error result
                 from core.base import DimensionResult
                 result = DimensionResult(
                     dimension_name=dimension.name,
@@ -81,13 +79,11 @@ class TranslationBenchmark(BaseBenchmark):
                     details={"error": str(e)},
                     issues=[str(e)]
                 )
-            
-            if not result.passed :
-                status = BenchmarkStatus.ERROR
-                issues[dimension.name] = result.details.get("error", "Unknown error")
+            if not result.passed:
+                issues[dimension.name] = result.details.get("error") or f"Score below threshold ({result.score:.2f})"
             results[dimension.name] = result
-            # Calculating scores
             combined_score += (weights[dimension.name]*result.score) if result.score else 0.00
+        status = BenchmarkStatus.PASSED if combined_score >= PASS_THRESHOLD else BenchmarkStatus.FAILED
         return BenchmarkResult(
             benchmark_name=self.name,
             status=status,

@@ -11,6 +11,7 @@ from core.base import (
 )
 from core.registry import ProviderRegistry
 from core.suite import TestSuite, SuiteConfig
+from core.scoring import ScoringEngine, BenchmarkReport, TaskScore, PASS_THRESHOLD, TASK_WEIGHTS
 
 __all__ = [
     "BaseProvider",
@@ -25,4 +26,9 @@ __all__ = [
     "ProviderRegistry",
     "TestSuite",
     "SuiteConfig",
+    "ScoringEngine",
+    "BenchmarkReport",
+    "TaskScore",
+    "PASS_THRESHOLD",
+    "TASK_WEIGHTS",
 ]

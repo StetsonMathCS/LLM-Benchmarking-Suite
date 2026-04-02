@@ -14,6 +14,7 @@ from core.base import (
 )
 from benchmarks import matrix
 from benchmarks.dimensions.test_pass_rate import TestPassRateDimension
+from core.scoring import PASS_THRESHOLD
 class TestGenerationBenchmark(BaseBenchmark):
     name = "Test Generation Benchmark"
     desc = "Evaluate the Language Model on test generation tasks."
@@ -28,7 +29,9 @@ class TestGenerationBenchmark(BaseBenchmark):
         }
         template = self._load_prompt_template(language, filename_map)
         if template:
-            return template.replace("{{CODE}}", code_input)
+            description = kwargs.get("description", "")
+            desc_line = f"Context: {description}\n" if description else ""
+            return template.replace("{{DESCRIPTION}}", desc_line).replace("{{CODE}}", code_input)
         return (
             f"Generate unit tests for the following {language} code:\n\n"
             f"```{language}\n{code_input}\n```"
@@ -41,17 +44,17 @@ class TestGenerationBenchmark(BaseBenchmark):
             return BenchmarkResult(
                 benchmark_name=self.name,
                 status=BenchmarkStatus.ERROR,
-                details={"error": llm_response.error},
+                details={"error": llm_response.error or "LLM returned empty response"},
+                llm_response=llm_response,
             )
 
         generated_tests = llm_response.content
 
-        weights = matrix.DIMENSION_WEIGHTS["test_generation"] 
+        weights = matrix.DIMENSION_WEIGHTS["test_generation"]
         dimensions = matrix.get_dimensions_for_task("test_generation")
         results = {}
         issues = {}
         combined_score = 0.00
-        status = BenchmarkStatus.PASSED
         for cls in dimensions:
             dimension = cls()
             try:
@@ -59,9 +62,7 @@ class TestGenerationBenchmark(BaseBenchmark):
                     result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_tests=generated_tests, **kwargs)
                 else:
                     result = dimension.evaluate(language=self.language, generated_code=generated_tests, **kwargs)
-                # print(result)
             except Exception as e:
-                # Dimension evaluation failed - create error result
                 from core.base import DimensionResult
                 result = DimensionResult(
                     dimension_name=dimension.name,
@@ -70,13 +71,11 @@ class TestGenerationBenchmark(BaseBenchmark):
                     details={"error": str(e)},
                     issues=[str(e)]
                 )
-
-            if not result.passed :
-                status = BenchmarkStatus.ERROR
-                issues[dimension.name] = result.details.get("error", "Unknown error")
+            if not result.passed:
+                issues[dimension.name] = result.details.get("error") or f"Score below threshold ({result.score:.2f})"
             results[dimension.name] = result
-            # Calculating scores
             combined_score += (weights[dimension.name]*result.score) if result.score else 0.00
+        status = BenchmarkStatus.PASSED if combined_score >= PASS_THRESHOLD else BenchmarkStatus.FAILED
         return BenchmarkResult(
             benchmark_name=self.name,
             status=status,

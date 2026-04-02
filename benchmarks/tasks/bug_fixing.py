@@ -15,6 +15,7 @@ from core.base import (
 from benchmarks import matrix
 from benchmarks.dimensions.semantic_drift import SemanticDriftDimension
 from benchmarks.dimensions.code_consistency import CodeConsistencyDimension
+from core.scoring import PASS_THRESHOLD
 
 class BugFixingBenchmark(BaseBenchmark):
     """Must provide expected output for the program as 'expected_output' arguement"""
@@ -41,16 +42,16 @@ class BugFixingBenchmark(BaseBenchmark):
             return BenchmarkResult(
                 benchmark_name=self.name,
                 status=BenchmarkStatus.ERROR,
-                details={"error": llm_response.error},
+                details={"error": llm_response.error or "LLM returned empty response"},
+                llm_response=llm_response,
             )
 
         fixed_code = llm_response.content
-        weights = matrix.DIMENSION_WEIGHTS["bug_fixing"] 
+        weights = matrix.DIMENSION_WEIGHTS["bug_fixing"]
         dimensions = matrix.get_dimensions_for_task("bug_fixing")
         results = {}
         issues = {}
         combined_score = 0.00
-        status = BenchmarkStatus.PASSED
         for cls in dimensions:
             dimension = cls()
             try:
@@ -59,7 +60,6 @@ class BugFixingBenchmark(BaseBenchmark):
                 else:
                     result = dimension.evaluate(language=self.language, generated_code=fixed_code, **kwargs)
             except Exception as e:
-                # Dimension evaluation failed - create error result
                 from core.base import DimensionResult
                 result = DimensionResult(
                     dimension_name=dimension.name,
@@ -68,12 +68,11 @@ class BugFixingBenchmark(BaseBenchmark):
                     details={"error": str(e)},
                     issues=[str(e)]
                 )
-            if not result.passed :
-                status = BenchmarkStatus.ERROR
-                issues[dimension.name] = result.details.get("error", "Unknown error")
+            if not result.passed:
+                issues[dimension.name] = result.details.get("error") or f"Score below threshold ({result.score:.2f})"
             results[dimension.name] = result
-            # Calculating scores
             combined_score += (weights[dimension.name]*result.score) if result.score else 0.00
+        status = BenchmarkStatus.PASSED if combined_score >= PASS_THRESHOLD else BenchmarkStatus.FAILED
         return BenchmarkResult(
             benchmark_name=self.name,
             status=status,

@@ -43,11 +43,36 @@ class OpenAIProvider(BaseProvider):
                 raw_response = response,
             )
         except Exception as e:
+            error_str = str(e)
+            # Retry without temperature if model doesn't support custom temperature
+            if "temperature" in error_str.lower() and "does not support" in error_str.lower():
+                try:
+                    response = self._client.chat.completions.create(
+                        model = self.config.model_name,
+                        messages = messages,
+                        max_completion_tokens = self.config.max_tokens,
+                        **self.config.extra_params,
+                    )
+                    return LLMResponse(
+                        content=response.choices[0].message.content,
+                        model = self.config.model_name,
+                        provider = "openai",
+                        prompt_tokens = response.usage.prompt_tokens,
+                        completion_tokens = response.usage.completion_tokens,
+                        raw_response = response,
+                    )
+                except Exception as retry_e:
+                    return LLMResponse(
+                        content="",
+                        model=self.config.model_name,
+                        provider="openai",
+                        error = str(retry_e)
+                    )
             return LLMResponse(
                 content="",
                 model=self.config.model_name,
                 provider="openai",
-                error = str(e)
+                error = error_str
             )
     
     def is_available(self) -> bool:

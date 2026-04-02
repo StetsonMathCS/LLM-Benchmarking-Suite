@@ -3,12 +3,35 @@ benchmarks/dimensions/functional_correctness.py
 
 Dimension that evaluates functional correctness by comparing outputs.
 """
+import re
 from core.base import (
     BaseDimension,
     DimensionResult
 )
 from utils.code_runner import CodeRunner
 from typing import Optional
+
+
+def _normalize_output(text: str, language: str) -> str:
+    """Normalize language-specific output differences for cross-language comparison."""
+    if language == "javascript":
+        # Boolean literals: JavaScript uses lowercase, Python uses capitalized
+        text = re.sub(r'\btrue\b', 'True', text)
+        text = re.sub(r'\bfalse\b', 'False', text)
+        text = re.sub(r'\bnull\b', 'None', text)
+        text = re.sub(r'\bundefined\b', 'None', text)
+        # Collapse all whitespace (handles multiline arrays/objects from Node console.log)
+        text = re.sub(r'\s+', ' ', text.strip())
+        # Remove spaces inside brackets and braces
+        text = re.sub(r'\[\s+', '[', text)
+        text = re.sub(r'\s+\]', ']', text)
+        text = re.sub(r'\{\s+', '{', text)
+        text = re.sub(r'\s+\}', '}', text)
+        # Add single quotes around unquoted JS object keys: {cat: 3} -> {'cat': 3}
+        text = re.sub(r'(\{|,\s*)([a-zA-Z_]\w*)\s*:', r"\1'\2':", text)
+    return text
+
+
 class FunctionalCorrectnessDimension(BaseDimension):
     name = "Functional Correctness"
     description = "Does generated code produce same output as original?"
@@ -23,21 +46,42 @@ class FunctionalCorrectnessDimension(BaseDimension):
         expected_output = kwargs.get('expected_output', None)
         generated_code_language = kwargs.get('generated_code_language', language)
         
-        # If we have expected_output and no original_code (or for transformations),
-        # do text-based comparison
+        # If we have expected_output and no original_code, execute the generated
+        # code and compare its stdout to expected_output.
         if expected_output and not original_code:
-            match = generated_code.strip() == expected_output.strip()
-            score = 1.0 if match else 0.0
-            return DimensionResult(
-                dimension_name=self.name,
-                score=score,
-                details={
-                    "original_output": expected_output,
-                    "generated_output": generated_code,
-                    "match": match
-                }
-            )
-        
+            try:
+                if generated_code_language == "python":
+                    gen_output = CodeRunner.run_python(generated_code)
+                elif generated_code_language == "javascript":
+                    gen_output = CodeRunner.run_javascript(generated_code)
+                elif generated_code_language == "cpp":
+                    gen_output = CodeRunner.run_cpp(generated_code)
+                else:
+                    return DimensionResult(
+                        dimension_name=self.name,
+                        score=0.0,
+                        details={"error": f"Unsupported language: {generated_code_language}"}
+                    )
+                match = _normalize_output(gen_output.strip(), generated_code_language) == _normalize_output(expected_output.strip(), language)
+                score = 1.0 if match else 0.0
+                return DimensionResult(
+                    dimension_name=self.name,
+                    score=score,
+                    passed=match,
+                    details={
+                        "expected_output": expected_output,
+                        "generated_output": gen_output,
+                        "match": match
+                    }
+                )
+            except Exception as e:
+                return DimensionResult(
+                    dimension_name=self.name,
+                    score=0.0,
+                    passed=False,
+                    details={"error": str(e)}
+                )
+
         # Otherwise, try to execute both versions
         try:
             # Execute original code using source language
@@ -68,20 +112,25 @@ class FunctionalCorrectnessDimension(BaseDimension):
                     details={"error": f"Unsupported generated code language: {generated_code_language}"}
                 )
 
-            score = 1.0 if orig_output.strip() == gen_output.strip() else 0.0
+            norm_orig = _normalize_output(orig_output.strip(), language)
+            norm_gen = _normalize_output(gen_output.strip(), generated_code_language)
+            match = norm_orig == norm_gen
+            score = 1.0 if match else 0.0
 
             return DimensionResult(
                 dimension_name=self.name,
                 score=score,
+                passed=match,
                 details={
                     "original_output": orig_output if original_code else expected_output,
                     "generated_output": gen_output,
-                    "match": score == 1.0
+                    "match": match
                 }
             )
         except Exception as e:
             return DimensionResult(
                 dimension_name=self.name,
                 score=0.0,
+                passed=False,
                 details={"error": str(e)}
             )

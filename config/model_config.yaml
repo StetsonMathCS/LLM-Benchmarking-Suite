@@ -1,8 +1,0 @@
-provider: ollama
-model_name: ''
-api_key: null
-base_url: null
-temperature: 0.7
-max_tokens: 1024
-system_prompt: null
-extra_params: {}
