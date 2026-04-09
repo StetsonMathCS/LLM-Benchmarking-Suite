@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 from typing import Optional, Callable
 import time
 from benchmarks.tasks.bug_fixing import BugFixingBenchmark
-from benchmarks.tasks.code_completion import CodeCompletionBenchmark
 from benchmarks.tasks.code_generation import CodeGenerationBenchmark
 from benchmarks.tasks.code_review import CodeReviewBenchmark
 from benchmarks.tasks.refactoring import RefactoringBenchmark
@@ -50,7 +49,6 @@ class TestSuite:
     def register_benchmarks(self) -> "TestSuite":
         """Auto-register every built-in benchmark."""
         self._benchmarks["bug_fixing"] =  BugFixingBenchmark(code_language=self.config.language, provider=self.provider)
-        self._benchmarks["code_completion"] = CodeCompletionBenchmark(code_language=self.config.language, provider=self.provider)
         self._benchmarks["code_generation"] = CodeGenerationBenchmark(code_language=self.config.language, provider=self.provider)
         self._benchmarks["code_review"] = CodeReviewBenchmark(code_language=self.config.language, provider=self.provider)
         self._benchmarks["refactoring"] = RefactoringBenchmark(code_language=self.config.language, provider=self.provider)

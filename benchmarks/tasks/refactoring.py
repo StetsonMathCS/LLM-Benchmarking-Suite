@@ -45,7 +45,8 @@ class RefactoringBenchmark(BaseBenchmark):
                 details={"error": llm_response.error or "LLM returned empty response"},
                 llm_response=llm_response,
             )
-        refactored_code = llm_response.content
+        from utils.code_runner import extract_code
+        refactored_code = extract_code(llm_response.content)
         # 2. Evaluate with dimensions
         weights = matrix.DIMENSION_WEIGHTS["refactoring"]
         dimensions = matrix.get_dimensions_for_task("refactoring")

@@ -48,7 +48,8 @@ class TestGenerationBenchmark(BaseBenchmark):
                 llm_response=llm_response,
             )
 
-        generated_tests = llm_response.content
+        from utils.code_runner import extract_code
+        generated_tests = extract_code(llm_response.content)
 
         weights = matrix.DIMENSION_WEIGHTS["test_generation"]
         dimensions = matrix.get_dimensions_for_task("test_generation")

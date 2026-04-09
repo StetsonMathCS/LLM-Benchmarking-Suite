@@ -43,7 +43,8 @@ class CodeGenerationBenchmark(BaseBenchmark):
                 details={"error": llm_response.error or "LLM returned empty response"},
                 llm_response=llm_response,
             )
-        generated_code = llm_response.content
+        from utils.code_runner import extract_code
+        generated_code = extract_code(llm_response.content)
 
         weights = matrix.DIMENSION_WEIGHTS["code_generation"]
         dimensions = matrix.get_dimensions_for_task("code_generation")

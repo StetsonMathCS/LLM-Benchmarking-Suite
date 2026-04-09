@@ -46,7 +46,8 @@ class BugFixingBenchmark(BaseBenchmark):
                 llm_response=llm_response,
             )
 
-        fixed_code = llm_response.content
+        from utils.code_runner import extract_code
+        fixed_code = extract_code(llm_response.content)
         weights = matrix.DIMENSION_WEIGHTS["bug_fixing"]
         dimensions = matrix.get_dimensions_for_task("bug_fixing")
         results = {}

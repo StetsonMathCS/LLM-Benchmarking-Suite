@@ -50,7 +50,8 @@ class TranslationBenchmark(BaseBenchmark):
                 llm_response=llm_response,
             )
 
-        translated_code = llm_response.content
+        from utils.code_runner import extract_code
+        translated_code = extract_code(llm_response.content)
         
         # Get target language (what language the generated code is in)
         target_language = kwargs.get("target_language", "javascript")

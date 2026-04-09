@@ -49,7 +49,8 @@ class CodeCompletionBenchmark(BaseBenchmark):
                 llm_response=llm_response,
             )
 
-        completed_code = llm_response.content
+        from utils.code_runner import extract_code
+        completed_code = extract_code(llm_response.content)
         weights = matrix.DIMENSION_WEIGHTS["code_completion"]
         dimensions = matrix.get_dimensions_for_task("code_completion")
         results = {}

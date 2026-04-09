@@ -18,6 +18,27 @@ _TYPING_NAMES = {
     "Sequence", "Set", "Tuple", "Type", "TypeVar", "Union",
 }
 
+def extract_code(text: str) -> str:
+    """Strip markdown code fences from LLM output and return only the code inside.
+
+    Handles:
+      ```python\\n...\\n```
+      ```\\n...\\n```
+      plain text with no fences (returned as-is, stripped)
+    """
+    if not text:
+        return text
+    # Match ```<optional lang>\n...\n```
+    match = re.search(r"```(?:\w+)?\s*\n(.*?)```", text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    # Fallback: single-line fence without newline (e.g. ```python def foo(): ...```)
+    match = re.search(r"```(?:\w+)?\s*(.*?)```", text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    return text.strip()
+
+
 def _inject_typing_imports(code: str) -> str:
     """Prepend 'from typing import ...' for any typing names used but not imported."""
     # Skip if already importing everything we need

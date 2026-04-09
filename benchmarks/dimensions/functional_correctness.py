@@ -20,14 +20,15 @@ def _normalize_output(text: str, language: str) -> str:
         text = re.sub(r'\bfalse\b', 'False', text)
         text = re.sub(r'\bnull\b', 'None', text)
         text = re.sub(r'\bundefined\b', 'None', text)
-        # Collapse all whitespace (handles multiline arrays/objects from Node console.log)
-        text = re.sub(r'\s+', ' ', text.strip())
-        # Remove spaces inside brackets and braces
-        text = re.sub(r'\[\s+', '[', text)
-        text = re.sub(r'\s+\]', ']', text)
-        text = re.sub(r'\{\s+', '{', text)
-        text = re.sub(r'\s+\}', '}', text)
-        # Add single quotes around unquoted JS object keys: {cat: 3} -> {'cat': 3}
+    # Common normalization applied to all languages for consistent cross-language comparison
+    text = re.sub(r'\s+', ' ', text.strip())
+    # Remove spaces inside brackets and braces
+    text = re.sub(r'\[\s+', '[', text)
+    text = re.sub(r'\s+\]', ']', text)
+    text = re.sub(r'\{\s+', '{', text)
+    text = re.sub(r'\s+\}', '}', text)
+    # JS object key quoting runs after whitespace cleanup so {key: is adjacent
+    if language == "javascript":
         text = re.sub(r'(\{|,\s*)([a-zA-Z_]\w*)\s*:', r"\1'\2':", text)
     return text
 

@@ -29,7 +29,6 @@ import yaml
 
 ALL_TASKS = [
     "bug_fixing",
-    "code_completion",
     "code_generation",
     "code_review",
     "partial_transform",

@@ -49,7 +49,6 @@ from datasets.mapper import DatasetMapper
 
 ORDERED_TASKS: list[str] = [
     "bug_fixing",
-    "code_completion",
     "code_generation",
     "code_review",
     "partial_transform",
@@ -60,7 +59,6 @@ ORDERED_TASKS: list[str] = [
 
 TASK_DISPLAY: dict[str, str] = {
     "bug_fixing":        "Bug Fixing",
-    "code_completion":   "Code Completion",
     "code_generation":   "Code Generation",
     "code_review":       "Code Review",
     "partial_transform": "Partial Transform",

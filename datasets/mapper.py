@@ -12,7 +12,6 @@ from dataclasses import dataclass
 
 # Dynamically import task classes
 from benchmarks.tasks.bug_fixing import BugFixingBenchmark
-from benchmarks.tasks.code_completion import CodeCompletionBenchmark
 from benchmarks.tasks.code_generation import CodeGenerationBenchmark
 from benchmarks.tasks.code_review import CodeReviewBenchmark
 from benchmarks.tasks.partial_transform import PartialTransformBenchmark
@@ -40,12 +39,6 @@ class DatasetMapper:
             "class": BugFixingBenchmark,
             "languages": ["python", "cpp", "javascript"],
             "csv_columns": ["id", "buggy_code", "fixed_code", "expected_output"],
-        },
-        "code_completion": {
-            "dir": "code_completion",
-            "class": CodeCompletionBenchmark,
-            "languages": ["python", "cpp", "javascript"],
-            "csv_columns": {"python": ["id", "prompt", "completed", "test", "entry_point"], "cpp": ["id", "prompt", "completed"], "javascript": ["id", "prompt", "completed"]},
         },
         "code_generation": {
             "dir": "code_generation",
@@ -297,14 +290,6 @@ class DatasetMapper:
             kwargs.update({
                 "code_input": data.get("buggy_code"),
                 "expected_output": data.get("expected_output"),
-            })
-        
-        elif task_name == "code_completion":
-            kwargs.update({
-                "code_input": data.get("prompt"),
-                "expected_output": data.get("completed"),
-                "test": data.get("test"),
-                "entry_point": data.get("entry_point"),
             })
         
         elif task_name == "code_generation":

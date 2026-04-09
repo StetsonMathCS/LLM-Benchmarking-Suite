@@ -44,6 +44,32 @@ class OpenAIProvider(BaseProvider):
             )
         except Exception as e:
             error_str = str(e)
+            # Retry using legacy /v1/completions for non-chat models (e.g. codex)
+            if "not a chat model" in error_str or "v1/completions" in error_str:
+                try:
+                    prompt_text = "\n".join(m["content"] for m in messages)
+                    response = self._client.completions.create(
+                        model=self.config.model_name,
+                        prompt=prompt_text,
+                        temperature=self.config.temperature,
+                        max_tokens=self.config.max_tokens,
+                        **self.config.extra_params,
+                    )
+                    return LLMResponse(
+                        content=response.choices[0].text,
+                        model=self.config.model_name,
+                        provider="openai",
+                        prompt_tokens=response.usage.prompt_tokens,
+                        completion_tokens=response.usage.completion_tokens,
+                        raw_response=response,
+                    )
+                except Exception as retry_e:
+                    return LLMResponse(
+                        content="",
+                        model=self.config.model_name,
+                        provider="openai",
+                        error=str(retry_e),
+                    )
             # Retry without temperature if model doesn't support custom temperature
             if "temperature" in error_str.lower() and "does not support" in error_str.lower():
                 try:

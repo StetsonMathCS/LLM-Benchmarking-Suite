@@ -29,13 +29,6 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
         SemanticDriftDimension,
         RuntimeAnalysisDimension,
     ],
-    "code_completion" : [
-        CodeConsistencyDimension,
-        CodeCompletionTestsDimension,
-        LintingDimension,
-        VulnerabilitiesDimension,
-        RuntimeAnalysisDimension
-    ],
     "code_generation" : [
         CodeConsistencyDimension,
         CodeCompletionTestsDimension,
@@ -83,14 +76,6 @@ DIMENSION_WEIGHTS = {
         "Vulnerabilities":        0.00,
         "Semantic Drift":         0.10,
         "Runtime Analysis":       0.00,
-    },
-    "code_completion" : {
-        "Semantic Drift" : 0.00,
-        "Code Consistency" : 0.25,
-        "Code Completion Tests" : 0.75,
-        "Linting" : 0.00,
-        "Vulnerabilities" : 0.00,
-        "Runtime Analysis" : 0.00,
     },
     "code_generation" : {
         "Code Consistency" : 0.50,

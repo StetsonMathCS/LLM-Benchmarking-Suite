@@ -40,12 +40,11 @@ PASS_THRESHOLD: float = 0.5
 # Rationale:
 #   - bug_fixing / code_generation / code_review / refactoring carry more
 #     weight because they probe deeper reasoning.
-#   - code_completion / test_generation are important but more mechanical.
+#   - test_generation is important but more mechanical.
 #   - translation / partial_transform are narrower skills.
 TASK_WEIGHTS: dict[str, float] = {
     "bug_fixing":        0.15,
-    "code_completion":   0.12,
-    "code_generation":   0.15,
+    "code_generation":   0.27,
     "code_review":       0.15,
     "refactoring":       0.15,
     "test_generation":   0.12,
@@ -57,7 +56,7 @@ assert abs(sum(TASK_WEIGHTS.values()) - 1.0) < 1e-9, "TASK_WEIGHTS must sum to 1
 
 # Category groupings — used for sub-scores that reveal WHERE a model is strong/weak
 TASK_CATEGORIES: dict[str, list[str]] = {
-    "generation":     ["code_completion", "code_generation", "test_generation"],
+    "generation":     ["code_generation", "test_generation"],
     "transformation": ["bug_fixing", "refactoring", "translation", "partial_transform"],
     "analysis":       ["code_review"],
 }
