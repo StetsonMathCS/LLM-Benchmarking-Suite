@@ -1,4 +1,4 @@
-id,original_code,refactoring_task,output_expected
+id,original_code,refactoring_task,output_expected,expected_console_output
 1,"def process_order(order):
     if order is None:
         return None
@@ -45,45 +45,8 @@ def process_order(order: dict) -> Optional[OrderResult]:
     if error:
         return None
     total = sum(item['price'] * item['quantity'] for item in order['items'])
-    return OrderResult(order_id=order['id'], total=total, user_id=order['user_id'])"
-2,"class Logger:
-    def log_info(self, message):
-        import datetime
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f'[{timestamp}] INFO: {message}')
-
-    def log_warning(self, message):
-        import datetime
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f'[{timestamp}] WARNING: {message}')
-
-    def log_error(self, message):
-        import datetime
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f'[{timestamp}] ERROR: {message}')
-
-    def log_debug(self, message):
-        import datetime
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f'[{timestamp}] DEBUG: {message}')","Eliminate method duplication by extracting a private _log(level, message) method and remove repeated datetime imports","import datetime
-
-class Logger:
-    def _log(self, level: str, message: str) -> None:
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f'[{timestamp}] {level}: {message}')
-
-    def log_info(self, message: str) -> None:
-        self._log('INFO', message)
-
-    def log_warning(self, message: str) -> None:
-        self._log('WARNING', message)
-
-    def log_error(self, message: str) -> None:
-        self._log('ERROR', message)
-
-    def log_debug(self, message: str) -> None:
-        self._log('DEBUG', message)"
-3,"def calculate_discount(price, user_type, is_member, years_active):
+    return OrderResult(order_id=order['id'], total=total, user_id=order['user_id'])","OrderResult(order_id=1, total=35, user_id=100)"
+2,"def calculate_discount(price, user_type, is_member, years_active):
     discount = 0
     if user_type == 'student':
         discount = 0.2
@@ -116,8 +79,9 @@ def calculate_discount(price: float, user_type: str, is_member: bool, years_acti
         discount += rates['member']
         if years_active > 5:
             discount += rates['loyal']
-    return price * (1 - discount)"
-4,"class Animal:
+    return price * (1 - discount)","70.0
+85.0"
+3,"class Animal:
     def __init__(self, name, animal_type):
         self.name = name
         self.animal_type = animal_type
@@ -168,225 +132,9 @@ class Cow(Animal):
     def speak(self) -> str:
         return f'{self.name} says Moo'
     def move(self) -> str:
-        return f'{self.name} plods'"
-5,"def send_notification(user, message, channel):
-    if channel == 'email':
-        print(f'Sending email to {user[""email""]}: {message}')
-        # smtp logic here
-    elif channel == 'sms':
-        print(f'Sending SMS to {user[""phone""]}: {message}')
-        # twilio logic here
-    elif channel == 'push':
-        print(f'Sending push to {user[""device_token""]}: {message}')
-        # firebase logic here
-    elif channel == 'slack':
-        print(f'Sending slack to {user[""slack_id""]}: {message}')
-        # slack api logic here
-    else:
-        raise ValueError(f'Unknown channel: {channel}')",Refactor channel dispatch into a Strategy pattern with a NotificationSender protocol and a registry,"from typing import Protocol
-
-class NotificationSender(Protocol):
-    def send(self, user: dict, message: str) -> None: ...
-
-class EmailSender:
-    def send(self, user: dict, message: str) -> None:
-        print(f'Sending email to {user[""email""]}: {message}')
-
-class SmsSender:
-    def send(self, user: dict, message: str) -> None:
-        print(f'Sending SMS to {user[""phone""]}: {message}')
-
-class PushSender:
-    def send(self, user: dict, message: str) -> None:
-        print(f'Sending push to {user[""device_token""]}: {message}')
-
-class SlackSender:
-    def send(self, user: dict, message: str) -> None:
-        print(f'Sending slack to {user[""slack_id""]}: {message}')
-
-SENDERS: dict[str, NotificationSender] = {
-    'email': EmailSender(),
-    'sms':   SmsSender(),
-    'push':  PushSender(),
-    'slack': SlackSender(),
-}
-
-def send_notification(user: dict, message: str, channel: str) -> None:
-    sender = SENDERS.get(channel)
-    if sender is None:
-        raise ValueError(f'Unknown channel: {channel}')
-    sender.send(user, message)"
-6,"results = []
-for user in users:
-    orders = []
-    for order in all_orders:
-        if order['user_id'] == user['id']:
-            items = []
-            for item in all_items:
-                if item['order_id'] == order['id']:
-                    items.append({
-                        'name': item['name'],
-                        'price': item['price']
-                    })
-            orders.append({
-                'order_id': order['id'],
-                'items': items
-            })
-    results.append({
-        'user_id': user['id'],
-        'name': user['name'],
-        'orders': orders
-    })",Eliminate O(n³) nested loops by pre-building index dicts for O(n) grouping,"from collections import defaultdict
-
-items_by_order = defaultdict(list)
-for item in all_items:
-    items_by_order[item['order_id']].append({'name': item['name'], 'price': item['price']})
-
-orders_by_user = defaultdict(list)
-for order in all_orders:
-    orders_by_user[order['user_id']].append({
-        'order_id': order['id'],
-        'items': items_by_order[order['id']],
-    })
-
-results = [
-    {'user_id': user['id'], 'name': user['name'], 'orders': orders_by_user[user['id']]}
-    for user in users
-]"
-7,"class UserManager:
-    def __init__(self):
-        self.users = []
-        self.db = Database()
-        self.emailer = Emailer()
-        self.sms = SMSService()
-        self.cache = {}
-        self.logger = Logger()
-        self.analytics = Analytics()
-
-    def register(self, name, email, phone):
-        user = {'id': len(self.users)+1, 'name': name, 'email': email, 'phone': phone}
-        self.users.append(user)
-        self.db.save(user)
-        self.cache[user['id']] = user
-        self.emailer.send(email, 'Welcome!')
-        self.sms.send(phone, 'Welcome!')
-        self.logger.log(f'Registered {name}')
-        self.analytics.track('register', user)
-        return user
-
-    def deactivate(self, user_id):
-        user = self.cache.get(user_id) or self.db.find(user_id)
-        user['active'] = False
-        self.db.save(user)
-        self.cache[user_id] = user
-        self.emailer.send(user['email'], 'Account deactivated')
-        self.logger.log(f'Deactivated {user_id}')
-        self.analytics.track('deactivate', user)
-        return user","Decompose the God Class into focused classes: UserRepository, NotificationService, and UserService with dependency injection","class UserRepository:
-    def __init__(self, db, cache):
-        self.db = db
-        self.cache = cache
-
-    def save(self, user: dict) -> None:
-        self.db.save(user)
-        self.cache[user['id']] = user
-
-    def find(self, user_id: int) -> dict:
-        return self.cache.get(user_id) or self.db.find(user_id)
-
-    def next_id(self) -> int:
-        return len(self.cache) + 1
-
-
-class NotificationService:
-    def __init__(self, emailer, sms):
-        self.emailer = emailer
-        self.sms = sms
-
-    def welcome(self, user: dict) -> None:
-        self.emailer.send(user['email'], 'Welcome!')
-        self.sms.send(user['phone'], 'Welcome!')
-
-    def deactivation(self, user: dict) -> None:
-        self.emailer.send(user['email'], 'Account deactivated')
-
-
-class UserService:
-    def __init__(self, repo: UserRepository, notifications: NotificationService, logger, analytics):
-        self.repo = repo
-        self.notifications = notifications
-        self.logger = logger
-        self.analytics = analytics
-
-    def register(self, name: str, email: str, phone: str) -> dict:
-        user = {'id': self.repo.next_id(), 'name': name, 'email': email, 'phone': phone}
-        self.repo.save(user)
-        self.notifications.welcome(user)
-        self.logger.log(f'Registered {name}')
-        self.analytics.track('register', user)
-        return user
-
-    def deactivate(self, user_id: int) -> dict:
-        user = self.repo.find(user_id)
-        user['active'] = False
-        self.repo.save(user)
-        self.notifications.deactivation(user)
-        self.logger.log(f'Deactivated {user_id}')
-        self.analytics.track('deactivate', user)
-        return user"
-8,"def parse_config(path):
-    config = {}
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if line == '' or line.startswith('#'):
-                continue
-            if '=' not in line:
-                continue
-            key, value = line.split('=', 1)
-            key = key.strip()
-            value = value.strip()
-            if value.lower() == 'true':
-                value = True
-            elif value.lower() == 'false':
-                value = False
-            elif value.isdigit():
-                value = int(value)
-            else:
-                try:
-                    value = float(value)
-                except ValueError:
-                    pass
-            config[key] = value
-    return config",Refactor the inline type-coercion chain into a separate _coerce_value(s) function and replace the manual file loop with a generator pipeline,"def _coerce_value(raw: str):
-    stripped = raw.strip()
-    low = stripped.lower()
-    if low == 'true':
-        return True
-    if low == 'false':
-        return False
-    try:
-        return int(stripped)
-    except ValueError:
-        pass
-    try:
-        return float(stripped)
-    except ValueError:
-        return stripped
-
-def _config_lines(path: str):
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith('#') and '=' in line:
-                yield line
-
-def parse_config(path: str) -> dict:
-    return {
-        (parts := line.split('=', 1))[0].strip(): _coerce_value(parts[1])
-        for line in _config_lines(path)
-    }"
-9,"class Pipeline:
+        return f'{self.name} plods'","Rex says Woof
+Rex runs"
+4,"class Pipeline:
     def __init__(self, data):
         self.data = data
 
@@ -411,9 +159,7 @@ def parse_config(path: str) -> dict:
                 step3.append(item)
 
         # Step 4: sort
-        step4 = sorted(step3)
-
-        return step4",Refactor sequential pipeline steps into composable named transform functions wired through a generic pipe() runner,"from typing import Callable, Any
+        return sorted(step3)",Refactor sequential pipeline steps into composable named transform functions wired through a generic pipe() runner,"from typing import Callable
 
 def pipe(*funcs: Callable) -> Callable:
     def _pipe(data):
@@ -446,73 +192,8 @@ class Pipeline:
         self._run = pipe(filter_nulls, normalize_strings, deduplicate, sort_items)
 
     def run(self):
-        return self._run(self.data)"
-10,"import json
-import os
-
-def load_users():
-    if not os.path.exists('users.json'):
-        return []
-    with open('users.json') as f:
-        return json.load(f)
-
-def save_users(users):
-    with open('users.json', 'w') as f:
-        json.dump(users, f)
-
-def add_user(name, email):
-    users = load_users()
-    users.append({'id': len(users)+1, 'name': name, 'email': email})
-    save_users(users)
-
-def remove_user(user_id):
-    users = load_users()
-    users = [u for u in users if u['id'] != user_id]
-    save_users(users)
-
-def find_user(email):
-    users = load_users()
-    for user in users:
-        if user['email'] == email:
-            return user
-    return None","Wrap the flat file-backed store in a JsonFileRepository class that loads once on init, maintains an in-memory list, and flushes on mutation","import json
-import os
-from typing import Optional
-
-class JsonFileRepository:
-    def __init__(self, path: str):
-        self.path = path
-        self._data: list = self._load()
-
-    def _load(self) -> list:
-        if not os.path.exists(self.path):
-            return []
-        with open(self.path) as f:
-            return json.load(f)
-
-    def _flush(self) -> None:
-        with open(self.path, 'w') as f:
-            json.dump(self._data, f, indent=2)
-
-    def _next_id(self) -> int:
-        return max((u['id'] for u in self._data), default=0) + 1
-
-    def add(self, name: str, email: str) -> dict:
-        user = {'id': self._next_id(), 'name': name, 'email': email}
-        self._data.append(user)
-        self._flush()
-        return user
-
-    def remove(self, user_id: int) -> None:
-        self._data = [u for u in self._data if u['id'] != user_id]
-        self._flush()
-
-    def find_by_email(self, email: str) -> Optional[dict]:
-        return next((u for u in self._data if u['email'] == email), None)
-
-    def all(self) -> list:
-        return list(self._data)"
-11,"def validate_user_input(data):
+        return self._run(self.data)","['hello', 'world']"
+5,"def validate_user_input(data):
     errors = []
     if 'name' not in data:
         errors.append('name is required')
@@ -577,8 +258,9 @@ def _validate_role(data: dict) -> list[str]:
 FIELD_VALIDATORS: list[Validator] = [_validate_name, _validate_email, _validate_age, _validate_role]
 
 def validate_user_input(data: dict) -> list[str]:
-    return [err for validate in FIELD_VALIDATORS for err in validate(data)]"
-12,"class ReportGenerator:
+    return [err for validate in FIELD_VALIDATORS for err in validate(data)]","[]
+['name must be at least 2 characters', 'email is required', 'age must be between 0 and 150', 'role is required']"
+6,"class ReportGenerator:
     def generate(self, data, format):
         if format == 'csv':
             lines = []
@@ -638,61 +320,10 @@ class ReportGenerator:
         renderer = FORMAT_REGISTRY.get(format)
         if renderer is None:
             raise ValueError(f'Unknown format: {format}')
-        return renderer.render(data)"
-13,"def fetch_and_process(url):
-    import urllib.request
-    try:
-        response = urllib.request.urlopen(url)
-        raw = response.read()
-        data = raw.decode('utf-8')
-        import json
-        parsed = json.loads(data)
-        results = []
-        for item in parsed:
-            if item.get('active'):
-                results.append({
-                    'id': item['id'],
-                    'name': item['name'].strip().title(),
-                    'score': round(item.get('score', 0), 2)
-                })
-        results.sort(key=lambda x: x['score'], reverse=True)
-        return results
-    except Exception as e:
-        print(f'Error: {e}')
-        return []","Separate concerns into fetch(url), parse(raw), transform(items), and orchestrate them in fetch_and_process with proper exception types","import json
-import urllib.request
-from typing import Optional
-
-def fetch(url: str) -> str:
-    response = urllib.request.urlopen(url)
-    return response.read().decode('utf-8')
-
-def parse(raw: str) -> list[dict]:
-    return json.loads(raw)
-
-def transform(items: list[dict]) -> list[dict]:
-    result = [
-        {
-            'id': item['id'],
-            'name': item['name'].strip().title(),
-            'score': round(item.get('score', 0), 2),
-        }
-        for item in items
-        if item.get('active')
-    ]
-    return sorted(result, key=lambda x: x['score'], reverse=True)
-
-def fetch_and_process(url: str) -> list[dict]:
-    try:
-        raw = fetch(url)
-    except OSError as e:
-        raise ConnectionError(f'Failed to fetch {url}') from e
-    try:
-        items = parse(raw)
-    except json.JSONDecodeError as e:
-        raise ValueError(f'Invalid JSON from {url}') from e
-    return transform(items)"
-14,"class Cart:
+        return renderer.render(data)","name,age
+Alice,25
+Bob,30"
+7,"class Cart:
     def __init__(self):
         self.items = []
         self.discount_code = None
@@ -720,7 +351,7 @@ def fetch_and_process(url: str) -> list[dict]:
         return (self.get_subtotal() - self.get_discount()) * 0.08
 
     def get_total(self):
-        return self.get_subtotal() - self.get_discount() + self.get_tax()",Replace magic-string discount codes with a DiscountCode dataclass registry and refactor Cart to use it; replace repeated subtotal calls with a computed property,"from dataclasses import dataclass
+        return self.get_subtotal() - self.get_discount() + self.get_tax()",Replace magic-string discount codes with a DiscountCode dataclass registry; replace repeated subtotal calls with a computed property,"from dataclasses import dataclass
 from typing import Optional
 
 @dataclass(frozen=True)
@@ -755,9 +386,7 @@ class Cart:
 
     @property
     def discount(self) -> float:
-        if self._discount_code is None:
-            return 0.0
-        return self.subtotal * self._discount_code.rate
+        return 0.0 if self._discount_code is None else self.subtotal * self._discount_code.rate
 
     @property
     def tax(self) -> float:
@@ -765,64 +394,9 @@ class Cart:
 
     @property
     def total(self) -> float:
-        return self.subtotal - self.discount + self.tax"
-15,"def run_etl(source_path, dest_path):
-    import csv, json, os
-    # Read
-    records = []
-    with open(source_path) as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            records.append(row)
-    # Transform
-    transformed = []
-    for r in records:
-        try:
-            transformed.append({
-                'id': int(r['id']),
-                'name': r['name'].strip().title(),
-                'age': int(r['age']),
-                'score': float(r['score']),
-                'active': r['active'].lower() == 'true'
-            })
-        except (KeyError, ValueError):
-            continue
-    # Write
-    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-    with open(dest_path, 'w') as f:
-        json.dump(transformed, f, indent=2)
-    return len(transformed)","Split ETL into extract(path)->records, transform_record(row)->Optional[dict], load(records, path)->None functions; wire in run_etl","import csv
-import json
-import os
-from typing import Optional
-
-def extract(source_path: str) -> list[dict]:
-    with open(source_path, newline='', encoding='utf-8') as f:
-        return list(csv.DictReader(f))
-
-def transform_record(row: dict) -> Optional[dict]:
-    try:
-        return {
-            'id':     int(row['id']),
-            'name':   row['name'].strip().title(),
-            'age':    int(row['age']),
-            'score':  float(row['score']),
-            'active': row['active'].lower() == 'true',
-        }
-    except (KeyError, ValueError):
-        return None
-
-def load(records: list[dict], dest_path: str) -> None:
-    os.makedirs(os.path.dirname(dest_path) or '.', exist_ok=True)
-    with open(dest_path, 'w', encoding='utf-8') as f:
-        json.dump(records, f, indent=2)
-
-def run_etl(source_path: str, dest_path: str) -> int:
-    raw = extract(source_path)
-    transformed = [r for row in raw if (r := transform_record(row)) is not None]
-    load(transformed, dest_path)
-    return len(transformed)"
-16,"class EventSystem:
+        return self.subtotal - self.discount + self.tax","8.00
+7.78"
+8,"class EventSystem:
     def __init__(self):
         self.listeners = {}
 
@@ -846,8 +420,7 @@ def run_etl(source_path: str, dest_path: str) -> int:
         def wrapper(*args, **kwargs):
             self.off(event, wrapper)
             callback(*args, **kwargs)
-        self.on(event, wrapper)","Refactor listeners dict to use defaultdict(list), add emit_async for awaitable callbacks, and add listener_count(event) helper","import asyncio
-from collections import defaultdict
+        self.on(event, wrapper)",Refactor listeners dict to use defaultdict(list); snapshot listeners list before iterating in emit and once; add listener_count helper,"from collections import defaultdict
 from typing import Callable
 
 class EventSystem:
@@ -872,18 +445,10 @@ class EventSystem:
             callback(*args, **kwargs)
         self.on(event, wrapper)
 
-    async def emit_async(self, event: str, *args, **kwargs) -> None:
-        coros = []
-        for callback in list(self.listeners.get(event, [])):
-            result = callback(*args, **kwargs)
-            if asyncio.iscoroutine(result):
-                coros.append(result)
-        if coros:
-            await asyncio.gather(*coros)
-
     def listener_count(self, event: str) -> int:
-        return len(self.listeners.get(event, []))"
-17,"def generate_report(orders):
+        return len(self.listeners.get(event, []))","count: 1
+received: hello"
+9,"def generate_report(orders):
     total_revenue = 0
     total_orders = 0
     total_items = 0
@@ -916,7 +481,7 @@ class EventSystem:
         'min_order': min_order if min_order != float('inf') else 0,
         'status_counts': status_counts,
         'top_products': sorted(product_revenue.items(), key=lambda x: x[1], reverse=True)[:5]
-    }","Refactor into a ReportAccumulator class with an update(order) method and a summary() property, replacing raw loop with a clean API","from collections import defaultdict
+    }","Refactor into a ReportAccumulator class with an update(order) method and a summary property, replacing the raw loop with a clean API","from collections import defaultdict
 from dataclasses import dataclass, field
 
 @dataclass
@@ -958,8 +523,8 @@ def generate_report(orders: list[dict]) -> dict:
     acc = ReportAccumulator()
     for order in orders:
         acc.update(order)
-    return acc.summary"
-18,"def process(data, operation, extra=None):
+    return acc.summary","total_revenue: 150.0, total_orders: 2"
+10,"def process(data, operation, extra=None):
     if operation == 'filter':
         result = []
         for item in data:
@@ -987,8 +552,8 @@ def generate_report(orders: list[dict]) -> dict:
         elif func == 'avg': return sum(values) / len(values) if values else 0
         elif func == 'min': return min(values) if values else None
         elif func == 'max': return max(values) if values else None
-    raise ValueError(f'Unknown operation: {operation}')","Replace the operation string-dispatch monolith with individual typed functions filter_data, sort_data, group_data, aggregate_data and a DataProcessor class exposing them","from collections import defaultdict
-from typing import Any, Optional
+    raise ValueError(f'Unknown operation: {operation}')",Replace the operation string-dispatch monolith with individual typed functions and a DataProcessor class exposing them,"from collections import defaultdict
+from typing import Any
 
 def filter_data(data: list[dict], field: str, value: Any) -> list[dict]:
     return [item for item in data if item.get(field) == value]
@@ -1012,8 +577,7 @@ _AGG_FUNCS = {
 def aggregate_data(data: list[dict], field: str, func: str = 'sum') -> Any:
     if func not in _AGG_FUNCS:
         raise ValueError(f'Unknown aggregation function: {func}')
-    values = [item.get(field, 0) for item in data]
-    return _AGG_FUNCS[func](values)
+    return _AGG_FUNCS[func]([item.get(field, 0) for item in data])
 
 class DataProcessor:
     def __init__(self, data: list[dict]):
@@ -1032,8 +596,9 @@ class DataProcessor:
         return aggregate_data(self.data, field, func)
 
     def to_list(self) -> list[dict]:
-        return self.data"
-19,"class TaskRunner:
+        return self.data","80
+2"
+11,"class TaskRunner:
     def __init__(self):
         self.tasks = []
         self.results = []
@@ -1061,8 +626,7 @@ class DataProcessor:
         return self.errors
 
     def get_successes(self):
-        return [r for r in self.results if r['status'] == 'ok']","Refactor TaskRunner to use a TaskResult dataclass, add an async run_async method using asyncio.gather, and expose a summary property","import asyncio
-from dataclasses import dataclass, field
+        return [r for r in self.results if r['status'] == 'ok']",Refactor TaskRunner to use a TaskResult dataclass; eliminate the running flag and parallel error/result lists; expose a summary property,"from dataclasses import dataclass
 from typing import Any, Callable, Optional
 
 @dataclass
@@ -1094,20 +658,287 @@ class TaskRunner:
         self._results = [self._execute(f, a, kw) for f, a, kw in self._tasks]
         return self._results
 
-    async def run_async(self) -> list[TaskResult]:
-        async def _run_one(func, args, kwargs):
-            try:
-                result = func(*args, **kwargs)
-                if asyncio.iscoroutine(result):
-                    result = await result
-                return TaskResult(func_name=func.__name__, status='ok', result=result)
-            except Exception as e:
-                return TaskResult(func_name=func.__name__, status='error', error=str(e))
-        self._results = list(await asyncio.gather(*[_run_one(f, a, kw) for f, a, kw in self._tasks]))
-        return self._results
-
     @property
     def summary(self) -> dict:
         ok = [r for r in self._results if r.ok]
         err = [r for r in self._results if not r.ok]
-        return {'total': len(self._results), 'succeeded': len(ok), 'failed': len(err), 'errors': [{'func': r.func_name, 'error': r.error} for r in err]}"
+        return {
+            'total': len(self._results),
+            'succeeded': len(ok),
+            'failed': len(err),
+            'errors': [{'func': r.func_name, 'error': r.error} for r in err],
+        }","{'total': 2, 'succeeded': 1, 'failed': 1, 'errors': [{'func': '<lambda>', 'error': 'division by zero'}]}"
+12,"_fib_cache = {}
+
+def fibonacci(n):
+    if n in _fib_cache:
+        return _fib_cache[n]
+    if n <= 1:
+        result = n
+    else:
+        result = fibonacci(n - 1) + fibonacci(n - 2)
+    _fib_cache[n] = result
+    return result",Replace the global manual cache dict with functools.lru_cache and simplify the function body,"import functools
+
+@functools.lru_cache(maxsize=None)
+def fibonacci(n: int) -> int:
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)",55
+13,"def add_student(names, ages, scores, name, age, score):
+    names.append(name)
+    ages.append(age)
+    scores.append(score)
+
+def average_score(scores):
+    return sum(scores) / len(scores) if scores else 0.0
+
+def top_students(names, ages, scores, n):
+    combined = sorted(zip(scores, names, ages), reverse=True)
+    return [(name, age, score) for score, name, age in combined[:n]]","Replace parallel lists with a Student dataclass and a StudentRoster class encapsulating add, average_score, and top_students","from dataclasses import dataclass
+
+@dataclass
+class Student:
+    name: str
+    age: int
+    score: float
+
+class StudentRoster:
+    def __init__(self):
+        self._students: list[Student] = []
+
+    def add(self, name: str, age: int, score: float) -> None:
+        self._students.append(Student(name, age, score))
+
+    def average_score(self) -> float:
+        if not self._students:
+            return 0.0
+        return sum(s.score for s in self._students) / len(self._students)
+
+    def top_students(self, n: int) -> list[Student]:
+        return sorted(self._students, key=lambda s: s.score, reverse=True)[:n]","84.3
+['Bob', 'Alice']"
+14,"def word_frequency(text):
+    freq = {}
+    for word in text.lower().split():
+        word = word.strip('.,!?;:')
+        if word:
+            if word in freq:
+                freq[word] += 1
+            else:
+                freq[word] = 1
+    return freq",Replace the manual frequency dict and if/else increment with collections.Counter,"from collections import Counter
+
+def word_frequency(text: str) -> dict:
+    words = [w.strip('.,!?;:') for w in text.lower().split()]
+    return dict(Counter(w for w in words if w))","[('hello', 2), ('world', 1), ('test', 1)]"
+15,"def find_first_duplicate(items):
+    found = False
+    duplicate = None
+    seen = []
+    i = 0
+    while i < len(items) and not found:
+        if items[i] in seen:
+            found = True
+            duplicate = items[i]
+        else:
+            seen.append(items[i])
+        i += 1
+    return duplicate",Eliminate flag variables and linear-scan list; use a set for O(1) lookup and return early on the first duplicate,"from typing import Optional
+
+def find_first_duplicate(items: list) -> Optional[object]:
+    seen = set()
+    for item in items:
+        if item in seen:
+            return item
+        seen.add(item)
+    return None","2
+None"
+16,"def format_table_row(values, widths):
+    row = ''
+    for i, (val, width) in enumerate(zip(values, widths)):
+        cell = str(val).ljust(width)
+        if i < len(values) - 1:
+            row += cell + ' | '
+        else:
+            row += cell
+    return row",Replace the manual string concatenation loop with str.join and a generator expression,"def format_table_row(values: list, widths: list) -> str:
+    return ' | '.join(str(val).ljust(width) for val, width in zip(values, widths))",A     | B
+17,"def compute_stats(numbers):
+    if not numbers:
+        return {'count': 0, 'mean': 0.0, 'variance': 0.0, 'min': None, 'max': None}
+    count = len(numbers)
+    total = 0
+    for n in numbers:
+        total += n
+    mean = total / count
+    sq_diff_total = 0
+    for n in numbers:
+        sq_diff_total += (n - mean) ** 2
+    variance = sq_diff_total / count
+    return {
+        'count': count,
+        'mean': mean,
+        'variance': variance,
+        'min': min(numbers),
+        'max': max(numbers),
+    }",Replace the two manual accumulator loops with built-in sum() and a generator expression for variance,"def compute_stats(numbers: list) -> dict:
+    if not numbers:
+        return {'count': 0, 'mean': 0.0, 'variance': 0.0, 'min': None, 'max': None}
+    count = len(numbers)
+    mean = sum(numbers) / count
+    variance = sum((n - mean) ** 2 for n in numbers) / count
+    return {
+        'count': count,
+        'mean': mean,
+        'variance': variance,
+        'min': min(numbers),
+        'max': max(numbers),
+    }","mean=3.0, variance=2.0"
+18,"def letter_grade(score):
+    if score >= 93:
+        return 'A'
+    elif score >= 90:
+        return 'A-'
+    elif score >= 87:
+        return 'B+'
+    elif score >= 83:
+        return 'B'
+    elif score >= 80:
+        return 'B-'
+    elif score >= 77:
+        return 'C+'
+    elif score >= 73:
+        return 'C'
+    elif score >= 70:
+        return 'C-'
+    elif score >= 67:
+        return 'D+'
+    elif score >= 63:
+        return 'D'
+    elif score >= 60:
+        return 'D-'
+    else:
+        return 'F'",Replace the 12-branch if/elif chain with a bisect-based lookup table,"import bisect
+
+_THRESHOLDS = [60, 63, 67, 70, 73, 77, 80, 83, 87, 90, 93]
+_GRADES     = ['F', 'D-', 'D', 'D+', 'C-', 'C', 'C+', 'B-', 'B', 'B+', 'A-', 'A']
+
+def letter_grade(score: float) -> str:
+    return _GRADES[bisect.bisect_right(_THRESHOLDS, score)]","A
+B
+F"
+19,"def make_running_stats():
+    data = {'count': 0, 'total': 0.0, 'sq_total': 0.0, 'min': None, 'max': None}
+
+    def update(x):
+        data['count'] += 1
+        data['total'] += x
+        data['sq_total'] += x * x
+        if data['min'] is None or x < data['min']:
+            data['min'] = x
+        if data['max'] is None or x > data['max']:
+            data['max'] = x
+
+    def mean():
+        return data['total'] / data['count'] if data['count'] else 0.0
+
+    def variance():
+        if data['count'] < 2:
+            return 0.0
+        m = mean()
+        return data['sq_total'] / data['count'] - m * m
+
+    def snapshot():
+        return {'count': data['count'], 'mean': mean(), 'variance': variance(),
+                'min': data['min'], 'max': data['max']}
+
+    return update, snapshot","Replace the closure-based running stats with a RunningStats dataclass that exposes update(), mean, variance, and snapshot() as methods/properties","from dataclasses import dataclass, field
+from typing import Optional
+
+@dataclass
+class RunningStats:
+    _count: int = field(default=0, init=False)
+    _total: float = field(default=0.0, init=False)
+    _sq_total: float = field(default=0.0, init=False)
+    _min: Optional[float] = field(default=None, init=False)
+    _max: Optional[float] = field(default=None, init=False)
+
+    def update(self, x: float) -> None:
+        self._count += 1
+        self._total += x
+        self._sq_total += x * x
+        self._min = x if self._min is None else min(self._min, x)
+        self._max = x if self._max is None else max(self._max, x)
+
+    @property
+    def mean(self) -> float:
+        return self._total / self._count if self._count else 0.0
+
+    @property
+    def variance(self) -> float:
+        if self._count < 2:
+            return 0.0
+        return self._sq_total / self._count - self.mean ** 2
+
+    def snapshot(self) -> dict:
+        return {
+            'count': self._count,
+            'mean': self.mean,
+            'variance': self.variance,
+            'min': self._min,
+            'max': self._max,
+        }","count=5, mean=3.0"
+20,"def serialize(value):
+    if isinstance(value, bool):
+        return 'true' if value else 'false'
+    elif isinstance(value, int):
+        return str(value)
+    elif isinstance(value, float):
+        return f'{value:.6g}'
+    elif isinstance(value, str):
+        return f'""{value}""'
+    elif isinstance(value, list):
+        return '[' + ', '.join(serialize(v) for v in value) + ']'
+    elif isinstance(value, dict):
+        pairs = ', '.join(f'{serialize(k)}: {serialize(v)}' for k, v in value.items())
+        return '{' + pairs + '}'
+    elif value is None:
+        return 'null'
+    else:
+        raise TypeError(f'Unsupported type: {type(value)}')",Refactor the isinstance chain into a functools.singledispatch registry; register bool before int since bool is a subclass of int,"import functools
+
+@functools.singledispatch
+def serialize(value) -> str:
+    raise TypeError(f'Unsupported type: {type(value)}')
+
+@serialize.register(type(None))
+def _(value) -> str:
+    return 'null'
+
+@serialize.register(bool)
+def _(value: bool) -> str:
+    return 'true' if value else 'false'
+
+@serialize.register(int)
+def _(value: int) -> str:
+    return str(value)
+
+@serialize.register(float)
+def _(value: float) -> str:
+    return f'{value:.6g}'
+
+@serialize.register(str)
+def _(value: str) -> str:
+    return f'""{value}""'
+
+@serialize.register(list)
+def _(value: list) -> str:
+    return '[' + ', '.join(serialize(v) for v in value) + ']'
+
+@serialize.register(dict)
+def _(value: dict) -> str:
+    pairs = ', '.join(f'{serialize(k)}: {serialize(v)}' for k, v in value.items())
+    return '{' + pairs + '}'","true
+[1, 2, 3]
+{""a"": ""hello""}"

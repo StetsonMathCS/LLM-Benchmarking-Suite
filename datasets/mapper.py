@@ -321,6 +321,7 @@ class DatasetMapper:
                 "code_input": data.get("original_code"),
                 "refactoring_task": data.get("refactoring_task"),
                 "expected_output": data.get("output_expected"),
+                "expected_console_output": data.get("expected_console_output"),
             })
         
         elif task_name == "test_generation":

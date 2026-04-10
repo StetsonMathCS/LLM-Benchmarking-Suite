@@ -45,8 +45,44 @@ class FunctionalCorrectnessDimension(BaseDimension):
         For translation tasks, uses generated_code_language for executing generated code.
         """
         expected_output = kwargs.get('expected_output', None)
+        expected_console_output = kwargs.get('expected_console_output', None)
         generated_code_language = kwargs.get('generated_code_language', language)
-        
+
+        # Refactoring path: compare generated code's stdout to expected_console_output
+        if expected_console_output:
+            try:
+                if generated_code_language == "python":
+                    gen_output = CodeRunner.run_python(generated_code)
+                elif generated_code_language == "javascript":
+                    gen_output = CodeRunner.run_javascript(generated_code)
+                elif generated_code_language == "cpp":
+                    gen_output = CodeRunner.run_cpp(generated_code)
+                else:
+                    return DimensionResult(
+                        dimension_name=self.name,
+                        score=0.0,
+                        details={"error": f"Unsupported language: {generated_code_language}"}
+                    )
+                match = _normalize_output(gen_output.strip(), generated_code_language) == _normalize_output(expected_console_output.strip(), language)
+                score = 1.0 if match else 0.0
+                return DimensionResult(
+                    dimension_name=self.name,
+                    score=score,
+                    passed=match,
+                    details={
+                        "expected_console_output": expected_console_output,
+                        "generated_output": gen_output,
+                        "match": match
+                    }
+                )
+            except Exception as e:
+                return DimensionResult(
+                    dimension_name=self.name,
+                    score=0.0,
+                    passed=False,
+                    details={"error": str(e)}
+                )
+
         # If we have expected_output and no original_code, execute the generated
         # code and compare its stdout to expected_output.
         if expected_output and not original_code:

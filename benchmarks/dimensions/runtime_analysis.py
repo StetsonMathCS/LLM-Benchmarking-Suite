@@ -105,6 +105,54 @@ class RuntimeAnalysisDimension(BaseDimension):
 
     def evaluate(self, language: str, generated_code: str, original_code: Optional[str] = None, **kwargs) -> DimensionResult:
         try:
+            expected_console_output = kwargs.get('expected_console_output', None)
+            expected_output = kwargs.get('expected_output', None)
+
+            # Refactoring path: compare expected refactored code vs LLM-generated refactored code
+            if expected_console_output is not None and expected_output:
+                run_fn = {
+                    "python": RuntimeAnalysisDimension.run_python,
+                    "cpp": RuntimeAnalysisDimension.run_cpp,
+                    "javascript": RuntimeAnalysisDimension.run_javascript,
+                }.get(language)
+                if run_fn is None:
+                    return DimensionResult(
+                        dimension_name=self.name,
+                        score=0.0,
+                        details={"error": f"Unsupported language: {language}"}
+                    )
+                baseline_results = run_fn(expected_output)
+                generated_results = run_fn(generated_code)
+
+                def ratio_score(v1, v2):
+                    if v1 == 0 and v2 == 0:
+                        return 1.0
+                    if v1 == 0:
+                        return 0.0
+                    ratio = v2 / v1
+                    log_ratio = math.log(ratio)
+                    score = 1 / (1 + math.exp(3 * log_ratio))
+                    return round(score, 4)
+
+                memory_score = ratio_score(
+                    baseline_results.get("peak_memory", 0),
+                    generated_results.get("peak_memory", 0)
+                )
+                time_score = ratio_score(
+                    baseline_results.get("wall_time", 0),
+                    generated_results.get("wall_time", 0)
+                )
+                final_score = (0.5 * memory_score) + (0.5 * time_score)
+                return DimensionResult(
+                    dimension_name=self.name,
+                    score=final_score,
+                    passed=True,
+                    details={
+                        "expected_refactored_results": baseline_results,
+                        "generated_results": generated_results
+                    }
+                )
+
             # If no original code, just analyze generated code
             if not original_code:
                 if language == "python":

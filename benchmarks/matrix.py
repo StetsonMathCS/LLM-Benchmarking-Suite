@@ -26,15 +26,13 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
         FunctionalCorrectnessDimension,
         LintingDimension,
         VulnerabilitiesDimension,
-        SemanticDriftDimension,
-        RuntimeAnalysisDimension,
+        SemanticDriftDimension
     ],
     "code_generation" : [
         CodeConsistencyDimension,
         CodeCompletionTestsDimension,
         LintingDimension,
-        VulnerabilitiesDimension,
-        RuntimeAnalysisDimension
+        VulnerabilitiesDimension
     ],
     "code_review" : [
         CodeReviewDimension
@@ -42,15 +40,13 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
     "refactoring" : [
         CodeConsistencyDimension,
         FunctionalCorrectnessDimension,
-        SemanticDriftDimension,
         LintingDimension,
         RuntimeAnalysisDimension,
         VulnerabilitiesDimension
     ],
     "test_generation" : [   
         CodeConsistencyDimension,
-        TestPassRateDimension,
-        LintingDimension
+        TestPassRateDimension
     ],
     "translation":[
         CodeConsistencyDimension,
@@ -63,7 +59,6 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
         FunctionalCorrectnessDimension,
         LintingDimension,
         VulnerabilitiesDimension,
-        RuntimeAnalysisDimension
     ]
 }
 
@@ -71,26 +66,23 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
 DIMENSION_WEIGHTS = {
     "bug_fixing": {
         "Functional Correctness": 0.70,
-        "Linting":                0.00,
-        "Code Consistency":       0.20,
-        "Vulnerabilities":        0.00,
-        "Semantic Drift":         0.10,
-        "Runtime Analysis":       0.00,
+        "Linting":                0.10,
+        "Code Consistency":       0.10,
+        "Vulnerabilities":        0.05,
+        "Semantic Drift":         0.05,
     },
     "code_generation" : {
-        "Code Consistency" : 0.50,
-        "Code Completion Tests" : 0.50,
-        "Linting" : 0.00,
-        "Vulnerabilities" : 0.00,
-        "Runtime Analysis" : 0.00,
+        "Code Consistency" : 0.40,
+        "Code Completion Tests" : 0.40,
+        "Linting" : 0.05,
+        "Vulnerabilities" : 0.05,
     },
     "code_review" : {
         "Code Review Quality" : 1.00,
     },
     "refactoring": {
-        "Functional Correctness": 0.30,
-        "Semantic Drift":         0.25,
-        "Runtime Analysis":       0.20,
+        "Functional Correctness": 0.40,
+        "Runtime Analysis":       0.35,
         "Code Consistency":       0.10,
         "Linting":                0.10,
         "Vulnerabilities":        0.05,
@@ -98,12 +90,11 @@ DIMENSION_WEIGHTS = {
     "test_generation": {
         "Code Consistency" : 0.25,
         "Test Pass Rate" : 0.75,
-        "Linting" : 0.00,
     },
     "translation": {
-        "Code Consistency": 0.50,
-        "Linting": 0.00,
-        "Vulnerabilities": 0.00,
+        "Code Consistency": 0.30,
+        "Linting": 0.10,
+        "Vulnerabilities": 0.10,
         "Functional Correctness": 0.50,
     },
     "partial_transform": {
@@ -111,7 +102,6 @@ DIMENSION_WEIGHTS = {
         "Functional Correctness": 0.20,
         "Linting": 0.10,
         "Vulnerabilities": 0.10,
-        "Runtime Analysis": 0.10,
     }
 }
 
