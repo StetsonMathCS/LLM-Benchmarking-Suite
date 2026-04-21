@@ -21,6 +21,7 @@ Usage:
 """
 from __future__ import annotations
 
+import math
 import statistics
 from dataclasses import dataclass, field, asdict
 from typing import Optional
@@ -41,15 +42,14 @@ PASS_THRESHOLD: float = 0.5
 #   - bug_fixing / code_generation / code_review / refactoring carry more
 #     weight because they probe deeper reasoning.
 #   - test_generation is important but more mechanical.
-#   - translation / partial_transform are narrower skills.
+#   - translation is a narrower skill.
 TASK_WEIGHTS: dict[str, float] = {
-    "bug_fixing":        0.15,
-    "code_generation":   0.27,
-    "code_review":       0.15,
-    "refactoring":       0.15,
-    "test_generation":   0.12,
-    "translation":       0.10,
-    "partial_transform": 0.06,
+    "bug_fixing":      0.15,
+    "code_generation": 0.27,
+    "code_review":     0.15,
+    "refactoring":     0.15,
+    "test_generation": 0.12,
+    "translation":     0.16,
 }
 # Verify at import time that weights sum to ~1.0
 assert abs(sum(TASK_WEIGHTS.values()) - 1.0) < 1e-9, "TASK_WEIGHTS must sum to 1.0"
@@ -57,7 +57,7 @@ assert abs(sum(TASK_WEIGHTS.values()) - 1.0) < 1e-9, "TASK_WEIGHTS must sum to 1
 # Category groupings — used for sub-scores that reveal WHERE a model is strong/weak
 TASK_CATEGORIES: dict[str, list[str]] = {
     "generation":     ["code_generation", "test_generation"],
-    "transformation": ["bug_fixing", "refactoring", "translation", "partial_transform"],
+    "transformation": ["bug_fixing", "refactoring", "translation"],
     "analysis":       ["code_review"],
 }
 
@@ -80,6 +80,33 @@ GRADE_THRESHOLDS: list[tuple[float, str]] = [
 
 
 # ---------------------------------------------------------------------------
+# pass@k estimator  (Chen et al., 2021 — "Evaluating Large Language Models
+# Trained on Code")
+# ---------------------------------------------------------------------------
+
+def pass_at_k_estimator(n: int, c: int, k: int) -> float:
+    """
+    Unbiased estimator of pass@k.
+
+    Args:
+        n: total number of samples generated for a single problem
+        c: number of correct samples (combined_score >= threshold)
+        k: the k in pass@k
+
+    Returns:
+        Estimated probability that at least one of k random samples is correct.
+        Returns float('nan') when n < k (insufficient samples).
+    """
+    if n < k:
+        return float("nan")
+    if c == 0:
+        return 0.0
+    if n - c < k:
+        return 1.0
+    return 1.0 - math.comb(n - c, k) / math.comb(n, k)
+
+
+# ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
 
@@ -95,9 +122,14 @@ class TaskScore:
     min_score: float
     max_score: float
     std_score: float        # 0.0 if only one record
+    pass_at_k: dict[int, float] = field(default_factory=dict)  # {k: estimated_pass_at_k}
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        d = asdict(self)
+        # Only include pass_at_k when populated (multi-sample mode)
+        if not self.pass_at_k:
+            d.pop("pass_at_k", None)
+        return d
 
 
 @dataclass
@@ -123,8 +155,12 @@ class BenchmarkReport:
     total_errors: int       # records with no combined_score (LLM/critical error)
     overall_pass_rate: float
 
+    # pass@k per task — populated only in multi-sample mode
+    # { task_name: {k: estimated_pass_at_k} }
+    pass_at_k: dict[str, dict[int, float]] = field(default_factory=dict)
+
     def to_dict(self) -> dict:
-        return {
+        d = {
             "final_score": self.final_score,
             "grade": self.grade,
             "overall_pass_rate": self.overall_pass_rate,
@@ -135,6 +171,9 @@ class BenchmarkReport:
             "category_scores": self.category_scores,
             "task_scores": {k: v.to_dict() for k, v in self.task_scores.items()},
         }
+        if self.pass_at_k:
+            d["pass_at_k"] = self.pass_at_k
+        return d
 
 
 # ---------------------------------------------------------------------------
@@ -150,6 +189,10 @@ class ScoringEngine:
 
     Pass ``task_weights`` / ``pass_threshold`` to override the module-level
     defaults — the TUI uses this to apply user-edited values.
+
+    For multi-sample (pass@k) mode, set ``num_samples`` > 1 and provide
+    ``pass_k_values`` (e.g. [1, 5, 10]).  Results must carry
+    ``metadata["record_id"]`` so the engine can group samples per problem.
     """
 
     def __init__(
@@ -157,10 +200,14 @@ class ScoringEngine:
         results: list[BenchmarkResult],
         task_weights: Optional[dict[str, float]] = None,
         pass_threshold: Optional[float] = None,
+        num_samples: int = 1,
+        pass_k_values: Optional[list[int]] = None,
     ):
         self._results = results
         self._weights = task_weights if task_weights is not None else TASK_WEIGHTS
         self._threshold = pass_threshold if pass_threshold is not None else PASS_THRESHOLD
+        self._num_samples = num_samples
+        self._pass_k_values = pass_k_values or [1, 5, 10]
 
     # ------------------------------------------------------------------ #
     # Public API                                                           #
@@ -178,6 +225,9 @@ class ScoringEngine:
         passed = [r for r in scored if r.combined_score >= self._threshold]
         errors = [r for r in self._results if r.combined_score is None]
 
+        # Compute pass@k when in multi-sample mode
+        pak = self._compute_pass_at_k(task_scores)
+
         return BenchmarkReport(
             task_scores=task_scores,
             category_scores=category_scores,
@@ -188,6 +238,7 @@ class ScoringEngine:
             total_passed=len(passed),
             total_errors=len(errors),
             overall_pass_rate=round(len(passed) / total, 4) if total else 0.0,
+            pass_at_k=pak,
         )
 
     # ------------------------------------------------------------------ #
@@ -241,6 +292,60 @@ class ScoringEngine:
                 ),
             )
         return task_scores
+
+    def _compute_pass_at_k(
+        self, task_scores: dict[str, TaskScore]
+    ) -> dict[str, dict[int, float]]:
+        """
+        Compute pass@k for each task using the unbiased estimator.
+
+        Groups results by (task_name, record_id), counts correct samples per
+        problem, applies ``pass_at_k_estimator`` for each requested k, then
+        averages across problems.  Also attaches per-task pass_at_k to the
+        corresponding TaskScore objects.
+
+        Returns an empty dict when num_samples <= 1 (single-run mode).
+        """
+        if self._num_samples <= 1:
+            return {}
+
+        # Group results by (task, record_id)
+        groups: dict[str, dict[str, list[BenchmarkResult]]] = {}
+        for r in self._results:
+            task = r.metadata.get("task_name") or r.benchmark_name
+            rid = r.metadata.get("record_id", "unknown")
+            groups.setdefault(task, {}).setdefault(rid, []).append(r)
+
+        pak: dict[str, dict[int, float]] = {}
+        for task_name, records_by_id in groups.items():
+            k_sums: dict[int, float] = {k: 0.0 for k in self._pass_k_values}
+            k_counts: dict[int, int] = {k: 0 for k in self._pass_k_values}
+
+            for _rid, samples in records_by_id.items():
+                n = len(samples)
+                c = sum(
+                    1
+                    for s in samples
+                    if s.combined_score is not None
+                    and s.combined_score >= self._threshold
+                )
+                for k in self._pass_k_values:
+                    val = pass_at_k_estimator(n, c, k)
+                    if not math.isnan(val):
+                        k_sums[k] += val
+                        k_counts[k] += 1
+
+            task_pak: dict[int, float] = {}
+            for k in self._pass_k_values:
+                if k_counts[k] > 0:
+                    task_pak[k] = round(k_sums[k] / k_counts[k], 4)
+            pak[task_name] = task_pak
+
+            # Attach to TaskScore object as well
+            if task_name in task_scores:
+                task_scores[task_name].pass_at_k = task_pak
+
+        return pak
 
     def _compute_category_scores(
         self, task_scores: dict[str, TaskScore]

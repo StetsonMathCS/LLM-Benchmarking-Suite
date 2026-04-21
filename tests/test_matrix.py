@@ -14,10 +14,10 @@ from core.base import BaseDimension
 # ── Matrix structure ──────────────────────────────────────────────────────
 
 class TestMatrixStructure:
-    def test_all_eight_tasks_present(self):
+    def test_all_tasks_present(self):
         expected = {
-            "bug_fixing", "code_completion", "code_generation", "code_review",
-            "refactoring", "test_generation", "translation", "partial_transform",
+            "bug_fixing", "code_generation", "code_review",
+            "refactoring", "test_generation", "translation",
         }
         assert set(BENCHMARK_MATRIX.keys()) == expected
 
@@ -75,7 +75,7 @@ class TestLookupFunctions:
 
     def test_get_all_task_names(self):
         names = get_all_task_names()
-        assert len(names) == 8
+        assert len(names) == 6
         assert "bug_fixing" in names
         assert "translation" in names
 
@@ -98,7 +98,3 @@ class TestSpecificMappings:
         dim_names = [cls().name for cls in dims]
         assert "Test Pass Rate" in dim_names
 
-    def test_partial_transform_has_transformation_dim(self):
-        dims = get_dimensions_for_task("partial_transform")
-        dim_names = [cls().name for cls in dims]
-        assert "Partial Transformation" in dim_names

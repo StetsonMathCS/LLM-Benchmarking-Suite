@@ -1,4 +1,4 @@
-id,original_code,refactoring_task,output_expected,expected_console_output
+id,original_code,refactoring_task,output_expected,expected_console_output,test_harness
 1,"def process_order(order):
     if order is None:
         return None
@@ -45,7 +45,8 @@ def process_order(order: dict) -> Optional[OrderResult]:
     if error:
         return None
     total = sum(item['price'] * item['quantity'] for item in order['items'])
-    return OrderResult(order_id=order['id'], total=total, user_id=order['user_id'])","OrderResult(order_id=1, total=35, user_id=100)"
+    return OrderResult(order_id=order['id'], total=total, user_id=order['user_id'])","OrderResult(order_id=1, total=35, user_id=100)","order = {'id': 1, 'status': 'pending', 'items': [{'price': 5, 'quantity': 7}], 'user_id': 100}
+print(process_order(order))"
 2,"def calculate_discount(price, user_type, is_member, years_active):
     discount = 0
     if user_type == 'student':
@@ -80,7 +81,8 @@ def calculate_discount(price: float, user_type: str, is_member: bool, years_acti
         if years_active > 5:
             discount += rates['loyal']
     return price * (1 - discount)","70.0
-85.0"
+85.0","print(calculate_discount(100, 'student', True, 6))
+print(calculate_discount(100, 'senior', False, 0))"
 3,"class Animal:
     def __init__(self, name, animal_type):
         self.name = name
@@ -133,7 +135,9 @@ class Cow(Animal):
         return f'{self.name} says Moo'
     def move(self) -> str:
         return f'{self.name} plods'","Rex says Woof
-Rex runs"
+Rex runs","d = Dog('Rex')
+print(d.speak())
+print(d.move())"
 4,"class Pipeline:
     def __init__(self, data):
         self.data = data
@@ -192,7 +196,8 @@ class Pipeline:
         self._run = pipe(filter_nulls, normalize_strings, deduplicate, sort_items)
 
     def run(self):
-        return self._run(self.data)","['hello', 'world']"
+        return self._run(self.data)","['hello', 'world']","p = Pipeline([None, 'Hello', 'World', 'hello'])
+print(p.run())"
 5,"def validate_user_input(data):
     errors = []
     if 'name' not in data:
@@ -259,7 +264,8 @@ FIELD_VALIDATORS: list[Validator] = [_validate_name, _validate_email, _validate_
 
 def validate_user_input(data: dict) -> list[str]:
     return [err for validate in FIELD_VALIDATORS for err in validate(data)]","[]
-['name must be at least 2 characters', 'email is required', 'age must be between 0 and 150', 'role is required']"
+['name must be at least 2 characters', 'email is required', 'age must be between 0 and 150', 'role is required']","print(validate_user_input({'name': 'Alice', 'email': 'alice@example.com', 'age': 30, 'role': 'admin'}))
+print(validate_user_input({'name': 'A', 'age': 200}))"
 6,"class ReportGenerator:
     def generate(self, data, format):
         if format == 'csv':
@@ -322,7 +328,8 @@ class ReportGenerator:
             raise ValueError(f'Unknown format: {format}')
         return renderer.render(data)","name,age
 Alice,25
-Bob,30"
+Bob,30","data = [{'name': 'Alice', 'age': 25}, {'name': 'Bob', 'age': 30}]
+print(ReportGenerator().generate(data, 'csv'))"
 7,"class Cart:
     def __init__(self):
         self.items = []
@@ -395,7 +402,11 @@ class Cart:
     @property
     def total(self) -> float:
         return self.subtotal - self.discount + self.tax","8.00
-7.78"
+7.78","c = Cart()
+c.add_item('item', 4, 2)
+print(f""{c.subtotal:.2f}"")
+c.apply_discount('SAVE10')
+print(f""{c.total:.2f}"")"
 8,"class EventSystem:
     def __init__(self):
         self.listeners = {}
@@ -447,7 +458,12 @@ class EventSystem:
 
     def listener_count(self, event: str) -> int:
         return len(self.listeners.get(event, []))","count: 1
-received: hello"
+received: hello","es = EventSystem()
+def handler(msg):
+    print(f""received: {msg}"")
+es.on('msg', handler)
+print(f""count: {es.listener_count('msg')}"")
+es.emit('msg', 'hello')"
 9,"def generate_report(orders):
     total_revenue = 0
     total_orders = 0
@@ -523,7 +539,12 @@ def generate_report(orders: list[dict]) -> dict:
     acc = ReportAccumulator()
     for order in orders:
         acc.update(order)
-    return acc.summary","total_revenue: 150.0, total_orders: 2"
+    return acc.summary","total_revenue: 150.0, total_orders: 2","orders = [
+    {'value': 100.0, 'status': 'pending', 'items': [{'product_id': 'p1', 'price': 50.0, 'qty': 2}]},
+    {'value': 50.0,  'status': 'done',    'items': [{'product_id': 'p2', 'price': 25.0, 'qty': 2}]},
+]
+r = generate_report(orders)
+print(f""total_revenue: {r['total_revenue']}, total_orders: {r['total_orders']}"")"
 10,"def process(data, operation, extra=None):
     if operation == 'filter':
         result = []
@@ -597,7 +618,8 @@ class DataProcessor:
 
     def to_list(self) -> list[dict]:
         return self.data","80
-2"
+2","print(DataProcessor([{'x': 80}]).aggregate('x'))
+print(len(DataProcessor([{'t': True}, {'t': True}, {'t': False}]).filter('t', True).to_list()))"
 11,"class TaskRunner:
     def __init__(self):
         self.tasks = []
@@ -667,7 +689,11 @@ class TaskRunner:
             'succeeded': len(ok),
             'failed': len(err),
             'errors': [{'func': r.func_name, 'error': r.error} for r in err],
-        }","{'total': 2, 'succeeded': 1, 'failed': 1, 'errors': [{'func': '<lambda>', 'error': 'division by zero'}]}"
+        }","{'total': 2, 'succeeded': 1, 'failed': 1, 'errors': [{'func': '<lambda>', 'error': 'division by zero'}]}","tr = TaskRunner()
+tr.add_task(lambda: 42)
+tr.add_task(lambda: 1/0)
+tr.run()
+print(tr.summary)"
 12,"_fib_cache = {}
 
 def fibonacci(n):
@@ -684,7 +710,7 @@ def fibonacci(n):
 def fibonacci(n: int) -> int:
     if n <= 1:
         return n
-    return fibonacci(n - 1) + fibonacci(n - 2)",55
+    return fibonacci(n - 1) + fibonacci(n - 2)",55,print(fibonacci(10))
 13,"def add_student(names, ages, scores, name, age, score):
     names.append(name)
     ages.append(age)
@@ -717,7 +743,12 @@ class StudentRoster:
 
     def top_students(self, n: int) -> list[Student]:
         return sorted(self._students, key=lambda s: s.score, reverse=True)[:n]","84.3
-['Bob', 'Alice']"
+['Bob', 'Alice']","roster = StudentRoster()
+roster.add('Alice', 20, 85.5)
+roster.add('Bob', 22, 90.5)
+roster.add('Charlie', 21, 76.9)
+print(round(roster.average_score(), 1))
+print([s.name for s in roster.top_students(2)])"
 14,"def word_frequency(text):
     freq = {}
     for word in text.lower().split():
@@ -731,7 +762,7 @@ class StudentRoster:
 
 def word_frequency(text: str) -> dict:
     words = [w.strip('.,!?;:') for w in text.lower().split()]
-    return dict(Counter(w for w in words if w))","[('hello', 2), ('world', 1), ('test', 1)]"
+    return dict(Counter(w for w in words if w))","[('hello', 2), ('world', 1), ('test', 1)]","print(sorted(word_frequency(""hello world hello test"").items(), key=lambda x: -x[1]))"
 15,"def find_first_duplicate(items):
     found = False
     duplicate = None
@@ -753,7 +784,8 @@ def find_first_duplicate(items: list) -> Optional[object]:
             return item
         seen.add(item)
     return None","2
-None"
+None","print(find_first_duplicate([1, 2, 3, 2, 4]))
+print(find_first_duplicate([1, 2, 3]))"
 16,"def format_table_row(values, widths):
     row = ''
     for i, (val, width) in enumerate(zip(values, widths)):
@@ -763,7 +795,7 @@ None"
         else:
             row += cell
     return row",Replace the manual string concatenation loop with str.join and a generator expression,"def format_table_row(values: list, widths: list) -> str:
-    return ' | '.join(str(val).ljust(width) for val, width in zip(values, widths))",A     | B
+    return ' | '.join(str(val).ljust(width) for val, width in zip(values, widths))",A     | B,"print(format_table_row(['A', 'B'], [5, 1]))"
 17,"def compute_stats(numbers):
     if not numbers:
         return {'count': 0, 'mean': 0.0, 'variance': 0.0, 'min': None, 'max': None}
@@ -794,7 +826,8 @@ None"
         'variance': variance,
         'min': min(numbers),
         'max': max(numbers),
-    }","mean=3.0, variance=2.0"
+    }","mean=3.0, variance=2.0","s = compute_stats([1, 2, 3, 4, 5])
+print(f""mean={s['mean']}, variance={s['variance']}"")"
 18,"def letter_grade(score):
     if score >= 93:
         return 'A'
@@ -827,7 +860,9 @@ _GRADES     = ['F', 'D-', 'D', 'D+', 'C-', 'C', 'C+', 'B-', 'B', 'B+', 'A-', 'A'
 def letter_grade(score: float) -> str:
     return _GRADES[bisect.bisect_right(_THRESHOLDS, score)]","A
 B
-F"
+F","print(letter_grade(95))
+print(letter_grade(85))
+print(letter_grade(50))"
 19,"def make_running_stats():
     data = {'count': 0, 'total': 0.0, 'sq_total': 0.0, 'min': None, 'max': None}
 
@@ -888,7 +923,11 @@ class RunningStats:
             'variance': self.variance,
             'min': self._min,
             'max': self._max,
-        }","count=5, mean=3.0"
+        }","count=5, mean=3.0","rs = RunningStats()
+for x in [1, 2, 3, 4, 5]:
+    rs.update(x)
+snap = rs.snapshot()
+print(f""count={snap['count']}, mean={snap['mean']}"")"
 20,"def serialize(value):
     if isinstance(value, bool):
         return 'true' if value else 'false'
@@ -941,4 +980,6 @@ def _(value: dict) -> str:
     pairs = ', '.join(f'{serialize(k)}: {serialize(v)}' for k, v in value.items())
     return '{' + pairs + '}'","true
 [1, 2, 3]
-{""a"": ""hello""}"
+{""a"": ""hello""}","print(serialize(True))
+print(serialize([1, 2, 3]))
+print(serialize({'a': 'hello'}))"

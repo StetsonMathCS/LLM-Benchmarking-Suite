@@ -41,7 +41,6 @@ ALL_TASKS = [
     "code_completion",
     "code_generation",
     "code_review",
-    "partial_transform",
     "refactoring",
     "test_generation",
     "translation",
@@ -310,7 +309,6 @@ def main():
     from benchmarks.tasks.code_completion import CodeCompletionBenchmark
     from benchmarks.tasks.code_generation import CodeGenerationBenchmark
     from benchmarks.tasks.code_review import CodeReviewBenchmark
-    from benchmarks.tasks.partial_transform import PartialTransformBenchmark
     from benchmarks.tasks.refactoring import RefactoringBenchmark
     from benchmarks.tasks.test_generation import TestGenerationBenchmark
     from benchmarks.tasks.translation import TranslationBenchmark
@@ -320,7 +318,6 @@ def main():
         "code_completion":  CodeCompletionBenchmark,
         "code_generation":  CodeGenerationBenchmark,
         "code_review":      CodeReviewBenchmark,
-        "partial_transform": PartialTransformBenchmark,
         "refactoring":      RefactoringBenchmark,
         "test_generation":  TestGenerationBenchmark,
         "translation":      TranslationBenchmark,

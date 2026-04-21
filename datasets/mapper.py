@@ -14,7 +14,6 @@ from dataclasses import dataclass
 from benchmarks.tasks.bug_fixing import BugFixingBenchmark
 from benchmarks.tasks.code_generation import CodeGenerationBenchmark
 from benchmarks.tasks.code_review import CodeReviewBenchmark
-from benchmarks.tasks.partial_transform import PartialTransformBenchmark
 from benchmarks.tasks.refactoring import RefactoringBenchmark
 from benchmarks.tasks.test_generation import TestGenerationBenchmark
 from benchmarks.tasks.translation import TranslationBenchmark
@@ -52,23 +51,17 @@ class DatasetMapper:
             "languages": ["python", "cpp", "javascript"],
             "csv_columns": ["id", "code_snippet", "review", "expected_reviews"],
         },
-        "partial_transform": {
-            "dir": "partial_transform",
-            "class": PartialTransformBenchmark,
-            "languages": ["python"],
-            "csv_columns": ["id", "code_snippet", "from", "to", "final_output", "verify_ast_nodes_removed", "verify_ast_nodes_added", "verify_strategy", "verify_note"],
-        },
         "refactoring": {
             "dir": "refactoring",
             "class": RefactoringBenchmark,
             "languages": ["python", "cpp", "javascript"],
-            "csv_columns": ["id", "original_code", "refactoring_task", "output_expected"],
+            "csv_columns": ["id", "original_code", "refactoring_task", "output_expected", "expected_console_output", "test_harness"],
         },
         "test_generation": {
             "dir": "test_generation",
             "class": TestGenerationBenchmark,
             "languages": ["python"],
-            "csv_columns": ["id", "code_snippet", "description"],
+            "csv_columns": ["id", "code_snippet", "description", "test", "entry_point"],
         },
         "translation": {
             "dir": "translation",
@@ -296,6 +289,8 @@ class DatasetMapper:
             kwargs.update({
                 "code_input": data.get("prompt") or data.get("instruction"),
                 "expected_output": data.get("completed") or data.get("expected_output"),
+                "test": data.get("test", ""),
+                "entry_point": data.get("entry_point", ""),
             })
         
         elif task_name == "code_review":
@@ -305,29 +300,21 @@ class DatasetMapper:
                 "expected_reviews": data.get("expected_reviews", "").split("|") if data.get("expected_reviews") else [],
             })
         
-        elif task_name == "partial_transform":
-            kwargs.update({
-                "code_input": data.get("code_snippet"),
-                "transform_from": data.get("from"),
-                "transform_to": data.get("to"),
-                "expected_output": data.get("final_output"),
-                "verify_ast_nodes_removed": data.get("verify_ast_nodes_removed", ""),
-                "verify_ast_nodes_added": data.get("verify_ast_nodes_added", ""),
-                "verify_strategy": data.get("verify_strategy", ""),
-            })
-        
         elif task_name == "refactoring":
             kwargs.update({
                 "code_input": data.get("original_code"),
                 "refactoring_task": data.get("refactoring_task"),
                 "expected_output": data.get("output_expected"),
                 "expected_console_output": data.get("expected_console_output"),
+                "test_harness": data.get("test_harness", ""),
             })
-        
+
         elif task_name == "test_generation":
             kwargs.update({
                 "code_input": data.get("code_snippet"),
                 "description": data.get("description"),
+                "reference_tests": data.get("test", ""),
+                "entry_point": data.get("entry_point", ""),
             })
         
         elif task_name == "translation":

@@ -10,11 +10,10 @@ from benchmarks.dimensions.semantic_drift import SemanticDriftDimension
 from benchmarks.dimensions.code_consistency import CodeConsistencyDimension
 from benchmarks.dimensions.linting import LintingDimension
 from benchmarks.dimensions.runtime_analysis import RuntimeAnalysisDimension
-from benchmarks.dimensions.partial_transform import PartialTransformationDimension
 from benchmarks.dimensions.test_pass_rate import TestPassRateDimension
 from benchmarks.dimensions.vulnerabilities import VulnerabilitiesDimension
 from benchmarks.dimensions.code_review import CodeReviewDimension
-from benchmarks.dimensions.code_completion_tests import CodeCompletionTestsDimension
+from benchmarks.dimensions.code_generation_tests import CodeGenerationTestsDimension
 
 # Matrix Definition 
 # Keys   = task names (must match BaseBenchmark.name on each task)
@@ -30,9 +29,7 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
     ],
     "code_generation" : [
         CodeConsistencyDimension,
-        CodeCompletionTestsDimension,
-        LintingDimension,
-        VulnerabilitiesDimension
+        CodeGenerationTestsDimension,
     ],
     "code_review" : [
         CodeReviewDimension
@@ -54,12 +51,6 @@ BENCHMARK_MATRIX: dict[str, list[type]] = {
         VulnerabilitiesDimension,
         FunctionalCorrectnessDimension
     ],
-    "partial_transform" : [
-        PartialTransformationDimension,
-        FunctionalCorrectnessDimension,
-        LintingDimension,
-        VulnerabilitiesDimension,
-    ]
 }
 
 # Weights per dimension
@@ -69,13 +60,11 @@ DIMENSION_WEIGHTS = {
         "Linting":                0.10,
         "Code Consistency":       0.10,
         "Vulnerabilities":        0.05,
-        "Semantic Drift":         0.05,
+        "Semantic Drift":         0.05, 
     },
     "code_generation" : {
-        "Code Consistency" : 0.40,
-        "Code Completion Tests" : 0.40,
-        "Linting" : 0.05,
-        "Vulnerabilities" : 0.05,
+        "Code Consistency" :      0.40,
+        "Code Generation Tests" : 0.60,
     },
     "code_review" : {
         "Code Review Quality" : 1.00,
@@ -97,12 +86,6 @@ DIMENSION_WEIGHTS = {
         "Vulnerabilities": 0.10,
         "Functional Correctness": 0.50,
     },
-    "partial_transform": {
-        "Partial Transformation": 0.50,
-        "Functional Correctness": 0.20,
-        "Linting": 0.10,
-        "Vulnerabilities": 0.10,
-    }
 }
 
 def get_dimensions_for_task(task_name: str) -> list[type]:

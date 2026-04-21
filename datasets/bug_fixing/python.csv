@@ -1,71 +1,1035 @@
 id,buggy_code,fixed_code,expected_output
-1,"x = [1, 2, 3]
-print x","x = [1, 2, 3]
-print(x)","[1, 2, 3]"
-2,"list = [1, 2, 3, 4]
-for i in list
-    print(i)","lst = [1, 2, 3, 4]
-for i in lst:
-    print(i)","1
-2
-3
-4"
-3,"def factorial(n):
-    if n == 1
-        return 1
-    else:
-        return n * factorial(n-1)
-    print('done')
-print(factorial(5))","def factorial(n):
-    if n == 1:
-        return 1
-    else:
-        return n * factorial(n-1)
-    print('done')
-print(factorial(5))",120
-4,"def foo()
-    print('Missing colon in function definition')
-foo()","def foo():
-    print('Fixed missing colon in function definition')
-foo()",Fixed missing colon in function definition
-6,"def greet(name):
-    print('Hello, ' + name)
-greet('jack')","def greet(name):
-    print('Hello, ' + name)
-greet('jack')","Hello, jack"
-11,"if (a > b):
-    print('a is greater')
-else
-    print('b is greater')","a = 10
-b = 5
-if (a > b):
-    print('a is greater')
-else:
-    print('b is greater')",a is greater
-12,"while True
-    do_something()","def do_something():
-    print('done')
-while True:
-    do_something()
-    break",done
-13,"def add(a, b)
-    return a + b
-print(add(3,5))","def add(a, b):
-    return a + b
-print(add(3,5))",8
-14,"if x = 5:
-    print('x is 5')","x = 5
-if x == 5:
-    print('x is 5')",x is 5
-18,"for i in range(10):
-print(i)","for i in range(10):
-    print(i)","0
+1,"
+def bitcount(n):
+    count = 0
+    while n:
+        n ^= n - 1
+        count += 1
+    return count
+
+print(bitcount(127))
+print(bitcount(128))
+print(bitcount(3005))","
+def bitcount(n):
+    count = 0
+    while n:
+        n &= n - 1
+        count += 1
+    return count
+
+print(bitcount(127))
+print(bitcount(128))
+print(bitcount(3005))","7
 1
-2
-3
-4
-5
-6
-7
-8
 9"
+2,"def bucketsort(arr, k):
+    counts = [0] * k
+    for x in arr:
+        counts[x] += 1
+
+    sorted_arr = []
+    for i, count in enumerate(arr):
+        sorted_arr.extend([i] * count)
+
+    return sorted_arr
+
+print(bucketsort([], 14))
+print(bucketsort([3, 11, 2, 9, 1, 5], 12))
+print(bucketsort([3, 2, 4, 2, 3, 5], 6))","
+def bucketsort(arr, k):
+    counts = [0] * k
+    for x in arr:
+        counts[x] += 1
+
+    sorted_arr = []
+    for i, count in enumerate(counts):
+        sorted_arr.extend([i] * count)
+
+    return sorted_arr
+
+print(bucketsort([], 14))
+print(bucketsort([3, 11, 2, 9, 1, 5], 12))
+print(bucketsort([3, 2, 4, 2, 3, 5], 6))","[]
+[1, 2, 3, 5, 9, 11]
+[2, 2, 3, 3, 4, 5]"
+3,"def find_first_in_sorted(arr, x):
+    lo = 0
+    hi = len(arr)
+
+    while lo <= hi:
+        mid = (lo + hi) // 2
+
+        if x == arr[mid] and (mid == 0 or x != arr[mid - 1]):
+            return mid
+
+        elif x <= arr[mid]:
+            hi = mid
+
+        else:
+            lo = mid + 1
+
+    return -1
+
+print(find_first_in_sorted([3, 4, 5, 5, 5, 5, 6], 5))
+print(find_first_in_sorted([3, 4, 5, 5, 5, 5, 6], 7))
+print(find_first_in_sorted([3, 4, 5, 5, 5, 5, 6], 2))","
+def find_first_in_sorted(arr, x):
+    lo = 0
+    hi = len(arr)
+
+    while lo < hi:
+        mid = (lo + hi) // 2
+
+        if x == arr[mid] and (mid == 0 or x != arr[mid - 1]):
+            return mid
+
+        elif x <= arr[mid]:
+            hi = mid
+
+        else:
+            lo = mid + 1
+
+    return -1
+
+print(find_first_in_sorted([3, 4, 5, 5, 5, 5, 6], 5))
+print(find_first_in_sorted([3, 4, 5, 5, 5, 5, 6], 7))
+print(find_first_in_sorted([3, 4, 5, 5, 5, 5, 6], 2))","2
+-1
+-1"
+4,"def find_in_sorted(arr, x):
+    def binsearch(start, end):
+        if start == end:
+            return -1
+        mid = start + (end - start) // 2
+        if x < arr[mid]:
+            return binsearch(start, mid)
+        elif x > arr[mid]:
+            return binsearch(mid, end)
+        else:
+            return mid
+
+    return binsearch(0, len(arr))
+
+print(find_in_sorted([3, 4, 5, 5, 5, 5, 6], 5))
+print(find_in_sorted([1, 2, 3, 4, 6, 7, 8], 5))
+print(find_in_sorted([1, 2, 3, 4, 6, 7, 8], 4))","
+def find_in_sorted(arr, x):
+    def binsearch(start, end):
+        if start == end:
+            return -1
+        mid = start + (end - start) // 2
+        if x < arr[mid]:
+            return binsearch(start, mid)
+        elif x > arr[mid]:
+            return binsearch(mid + 1, end)
+        else:
+            return mid
+
+    return binsearch(0, len(arr))
+
+print(find_in_sorted([3, 4, 5, 5, 5, 5, 6], 5))
+print(find_in_sorted([1, 2, 3, 4, 6, 7, 8], 5))
+print(find_in_sorted([1, 2, 3, 4, 6, 7, 8], 4))","3
+-1
+3"
+5,"def flatten(arr):
+    for x in arr:
+        if isinstance(x, list):
+            for y in flatten(x):
+                yield y
+        else:
+            yield flatten(x)
+
+print(list(flatten([[1, [], [2, 3]], [[4]], 5])))
+print(list(flatten([[], [], [], [], []])))
+print(list(flatten([[], [], 1, [], 1, [], []])))","
+def flatten(arr):
+    for x in arr:
+        if isinstance(x, list):
+            for y in flatten(x):
+                yield y
+        else:
+            yield x
+
+print(list(flatten([[1, [], [2, 3]], [[4]], 5])))
+print(list(flatten([[], [], [], [], []])))
+print(list(flatten([[], [], 1, [], 1, [], []])))","[1, 2, 3, 4, 5]
+[]
+[1, 1]"
+6,"def gcd(a, b):
+    if b == 0:
+        return a
+    else:
+        return gcd(a % b, b)
+
+print(gcd(17, 0))
+print(gcd(13, 13))
+print(gcd(37, 600))","
+def gcd(a, b):
+    if b == 0:
+        return a
+    else:
+        return gcd(b, a % b)
+
+print(gcd(17, 0))
+print(gcd(13, 13))
+print(gcd(37, 600))","17
+13
+1"
+7,"
+def get_factors(n):
+    if n == 1:
+        return []
+
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return [i] + get_factors(n // i)
+
+    return []
+
+print(get_factors(1))
+print(get_factors(100))
+print(get_factors(101))","
+def get_factors(n):
+    if n == 1:
+        return []
+
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return [i] + get_factors(n // i)
+
+    return [n]
+
+print(get_factors(1))
+print(get_factors(100))
+print(get_factors(101))","[]
+[2, 2, 5, 5]
+[101]"
+8,"def hanoi(height, start=1, end=3):
+    steps = []
+    if height > 0:
+        helper = ({1, 2, 3} - {start} - {end}).pop()
+        steps.extend(hanoi(height - 1, start, helper))
+        steps.append((start, helper))
+        steps.extend(hanoi(height - 1, helper, end))
+
+    return steps
+
+print(hanoi(0, 1, 3))
+print(hanoi(1, 1, 3))
+print(hanoi(2, 1, 3))","
+def hanoi(height, start=1, end=3):
+    steps = []
+    if height > 0:
+        helper = ({1, 2, 3} - {start} - {end}).pop()
+        steps.extend(hanoi(height - 1, start, helper))
+        steps.append((start, end))
+        steps.extend(hanoi(height - 1, helper, end))
+
+    return steps
+
+print(hanoi(0, 1, 3))
+print(hanoi(1, 1, 3))
+print(hanoi(2, 1, 3))","[]
+[(1, 3)]
+[(1, 2), (1, 3), (2, 3)]"
+9,"
+def is_valid_parenthesization(parens):
+    depth = 0
+    for paren in parens:
+        if paren == '(':
+            depth += 1
+        else:
+            depth -= 1
+            if depth < 0:
+                return False
+
+    return True
+
+print(is_valid_parenthesization('((()()))()'))
+print(is_valid_parenthesization(')()('))
+print(is_valid_parenthesization('(('))","
+def is_valid_parenthesization(parens):
+    depth = 0
+    for paren in parens:
+        if paren == '(':
+            depth += 1
+        else:
+            depth -= 1
+            if depth < 0:
+                return False
+
+    return depth == 0
+
+print(is_valid_parenthesization('((()()))()'))
+print(is_valid_parenthesization(')()('))
+print(is_valid_parenthesization('(('))","True
+False
+False"
+10,"def kheapsort(arr, k):
+    import heapq
+
+    heap = arr[:k]
+    heapq.heapify(heap)
+
+    for x in arr:
+        yield heapq.heappushpop(heap, x)
+
+    while heap:
+        yield heapq.heappop(heap)
+
+print(list(kheapsort([1, 2, 3, 4, 5], 0)))
+print(list(kheapsort([3, 2, 1, 5, 4], 2)))
+print(list(kheapsort([5, 4, 3, 2, 1], 4)))","
+def kheapsort(arr, k):
+    import heapq
+
+    heap = arr[:k]
+    heapq.heapify(heap)
+
+    for x in arr[k:]:
+        yield heapq.heappushpop(heap, x)
+
+    while heap:
+        yield heapq.heappop(heap)
+
+print(list(kheapsort([1, 2, 3, 4, 5], 0)))
+print(list(kheapsort([3, 2, 1, 5, 4], 2)))
+print(list(kheapsort([5, 4, 3, 2, 1], 4)))","[1, 2, 3, 4, 5]
+[1, 2, 3, 4, 5]
+[1, 2, 3, 4, 5]"
+11,"
+def knapsack(capacity, items):
+    from collections import defaultdict
+    memo = defaultdict(int)
+
+    for i in range(1, len(items) + 1):
+        weight, value = items[i - 1]
+
+        for j in range(1, capacity + 1):
+            memo[i, j] = memo[i - 1, j]
+
+            if weight < j:
+                memo[i, j] = max(
+                    memo[i, j],
+                    value + memo[i - 1, j - weight]
+                )
+
+    return memo[len(items), capacity]
+
+print(knapsack(100, [[60, 10], [50, 8], [20, 4], [20, 4], [8, 3], [3, 2]]))
+print(knapsack(40, [[30, 10], [50, 5], [10, 20], [40, 25]]))
+print(knapsack(750, [[70, 135], [73, 139], [77, 149], [80, 150], [82, 156], [87, 163], [90, 173], [94, 184], [98, 192], [106, 201], [110, 210], [113, 214], [115, 221], [118, 229], [120, 240]]))","
+def knapsack(capacity, items):
+    from collections import defaultdict
+    memo = defaultdict(int)
+
+    for i in range(1, len(items) + 1):
+        weight, value = items[i - 1]
+
+        for j in range(1, capacity + 1):
+            memo[i, j] = memo[i - 1, j]
+
+            if weight <= j:
+                memo[i, j] = max(
+                    memo[i, j],
+                    value + memo[i - 1, j - weight]
+                )
+
+    return memo[len(items), capacity]
+
+print(knapsack(100, [[60, 10], [50, 8], [20, 4], [20, 4], [8, 3], [3, 2]]))
+print(knapsack(40, [[30, 10], [50, 5], [10, 20], [40, 25]]))
+print(knapsack(750, [[70, 135], [73, 139], [77, 149], [80, 150], [82, 156], [87, 163], [90, 173], [94, 184], [98, 192], [106, 201], [110, 210], [113, 214], [115, 221], [118, 229], [120, 240]]))","19
+30
+1458"
+12,"def kth(arr, k):
+    pivot = arr[0]
+    below = [x for x in arr if x < pivot]
+    above = [x for x in arr if x > pivot]
+
+    num_less = len(below)
+    num_lessoreq = len(arr) - len(above)
+
+    if k < num_less:
+        return kth(below, k)
+    elif k >= num_lessoreq:
+        return kth(above, k)
+    else:
+        return pivot
+
+print(kth([1, 2, 3, 4, 5, 6, 7], 4))
+print(kth([3, 6, 7, 1, 6, 3, 8, 9], 5))
+print(kth([3, 6, 7, 1, 6, 3, 8, 9], 2))","
+def kth(arr, k):
+    pivot = arr[0]
+    below = [x for x in arr if x < pivot]
+    above = [x for x in arr if x > pivot]
+
+    num_less = len(below)
+    num_lessoreq = len(arr) - len(above)
+
+    if k < num_less:
+        return kth(below, k)
+    elif k >= num_lessoreq:
+        return kth(above, k - num_lessoreq)
+    else:
+        return pivot
+
+print(kth([1, 2, 3, 4, 5, 6, 7], 4))
+print(kth([3, 6, 7, 1, 6, 3, 8, 9], 5))
+print(kth([3, 6, 7, 1, 6, 3, 8, 9], 2))","5
+7
+3"
+13,"def lcs_length(s, t):
+    from collections import Counter
+
+    dp = Counter()
+
+    for i in range(len(s)):
+        for j in range(len(t)):
+            if s[i] == t[j]:
+                dp[i, j] = dp[i - 1, j] + 1
+
+    return max(dp.values()) if dp else 0
+
+print(lcs_length('witch', 'sandwich'))
+print(lcs_length('meow', 'homeowner'))
+print(lcs_length('fun', ''))","
+def lcs_length(s, t):
+    from collections import Counter
+
+    dp = Counter()
+
+    for i in range(len(s)):
+        for j in range(len(t)):
+            if s[i] == t[j]:
+                dp[i, j] = dp[i - 1, j - 1] + 1
+
+    return max(dp.values()) if dp else 0
+
+print(lcs_length('witch', 'sandwich'))
+print(lcs_length('meow', 'homeowner'))
+print(lcs_length('fun', ''))","2
+4
+0"
+14,"def levenshtein(source, target):
+    if source == '' or target == '':
+        return len(source) or len(target)
+
+    elif source[0] == target[0]:
+        return 1 + levenshtein(source[1:], target[1:])
+
+    else:
+        return 1 + min(
+            levenshtein(source,     target[1:]),
+            levenshtein(source[1:], target[1:]),
+            levenshtein(source[1:], target)
+        )
+
+print(levenshtein('electron', 'neutron'))
+print(levenshtein('kitten', 'sitting'))
+print(levenshtein('rosettacode', 'raisethysword'))","
+def levenshtein(source, target):
+    if source == '' or target == '':
+        return len(source) or len(target)
+
+    elif source[0] == target[0]:
+        return levenshtein(source[1:], target[1:])
+
+    else:
+        return 1 + min(
+            levenshtein(source,     target[1:]),
+            levenshtein(source[1:], target[1:]),
+            levenshtein(source[1:], target)
+        )
+
+print(levenshtein('electron', 'neutron'))
+print(levenshtein('kitten', 'sitting'))
+print(levenshtein('rosettacode', 'raisethysword'))","3
+3
+8"
+15,"
+def lis(arr):
+    ends = {}
+    longest = 0
+
+    for i, val in enumerate(arr):
+
+        prefix_lengths = [j for j in range(1, longest + 1) if arr[ends[j]] < val]
+
+        length = max(prefix_lengths) if prefix_lengths else 0
+
+        if length == longest or val < arr[ends[length + 1]]:
+            ends[length + 1] = i
+            longest = length + 1
+
+    return longest
+
+print(lis([]))
+print(lis([3]))
+print(lis([10, 20, 11, 32, 22, 48, 43]))","
+def lis(arr):
+    ends = {}
+    longest = 0
+
+    for i, val in enumerate(arr):
+
+        prefix_lengths = [j for j in range(1, longest + 1) if arr[ends[j]] < val]
+
+        length = max(prefix_lengths) if prefix_lengths else 0
+
+        if length == longest or val < arr[ends[length + 1]]:
+            ends[length + 1] = i
+            longest = max(longest, length + 1)
+
+    return longest
+
+print(lis([]))
+print(lis([3]))
+print(lis([10, 20, 11, 32, 22, 48, 43]))","0
+1
+4"
+16,"def longest_common_subsequence(a, b):
+    if not a or not b:
+        return ''
+
+    elif a[0] == b[0]:
+        return a[0] + longest_common_subsequence(a[1:], b)
+
+    else:
+        return max(
+            longest_common_subsequence(a, b[1:]),
+            longest_common_subsequence(a[1:], b),
+            key=len
+        )
+
+print(longest_common_subsequence('headache', 'pentadactyl'))
+print(longest_common_subsequence('daenarys', 'targaryen'))
+print(longest_common_subsequence('XMJYAUZ', 'MZJAWXU'))","
+def longest_common_subsequence(a, b):
+    if not a or not b:
+        return ''
+
+    elif a[0] == b[0]:
+        return a[0] + longest_common_subsequence(a[1:], b[1:])
+
+    else:
+        return max(
+            longest_common_subsequence(a, b[1:]),
+            longest_common_subsequence(a[1:], b),
+            key=len
+        )
+
+print(longest_common_subsequence('headache', 'pentadactyl'))
+print(longest_common_subsequence('daenarys', 'targaryen'))
+print(longest_common_subsequence('XMJYAUZ', 'MZJAWXU'))","eadac
+aary
+MJAU"
+17,"
+def max_sublist_sum(arr):
+    max_ending_here = 0
+    max_so_far = 0
+
+    for x in arr:
+        max_ending_here = max_ending_here + x
+        max_so_far = max(max_so_far, max_ending_here)
+
+    return max_so_far
+
+print(max_sublist_sum([4, -5, 2, 1, -1, 3]))
+print(max_sublist_sum([0, -1, 2, -1, 3, -1, 0]))
+print(max_sublist_sum([3, 4, 5]))","
+def max_sublist_sum(arr):
+    max_ending_here = 0
+    max_so_far = 0
+
+    for x in arr:
+        max_ending_here = max(0, max_ending_here + x)
+        max_so_far = max(max_so_far, max_ending_here)
+
+    return max_so_far
+
+print(max_sublist_sum([4, -5, 2, 1, -1, 3]))
+print(max_sublist_sum([0, -1, 2, -1, 3, -1, 0]))
+print(max_sublist_sum([3, 4, 5]))","5
+4
+12"
+18,"
+def mergesort(arr):
+    def merge(left, right):
+        result = []
+        i = 0
+        j = 0
+        while i < len(left) and j < len(right):
+            if left[i] <= right[j]:
+                result.append(left[i])
+                i += 1
+            else:
+                result.append(right[j])
+                j += 1
+        result.extend(left[i:] or right[j:])
+        return result
+
+    if len(arr) == 0:
+        return arr
+    else:
+        middle = len(arr) // 2
+        left = mergesort(arr[:middle])
+        right = mergesort(arr[middle:])
+        return merge(left, right)
+
+print(mergesort([]))
+print(mergesort([1, 2, 6, 72, 7, 33, 4]))
+print(mergesort([3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9, 3]))","
+def mergesort(arr):
+    def merge(left, right):
+        result = []
+        i = 0
+        j = 0
+        while i < len(left) and j < len(right):
+            if left[i] <= right[j]:
+                result.append(left[i])
+                i += 1
+            else:
+                result.append(right[j])
+                j += 1
+        result.extend(left[i:] or right[j:])
+        return result
+
+    if len(arr) <= 1:
+        return arr
+    else:
+        middle = len(arr) // 2
+        left = mergesort(arr[:middle])
+        right = mergesort(arr[middle:])
+        return merge(left, right)
+
+print(mergesort([]))
+print(mergesort([1, 2, 6, 72, 7, 33, 4]))
+print(mergesort([3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9, 3]))","[]
+[1, 2, 4, 6, 7, 33, 72]
+[1, 1, 2, 3, 3, 3, 4, 5, 5, 5, 6, 7, 8, 9, 9, 9]"
+19,"def next_palindrome(digit_list):
+    high_mid = len(digit_list) // 2
+    low_mid = (len(digit_list) - 1) // 2
+    while high_mid < len(digit_list) and low_mid >= 0:
+        if digit_list[high_mid] == 9:
+            digit_list[high_mid] = 0
+            digit_list[low_mid] = 0
+            high_mid += 1
+            low_mid -= 1
+        else:
+            digit_list[high_mid] += 1
+            if low_mid != high_mid:
+                digit_list[low_mid] += 1
+            return digit_list
+    return [1] + (len(digit_list)) * [0] + [1]
+
+print(next_palindrome([1, 4, 9, 4, 1]))
+print(next_palindrome([1, 3, 1]))
+print(next_palindrome([4, 7, 2, 5, 5, 2, 7, 4]))","def next_palindrome(digit_list):
+    high_mid = len(digit_list) // 2
+    low_mid = (len(digit_list) - 1) // 2
+    while high_mid < len(digit_list) and low_mid >= 0:
+        if digit_list[high_mid] == 9:
+            digit_list[high_mid] = 0
+            digit_list[low_mid] = 0
+            high_mid += 1
+            low_mid -= 1
+        else:
+            digit_list[high_mid] += 1
+            if low_mid != high_mid:
+                digit_list[low_mid] += 1
+            return digit_list
+    return [1] + (len(digit_list) - 1) * [0] + [1]
+
+print(next_palindrome([1, 4, 9, 4, 1]))
+print(next_palindrome([1, 3, 1]))
+print(next_palindrome([4, 7, 2, 5, 5, 2, 7, 4]))","[1, 5, 0, 5, 1]
+[1, 4, 1]
+[4, 7, 2, 6, 6, 2, 7, 4]"
+20,"
+def next_permutation(perm):
+    for i in range(len(perm) - 2, -1, -1):
+        if perm[i] < perm[i + 1]:
+            for j in range(len(perm) - 1, i, -1):
+                if perm[j] < perm[i]:
+                    next_perm = list(perm)
+                    next_perm[i], next_perm[j] = perm[j], perm[i]
+                    next_perm[i + 1:] = reversed(next_perm[i + 1:])
+                    return next_perm
+
+print(next_permutation([3, 2, 4, 1]))
+print(next_permutation([3, 5, 6, 2, 1]))
+print(next_permutation([3, 5, 6, 2]))","
+def next_permutation(perm):
+    for i in range(len(perm) - 2, -1, -1):
+        if perm[i] < perm[i + 1]:
+            for j in range(len(perm) - 1, i, -1):
+                if perm[i] < perm[j]:
+                    next_perm = list(perm)
+                    next_perm[i], next_perm[j] = perm[j], perm[i]
+                    next_perm[i + 1:] = reversed(next_perm[i + 1:])
+                    return next_perm
+
+print(next_permutation([3, 2, 4, 1]))
+print(next_permutation([3, 5, 6, 2, 1]))
+print(next_permutation([3, 5, 6, 2]))","[3, 4, 1, 2]
+[3, 6, 1, 2, 5]
+[3, 6, 2, 5]"
+21,"
+def pascal(n):
+    rows = [[1]]
+    for r in range(1, n):
+        row = []
+        for c in range(0, r):
+            upleft = rows[r - 1][c - 1] if c > 0 else 0
+            upright = rows[r - 1][c] if c < r else 0
+            row.append(upleft + upright)
+        rows.append(row)
+
+    return rows
+
+print(pascal(1))
+print(pascal(2))
+print(pascal(3))","
+def pascal(n):
+    rows = [[1]]
+    for r in range(1, n):
+        row = []
+        for c in range(0, r + 1):
+            upleft = rows[r - 1][c - 1] if c > 0 else 0
+            upright = rows[r - 1][c] if c < r else 0
+            row.append(upleft + upright)
+        rows.append(row)
+
+    return rows
+
+print(pascal(1))
+print(pascal(2))
+print(pascal(3))","[[1]]
+[[1], [1, 1]]
+[[1], [1, 1], [1, 2, 1]]"
+22,"# Python 3
+def possible_change(coins, total):
+    if total == 0:
+        return 1
+    if total < 0:
+        return 0
+
+    first, *rest = coins
+    return possible_change(coins, total - first) + possible_change(rest, total)
+
+print(possible_change([1, 4, 2], -7))
+print(possible_change([1, 5, 10, 25], 11))
+print(possible_change([1, 5, 10, 25], 75))","
+def possible_change(coins, total):
+    if total == 0:
+        return 1
+    if total < 0 or not coins:
+        return 0
+
+    first, *rest = coins
+    return possible_change(coins, total - first) + possible_change(rest, total)
+
+print(possible_change([1, 4, 2], -7))
+print(possible_change([1, 5, 10, 25], 11))
+print(possible_change([1, 5, 10, 25], 75))","0
+4
+121"
+23,"
+def powerset(arr):
+    if arr:
+        first, *rest = arr #python3 just like car and cdr (in this case anyway..)
+        rest_subsets = powerset(rest)
+        return [[first] + subset for subset in rest_subsets]
+    else:
+        return [[]]
+
+print(list(powerset(['a', 'b', 'c'])))
+print(list(powerset(['a', 'b'])))
+print(list(powerset(['a'])))","
+def powerset(arr):
+    if arr:
+        first, *rest = arr
+        rest_subsets = powerset(rest)
+        return rest_subsets + [[first] + subset for subset in rest_subsets]
+    else:
+        return [[]]
+
+print(list(powerset(['a', 'b', 'c'])))
+print(list(powerset(['a', 'b'])))
+print(list(powerset(['a'])))","[[], ['c'], ['b'], ['b', 'c'], ['a'], ['a', 'c'], ['a', 'b'], ['a', 'b', 'c']]
+[[], ['b'], ['a'], ['a', 'b']]
+[[], ['a']]"
+24,"def quicksort(arr):
+    if not arr:
+        return []
+
+    pivot = arr[0]
+    lesser = quicksort([x for x in arr[1:] if x < pivot])
+    greater = quicksort([x for x in arr[1:] if x > pivot])
+    return lesser + [pivot] + greater
+
+print(quicksort([1, 2, 6, 72, 7, 33, 4]))
+print(quicksort([3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9, 3]))
+print(quicksort([5, 4, 3, 2, 1]))","
+def quicksort(arr):
+    if not arr:
+        return []
+
+    pivot = arr[0]
+    lesser = quicksort([x for x in arr[1:] if x < pivot])
+    greater = quicksort([x for x in arr[1:] if x >= pivot])
+    return lesser + [pivot] + greater
+
+print(quicksort([1, 2, 6, 72, 7, 33, 4]))
+print(quicksort([3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9, 3]))
+print(quicksort([5, 4, 3, 2, 1]))","[1, 2, 4, 6, 7, 33, 72]
+[1, 1, 2, 3, 3, 3, 4, 5, 5, 5, 6, 7, 8, 9, 9, 9]
+[1, 2, 3, 4, 5]"
+25,"
+def rpn_eval(tokens):
+    def op(symbol, a, b):
+        return {
+            '+': lambda a, b: a + b,
+            '-': lambda a, b: a - b,
+            '*': lambda a, b: a * b,
+            '/': lambda a, b: a / b
+        }[symbol](a, b)
+
+    stack = []
+
+    for token in tokens:
+        if isinstance(token, float):
+            stack.append(token)
+        else:
+            a = stack.pop()
+            b = stack.pop()
+            stack.append(
+                op(token, a, b)
+            )
+
+    return stack.pop()
+
+print(rpn_eval([3.0, 5.0, '+', 2.0, '/']))
+print(rpn_eval([2.0, 2.0, '+']))
+print(rpn_eval([7.0, 4.0, '+', 3.0, '-']))","
+def rpn_eval(tokens):
+    def op(symbol, a, b):
+        return {
+            '+': lambda a, b: a + b,
+            '-': lambda a, b: a - b,
+            '*': lambda a, b: a * b,
+            '/': lambda a, b: a / b
+        }[symbol](a, b)
+
+    stack = []
+
+    for token in tokens:
+        if isinstance(token, float):
+            stack.append(token)
+        else:
+            a = stack.pop()
+            b = stack.pop()
+            stack.append(
+                op(token, b, a)
+            )
+
+    return stack.pop()
+
+print(rpn_eval([3.0, 5.0, '+', 2.0, '/']))
+print(rpn_eval([2.0, 2.0, '+']))
+print(rpn_eval([7.0, 4.0, '+', 3.0, '-']))","4.0
+4.0
+8.0"
+26,"
+def shunting_yard(tokens):
+    precedence = {
+        '+': 1,
+        '-': 1,
+        '*': 2,
+        '/': 2
+    }
+
+    rpntokens = []
+    opstack = []
+    for token in tokens:
+        if isinstance(token, int):
+            rpntokens.append(token)
+        else:
+            while opstack and precedence[token] <= precedence[opstack[-1]]:
+                rpntokens.append(opstack.pop())
+
+    while opstack:
+        rpntokens.append(opstack.pop())
+
+    return rpntokens
+
+print(shunting_yard([]))
+print(shunting_yard([30]))
+print(shunting_yard([10, '-', 5, '-', 2]))","
+def shunting_yard(tokens):
+    precedence = {
+        '+': 1,
+        '-': 1,
+        '*': 2,
+        '/': 2
+    }
+
+    rpntokens = []
+    opstack = []
+    for token in tokens:
+        if isinstance(token, int):
+            rpntokens.append(token)
+        else:
+            while opstack and precedence[token] <= precedence[opstack[-1]]:
+                rpntokens.append(opstack.pop())
+            opstack.append(token)
+
+    while opstack:
+        rpntokens.append(opstack.pop())
+
+    return rpntokens
+
+print(shunting_yard([]))
+print(shunting_yard([30]))
+print(shunting_yard([10, '-', 5, '-', 2]))","[]
+[30]
+[10, 5, '-', 2, '-']"
+27,"def sieve(max):
+    primes = []
+    for n in range(2, max + 1):
+        if any(n % p > 0 for p in primes):
+            primes.append(n)
+    return primes
+
+print(sieve(1))
+print(sieve(2))
+print(sieve(4))","
+def sieve(max):
+    primes = []
+    for n in range(2, max + 1):
+        if all(n % p > 0 for p in primes):
+            primes.append(n)
+    return primes
+
+print(sieve(1))
+print(sieve(2))
+print(sieve(4))","[]
+[2]
+[2, 3]"
+28,"
+def sqrt(x, epsilon):
+    approx = x / 2
+    while abs(x - approx) > epsilon:
+        approx = 0.5 * (approx + x / approx)
+    return approx
+
+print(sqrt(2, 0.01))
+print(sqrt(2, 0.5))
+print(sqrt(2, 0.3))","
+def sqrt(x, epsilon):
+    approx = x / 2
+    while abs(x - approx ** 2) > epsilon:
+        approx = 0.5 * (approx + x / approx)
+    return approx
+
+print(sqrt(2, 0.01))
+print(sqrt(2, 0.5))
+print(sqrt(2, 0.3))","1.4166666666666665
+1.5
+1.5"
+29,"def subsequences(a, b, k):
+    if k == 0:
+        return []
+
+    ret = []
+    for i in range(a, b + 1 - k):
+        ret.extend(
+            [i] + rest for rest in subsequences(i + 1, b, k - 1)
+        )
+
+    return ret
+
+print(list(subsequences(1, 5, 3)))
+print(list(subsequences(30, -2, 3)))
+print(list(subsequences(30, 2, 3)))","
+def subsequences(a, b, k):
+    if k == 0:
+        return [[]]
+
+    ret = []
+    for i in range(a, b + 1 - k):
+        ret.extend(
+            [i] + rest for rest in subsequences(i + 1, b, k - 1)
+        )
+
+    return ret
+
+print(list(subsequences(1, 5, 3)))
+print(list(subsequences(30, -2, 3)))
+print(list(subsequences(30, 2, 3)))","[[1, 2, 3], [1, 2, 4], [1, 3, 4], [2, 3, 4]]
+[]
+[]"
+30,"
+import string
+def to_base(num, b):
+    result = ''
+    alphabet = string.digits + string.ascii_uppercase
+    while num > 0:
+        i = num % b
+        num = num // b
+        result = result + alphabet[i]
+    return result
+
+print(to_base(8227, 18))
+print(to_base(73, 8))
+print(to_base(16, 19))","
+import string
+def to_base(num, b):
+    result = ''
+    alphabet = string.digits + string.ascii_uppercase
+    while num > 0:
+        i = num % b
+        num = num // b
+        result = alphabet[i] + result
+    return result
+
+print(to_base(8227, 18))
+print(to_base(73, 8))
+print(to_base(16, 19))","1771
+111
+G"
+31,"def wrap(text, cols):
+    lines = []
+    while len(text) > cols:
+        end = text.rfind(' ', 0, cols + 1)
+        if end == -1:
+            end = cols
+        line, text = text[:end], text[end:]
+        lines.append(line)
+
+    return lines
+
+print(wrap('The leaves did not stir on the trees, grasshoppers chirruped, and the monotonous hollow sound of the sea rising up from below, spoke of the peace, of the eternal sleep awaiting us. So it must have sounded when there was no Yalta, no Oreanda here; so it sounds now, and it will sound as indifferently and monotonously when we are all no more. And in this constancy, in this complete indifference to the life and death of each of us, there lies hid, perhaps, a pledge of our eternal salvation, of the unceasing movement of life upon earth, of unceasing progress towards perfection. Sitting beside a young woman who in the dawn seemed so lovely, soothed and spellbound in these magical surroundings - the sea, mountains, clouds, the open sky - Gurov thought how in reality everything is beautiful in this world when one reflects: everything except what we think or do ourselves when we forget our human dignity and the higher aims of our existence.', 50))
+print(wrap('The leaves did not stir on the trees, grasshoppers chirruped, and the monotonous hollow sound of the sea rising up from below, spoke of the peace, of the eternal sleep awaiting us. So it must have sounded when there was no Yalta, no Oreanda here; so it sounds now, and it will sound as indifferently and monotonously when we are all no more. And in this constancy, in this complete indifference to the life and death of each of us, there lies hid, perhaps, a pledge of our eternal salvation, of the unceasing movement of life upon earth, of unceasing progress towards perfection. Sitting beside a young woman who in the dawn seemed so lovely, soothed and spellbound in these magical surroundings - the sea, mountains, clouds, the open sky - Gurov thought how in reality everything is beautiful in this world when one reflects: everything except what we think or do ourselves when we forget our human dignity and the higher aims of our existence.', 20))
+print(wrap('The leaves did not stir on the trees, grasshoppers chirruped, and the monotonous hollow sound of the sea rising up from below, spoke of the peace, of the eternal sleep awaiting us. So it must have sounded when there was no Yalta, no Oreanda here; so it sounds now, and it will sound as indifferently and monotonously when we are all no more. And in this constancy, in this complete indifference to the life and death of each of us, there lies hid, perhaps, a pledge of our eternal salvation, of the unceasing movement of life upon earth, of unceasing progress towards perfection. Sitting beside a young woman who in the dawn seemed so lovely, soothed and spellbound in these magical surroundings - the sea, mountains, clouds, the open sky - Gurov thought how in reality everything is beautiful in this world when one reflects: everything except what we think or do ourselves when we forget our human dignity and the higher aims of our existence.', 80))","
+def wrap(text, cols):
+    lines = []
+    while len(text) > cols:
+        end = text.rfind(' ', 0, cols + 1)
+        if end == -1:
+            end = cols
+        line, text = text[:end], text[end:]
+        lines.append(line)
+
+    lines.append(text)
+    return lines
+
+print(wrap('The leaves did not stir on the trees, grasshoppers chirruped, and the monotonous hollow sound of the sea rising up from below, spoke of the peace, of the eternal sleep awaiting us. So it must have sounded when there was no Yalta, no Oreanda here; so it sounds now, and it will sound as indifferently and monotonously when we are all no more. And in this constancy, in this complete indifference to the life and death of each of us, there lies hid, perhaps, a pledge of our eternal salvation, of the unceasing movement of life upon earth, of unceasing progress towards perfection. Sitting beside a young woman who in the dawn seemed so lovely, soothed and spellbound in these magical surroundings - the sea, mountains, clouds, the open sky - Gurov thought how in reality everything is beautiful in this world when one reflects: everything except what we think or do ourselves when we forget our human dignity and the higher aims of our existence.', 50))
+print(wrap('The leaves did not stir on the trees, grasshoppers chirruped, and the monotonous hollow sound of the sea rising up from below, spoke of the peace, of the eternal sleep awaiting us. So it must have sounded when there was no Yalta, no Oreanda here; so it sounds now, and it will sound as indifferently and monotonously when we are all no more. And in this constancy, in this complete indifference to the life and death of each of us, there lies hid, perhaps, a pledge of our eternal salvation, of the unceasing movement of life upon earth, of unceasing progress towards perfection. Sitting beside a young woman who in the dawn seemed so lovely, soothed and spellbound in these magical surroundings - the sea, mountains, clouds, the open sky - Gurov thought how in reality everything is beautiful in this world when one reflects: everything except what we think or do ourselves when we forget our human dignity and the higher aims of our existence.', 20))
+print(wrap('The leaves did not stir on the trees, grasshoppers chirruped, and the monotonous hollow sound of the sea rising up from below, spoke of the peace, of the eternal sleep awaiting us. So it must have sounded when there was no Yalta, no Oreanda here; so it sounds now, and it will sound as indifferently and monotonously when we are all no more. And in this constancy, in this complete indifference to the life and death of each of us, there lies hid, perhaps, a pledge of our eternal salvation, of the unceasing movement of life upon earth, of unceasing progress towards perfection. Sitting beside a young woman who in the dawn seemed so lovely, soothed and spellbound in these magical surroundings - the sea, mountains, clouds, the open sky - Gurov thought how in reality everything is beautiful in this world when one reflects: everything except what we think or do ourselves when we forget our human dignity and the higher aims of our existence.', 80))","['The leaves did not stir on the trees, grasshoppers', ' chirruped, and the monotonous hollow sound of the', ' sea rising up from below, spoke of the peace, of', ' the eternal sleep awaiting us. So it must have', ' sounded when there was no Yalta, no Oreanda here;', ' so it sounds now, and it will sound as', ' indifferently and monotonously when we are all no', ' more. And in this constancy, in this complete', ' indifference to the life and death of each of us,', ' there lies hid, perhaps, a pledge of our eternal', ' salvation, of the unceasing movement of life upon', ' earth, of unceasing progress towards perfection.', ' Sitting beside a young woman who in the dawn', ' seemed so lovely, soothed and spellbound in these', ' magical surroundings - the sea, mountains,', ' clouds, the open sky - Gurov thought how in', ' reality everything is beautiful in this world', ' when one reflects: everything except what we', ' think or do ourselves when we forget our human', ' dignity and the higher aims of our existence.']
+['The leaves did not', ' stir on the trees,', ' grasshoppers', ' chirruped, and the', ' monotonous hollow', ' sound of the sea', ' rising up from', ' below, spoke of the', ' peace, of the', ' eternal sleep', ' awaiting us. So it', ' must have sounded', ' when there was no', ' Yalta, no Oreanda', ' here; so it sounds', ' now, and it will', ' sound as', ' indifferently and', ' monotonously when', ' we are all no more.', ' And in this', ' constancy, in this', ' complete', ' indifference to the', ' life and death of', ' each of us, there', ' lies hid, perhaps,', ' a pledge of our', ' eternal salvation,', ' of the unceasing', ' movement of life', ' upon earth, of', ' unceasing progress', ' towards perfection.', ' Sitting beside a', ' young woman who in', ' the dawn seemed so', ' lovely, soothed and', ' spellbound in these', ' magical', ' surroundings - the', ' sea, mountains,', ' clouds, the open', ' sky - Gurov thought', ' how in reality', ' everything is', ' beautiful in this', ' world when one', ' reflects:', ' everything except', ' what we think or do', ' ourselves when we', ' forget our human', ' dignity and the', ' higher aims of our', ' existence.']
+['The leaves did not stir on the trees, grasshoppers chirruped, and the monotonous', ' hollow sound of the sea rising up from below, spoke of the peace, of the', ' eternal sleep awaiting us. So it must have sounded when there was no Yalta, no', ' Oreanda here; so it sounds now, and it will sound as indifferently and', ' monotonously when we are all no more. And in this constancy, in this complete', ' indifference to the life and death of each of us, there lies hid, perhaps, a', ' pledge of our eternal salvation, of the unceasing movement of life upon earth,', ' of unceasing progress towards perfection. Sitting beside a young woman who in', ' the dawn seemed so lovely, soothed and spellbound in these magical surroundings', ' - the sea, mountains, clouds, the open sky - Gurov thought how in reality', ' everything is beautiful in this world when one reflects: everything except what', ' we think or do ourselves when we forget our human dignity and the higher aims', ' of our existence.']"

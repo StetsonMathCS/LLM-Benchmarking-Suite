@@ -40,7 +40,6 @@ class FunctionalCorrectnessDimension(BaseDimension):
     def evaluate(self, language: str, generated_code: str, original_code: Optional[str] = None, **kwargs) -> DimensionResult:
         """Compare generated code output with expected output.
         
-        For code transformations (partial_transform), compares against expected_output text.
         For other tasks, executes both original and generated code and compares outputs.
         For translation tasks, uses generated_code_language for executing generated code.
         """
@@ -51,12 +50,14 @@ class FunctionalCorrectnessDimension(BaseDimension):
         # Refactoring path: compare generated code's stdout to expected_console_output
         if expected_console_output:
             try:
+                test_harness = kwargs.get("test_harness", "")
+                code_to_run = (generated_code + "\n" + test_harness) if test_harness else generated_code
                 if generated_code_language == "python":
-                    gen_output = CodeRunner.run_python(generated_code)
+                    gen_output = CodeRunner.run_python(code_to_run)
                 elif generated_code_language == "javascript":
-                    gen_output = CodeRunner.run_javascript(generated_code)
+                    gen_output = CodeRunner.run_javascript(code_to_run)
                 elif generated_code_language == "cpp":
-                    gen_output = CodeRunner.run_cpp(generated_code)
+                    gen_output = CodeRunner.run_cpp(code_to_run)
                 else:
                     return DimensionResult(
                         dimension_name=self.name,

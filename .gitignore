@@ -3,6 +3,13 @@ myenv/
 venv/
 test_openai.py
 __pycache__
+.pytest_cache
 .claude
-reports
 config
+.md
+/scripts
+compare_all.py
+compare_charts.py
+extract_models.py
+generate_charts.py
+.csv
