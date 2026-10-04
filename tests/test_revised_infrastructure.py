@@ -5,7 +5,7 @@ import pytest
 
 from core.base import BenchmarkResult, BenchmarkStatus, DimensionResult, LLMResponse, ModelConfig
 from core.scoring import ScoringEngine
-from facets.config import merge_cli, resolve_model, validate_resolved
+from facets.config import load_model_registry, merge_cli, resolve_model, validate_resolved
 from facets.migration import LegacyParseError, parse_legacy_repr
 from facets.scoring_profile import load_profile
 from providers.openai.provider import _text_content
@@ -51,6 +51,39 @@ def test_provider_credentials_never_fall_back(monkeypatch):
     spec = resolve_model(None, "anthropic", "exact-id", registry)
     issues = validate_resolved({"tasks": ["code_generation"], "language": "python", "profile": "revised-v1"}, spec, registry)
     assert any(issue["detail"] == "ANTHROPIC_API_KEY" for issue in issues)
+
+
+def test_short_aliases_resolve_to_one_canonical_model():
+    registry = {
+        "aliases": {"sonnet": "claude-sonnet-4-6", "short": "sonnet"},
+        "models": {"claude-sonnet-4-6": {"provider": "anthropic", "model": "claude-sonnet-4-6"}},
+    }
+    canonical = resolve_model("claude-sonnet-4-6", None, None, registry)
+    short = resolve_model("sonnet", None, None, registry)
+    nested = resolve_model("short", None, None, registry)
+
+    assert short == {**canonical, "requested_alias": "sonnet"}
+    assert nested["alias"] == "claude-sonnet-4-6"
+    assert nested["model"] == "claude-sonnet-4-6"
+    # The canonical key must stay the model identity so cohorts cannot fork on spelling.
+    assert resolve_model("claude-sonnet-4-6", None, None, registry).get("requested_alias") is None
+
+
+def test_unknown_and_circular_aliases_are_refused():
+    registry = {"aliases": {"loop": "loop"}, "models": {"real": {"provider": "ollama", "model": "real"}}}
+    with pytest.raises(ValueError, match="alias cycle"):
+        resolve_model("loop", None, None, registry)
+    with pytest.raises(ValueError, match="unknown model alias"):
+        resolve_model("missing", None, None, registry)
+
+
+def test_shipped_registry_aliases_all_point_at_real_models():
+    registry = load_model_registry()
+    models = registry["models"]
+    assert registry["aliases"]
+    for short, canonical in registry["aliases"].items():
+        assert canonical in models, f"{short} -> {canonical} is not a registry model"
+        assert resolve_model(short, None, None, registry)["alias"] == canonical
 
 
 def test_multiblock_text_extraction_and_truncation_metadata():

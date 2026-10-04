@@ -41,16 +41,33 @@ def merge_cli(config: dict, overrides: dict[str, Any]) -> dict:
     return resolved
 
 
+def canonical_alias(alias: str, registry: dict) -> str:
+    """Follow the registry's short-name aliases to the canonical model key."""
+    aliases = registry.get("aliases") or {}
+    seen = [alias]
+    current = alias
+    while current in aliases:
+        current = str(aliases[current])
+        if current in seen:
+            raise ValueError(f"alias cycle in registry: {' -> '.join([*seen, current])}")
+        seen.append(current)
+    return current
+
+
 def resolve_model(
     alias: str | None, provider: str | None, model: str | None, registry: dict
 ) -> dict:
     if alias and (provider or model):
         raise ValueError("use either a model alias or --provider/--model, not both")
     if alias:
-        entry = registry.get("models", {}).get(alias)
+        canonical = canonical_alias(alias, registry)
+        entry = registry.get("models", {}).get(canonical)
         if entry is None:
             raise ValueError(f"unknown model alias {alias!r}; run 'facets models list'")
-        return {"alias": alias, **entry}
+        spec = {"alias": canonical, **entry}
+        if canonical != alias:
+            spec["requested_alias"] = alias
+        return spec
     if not provider or not model:
         raise ValueError("provide a model alias or both --provider and --model")
     capabilities = registry.get("provider_capabilities", {}).get(provider)

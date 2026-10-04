@@ -4,17 +4,33 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from core.base import BaseProvider, LLMResponse, ModelConfig
 from facets.analysis import analyze_directory, summarize_directory
 from facets.config import (
-    ALL_TASKS, fingerprint, load_model_registry, load_yaml, merge_cli, nonsecret_config,
-    resolve_model, validate_resolved,
+    ALL_TASKS,
+    fingerprint,
+    load_model_registry,
+    load_yaml,
+    merge_cli,
+    nonsecret_config,
+    resolve_model,
+    validate_resolved,
 )
 from facets.doctor import run_doctor
 from facets.migration import migrate_legacy_report, parse_legacy_repr
+from facets.queue import (
+    EXIT_INCOMPLETE,
+    ON_ERROR_CONTINUE,
+    ON_ERROR_STOP,
+    Queue,
+    cohort_differences,
+    cohort_of,
+    list_queues,
+    queue_name_for_config,
+)
 from facets.runner import _manifest, _plan, execute_run
 from facets.runstore import RunStore, atomic_json
 
@@ -102,13 +118,39 @@ def build_parser() -> argparse.ArgumentParser:
     run = sub.add_parser("run", help="run one model noninteractively")
     _add_run_options(run)
 
-    sweep = sub.add_parser("sweep", help="run every model listed in the config")
+    sweep = sub.add_parser("sweep", help="run every model listed in the config through the experiment queue")
     sweep.add_argument("--config", required=True)
     sweep.add_argument("--registry")
     sweep.add_argument("--dry-run", action="store_true")
     sweep.add_argument("--resume", action="store_true")
+    sweep.add_argument("--retry-failed", action="store_true")
+    sweep.add_argument("--on-error", choices=[ON_ERROR_STOP, ON_ERROR_CONTINUE])
+    sweep.add_argument("--queue-name")
     sweep.add_argument("--limit", type=int)
     sweep.add_argument("--output-dir")
+
+    queue = sub.add_parser("queue", help="create, run, and inspect durable experiment queues")
+    queue_sub = queue.add_subparsers(dest="queue_command", required=True)
+    queue_list = queue_sub.add_parser("list")
+    queue_list.add_argument("--output-dir", default="reports/runs")
+    queue_create = queue_sub.add_parser("create", help="freeze a cohort and its model order")
+    queue_create.add_argument("name")
+    queue_create.add_argument("--config", required=True)
+    queue_create.add_argument("--models", nargs="+")
+    queue_create.add_argument("--registry")
+    queue_create.add_argument("--on-error", choices=[ON_ERROR_STOP, ON_ERROR_CONTINUE], default=ON_ERROR_STOP)
+    queue_create.add_argument("--output-dir")
+    queue_create.add_argument("--limit", type=int)
+    queue_run = queue_sub.add_parser("run", help="run or resume a queue sequentially")
+    queue_run.add_argument("name")
+    queue_run.add_argument("--output-dir", default="reports/runs")
+    queue_run.add_argument("--registry")
+    queue_run.add_argument("--on-error", choices=[ON_ERROR_STOP, ON_ERROR_CONTINUE])
+    queue_run.add_argument("--retry-failed", action="store_true")
+    queue_run.add_argument("--dry-run", action="store_true")
+    queue_status = queue_sub.add_parser("status", help="show a queue summary without running it")
+    queue_status.add_argument("name")
+    queue_status.add_argument("--output-dir", default="reports/runs")
 
     resume = sub.add_parser("resume", help="resume an interrupted run directory")
     resume.add_argument("run_directory")
@@ -123,10 +165,14 @@ def build_parser() -> argparse.ArgumentParser:
     summarize.add_argument("results_directory")
     summarize.add_argument("--output")
 
-    analyze = sub.add_parser("analyze", help="export tables, sensitivity, bootstrap intervals, and charts")
+    analyze = sub.add_parser("analyze", help="export tables, figures, sensitivity, and bootstrap intervals")
     analyze.add_argument("results_directory")
     analyze.add_argument("--output", required=True)
     analyze.add_argument("--allow-mixed", action="store_true")
+    analyze.add_argument("--run", dest="run_ids", action="append", default=[],
+                         help="analyse only this run id (repeatable; directory relative to results_directory)")
+    analyze.add_argument("--latest-complete", action="store_true",
+                         help="when a model has several runs, use its newest complete run")
     return parser
 
 
@@ -158,25 +204,79 @@ def _run_command(args) -> int:
     return status
 
 
+def _output_root(config: dict, override: str | None) -> str:
+    return override or config.get("output_dir", "reports/runs")
+
+
 def _sweep_command(args) -> int:
     config = merge_cli(load_yaml(args.config), {"limit": args.limit, "output_dir": args.output_dir})
     registry = load_model_registry(args.registry)
-    statuses = []
-    for model_index, alias in enumerate(config.get("models", [])):
-        model_spec = resolve_model(alias, None, None, registry)
-        issues = validate_resolved(config, model_spec, registry)
-        if args.dry_run:
+    aliases = list(config.get("models", []))
+    if not aliases:
+        print("facets: config lists no models to sweep", file=sys.stderr)
+        return 2
+    if args.dry_run:
+        statuses = []
+        for model_index, alias in enumerate(aliases):
             doctor_config = config if model_index == 0 else {**config, "mutation_preflight": "already_validated_for_shared_dataset"}
-            statuses.append({"alias": alias, "doctor": run_doctor(doctor_config, model_spec, registry)})
-            continue
-        if any(issue["severity"] == "error" for issue in issues):
-            statuses.append({"alias": alias, "status": "preflight_failed", "issues": issues})
-            continue
-        output = Path(config.get("output_dir", "reports/runs")) / alias
-        path, code = execute_run(config, model_spec, output, resume=args.resume)
-        statuses.append({"alias": alias, "path": str(path), "exit_code": code})
-    _print(statuses)
-    return 0 if all(item.get("exit_code", 0) == 0 and item.get("doctor", {"ok": True}).get("ok", True) for item in statuses) else 3
+            statuses.append({"alias": alias, "doctor": run_doctor(doctor_config, resolve_model(alias, None, None, registry), registry)})
+        _print(statuses)
+        return 0 if all(item["doctor"]["ok"] for item in statuses) else 2
+    output_root = _output_root(config, args.output_dir)
+    name = queue_name_for_config(args.config, args.queue_name)
+    queue = (
+        Queue.load(name, output_root) if args.resume
+        else Queue.create(name, config, aliases, output_root=output_root, registry=registry,
+                          on_error=args.on_error or ON_ERROR_STOP)
+    )
+    if args.resume:
+        differences = cohort_differences(queue.cohort, cohort_of(config))
+        if differences:
+            print(f"facets: resume refused, config no longer matches the queue cohort: {differences}", file=sys.stderr)
+            return 2
+        queue.verify_cohort({"limit": args.limit})
+    with queue.lock():
+        summary = queue.execute(
+            registry=registry,
+            on_error=args.on_error,
+            retry_failed=args.retry_failed,
+            on_event=lambda event: print(json.dumps(event, sort_keys=True), flush=True),
+        )
+    _print(summary)
+    return summary.get("exit_code", EXIT_INCOMPLETE)
+
+
+def _queue_command(args) -> int:
+    if args.queue_command == "list":
+        _print(list_queues(args.output_dir))
+        return 0
+    if args.queue_command == "status":
+        _print(Queue.load(args.name, args.output_dir).read_summary())
+        return 0
+    if args.queue_command == "run":
+        registry = load_model_registry(args.registry)
+        queue = Queue.load(args.name, args.output_dir)
+        with queue.lock():
+            summary = queue.execute(
+                registry=registry,
+                on_error=args.on_error,
+                retry_failed=args.retry_failed,
+                dry_run=args.dry_run,
+                on_event=lambda event: print(json.dumps(event, sort_keys=True), flush=True),
+            )
+        _print(summary)
+        return summary.get("exit_code", EXIT_INCOMPLETE)
+    config = merge_cli(load_yaml(args.config), {"limit": args.limit, "output_dir": args.output_dir})
+    registry = load_model_registry(args.registry)
+    aliases = args.models or list(config.get("models", []))
+    queue = Queue.create(
+        args.name, config, aliases,
+        output_root=_output_root(config, args.output_dir),
+        registry=registry,
+        on_error=args.on_error,
+    )
+    _print(queue.summary(dry_run=True, planned=[item.alias for item in queue.selectable()]))
+    return 0
 
 
 class _NoGenerationProvider(BaseProvider):
@@ -261,6 +361,7 @@ def main(argv: list[str] | None = None) -> int:
             return 0 if reports and all(report["ok"] for report in reports) else 2
         if args.command == "run": return _run_command(args)
         if args.command == "sweep": return _sweep_command(args)
+        if args.command == "queue": return _queue_command(args)
         if args.command == "resume":
             run_dir = Path(args.run_directory).resolve()
             manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
@@ -274,7 +375,14 @@ def main(argv: list[str] | None = None) -> int:
             if args.output: atomic_json(Path(args.output), {"runs": rows})
             return 0
         if args.command == "analyze":
-            _print(analyze_directory(Path(args.results_directory), Path(args.output), args.allow_mixed))
+            if args.run_ids and args.latest_complete:
+                print("facets: --run and --latest-complete are mutually exclusive", file=sys.stderr)
+                return 2
+            _print(analyze_directory(
+                Path(args.results_directory), Path(args.output), args.allow_mixed,
+                selection="latest-complete" if args.latest_complete else None,
+                run_ids=args.run_ids or None,
+            ))
             return 0
     except (FileNotFoundError, FileExistsError, ValueError, RuntimeError) as exc:
         print(f"facets: {exc}", file=sys.stderr)

@@ -4,8 +4,23 @@ OpenAI API provider
 """
 from typing import Optional
 from core.registry import ProviderRegistry
-from core.base import BaseProvider, LLMResponse
+from core.base import BaseProvider, LLMResponse, usage_fields
 from time import perf_counter
+
+RESPONSES_USAGE_FIELDS = (
+    "input_tokens",
+    "output_tokens",
+    "total_tokens",
+    "input_tokens_details",
+    "output_tokens_details",
+)
+CHAT_USAGE_FIELDS = (
+    "prompt_tokens",
+    "completion_tokens",
+    "total_tokens",
+    "prompt_tokens_details",
+    "completion_tokens_details",
+)
 
 
 def _text_content(content) -> str:
@@ -72,6 +87,7 @@ class OpenAIProvider(BaseProvider):
                     truncated=getattr(response, "status", None) == "incomplete",
                     requested_settings=requested,
                     effective_settings=response_settings,
+                    usage=usage_fields(usage, RESPONSES_USAGE_FIELDS),
                 )
             except Exception as exc:
                 return LLMResponse("", self.config.model_name, "openai", error=str(exc), requested_settings=requested)
@@ -99,6 +115,7 @@ class OpenAIProvider(BaseProvider):
                 truncated=getattr(response.choices[0], "finish_reason", None) == "length",
                 requested_settings=requested,
                 effective_settings=chat_settings,
+                usage=usage_fields(getattr(response, "usage", None), CHAT_USAGE_FIELDS),
             )
         except Exception as e:
             return LLMResponse(

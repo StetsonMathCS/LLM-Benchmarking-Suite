@@ -5,7 +5,7 @@ Ollama API provider
 
 from typing import Optional
 from core.registry import ProviderRegistry
-from core.base import BaseProvider, LLMResponse
+from core.base import BaseProvider, LLMResponse, usage_fields
 
 @ProviderRegistry.register("ollama")
 class OllamaProvider(BaseProvider):
@@ -19,6 +19,7 @@ class OllamaProvider(BaseProvider):
             self._lib = ollama.Client(
                 host=self._base_url,
                 timeout=self.config.extra_params.get("_provider_timeout_s", 180),
+                max_retries=0,
             )
             return True
         except ImportError:
@@ -52,8 +53,9 @@ class OllamaProvider(BaseProvider):
                 prompt_tokens=int(response.get("prompt_eval_count", 0) or 0),
                 completion_tokens=int(response.get("eval_count", 0) or 0),
                 latency_ms=float(response.get("total_duration", 0) or 0) / 1_000_000,
-                requested_settings={key: value for key, value in {"temperature": self.config.temperature, "max_tokens": self.config.max_tokens, **{k: v for k, v in self.config.extra_params.items() if not k.startswith("_")}}.items() if value is not None},
+requested_settings={key: value for key, value in {"temperature": self.config.temperature, "max_tokens": self.config.max_tokens, **{k: v for k, v in self.config.extra_params.items() if not k.startswith("_")}}.items() if value is not None},
                 effective_settings=options,
+                usage=usage_fields(response, ("prompt_eval_count", "eval_count", "total_token_count")),
             )
         except Exception as e:
             return LLMResponse(

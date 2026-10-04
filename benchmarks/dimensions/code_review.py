@@ -9,16 +9,18 @@ from core.base import (
     DimensionResult
 )
 from typing import Optional, List
+from time import perf_counter
 
 
 class ReferenceReviewSimilarityDimension(BaseDimension):
     dimension_id = "reference_review_similarity"
     name = "Reference Review Similarity (RRS)"
     description = "Embedding similarity to a reference review; it does not establish expert review accuracy."
-    # Default Ollama embedding model and host
+# Default Ollama embedding model and host
     EMBEDDING_MODEL = "nomic-embed-text:latest"
     DEFAULT_BASE_URL = "http://localhost:11434"
-    
+    USAGE_SINK = None
+
     def __init__(self):
         """Initialize the dimension and create Ollama client."""
         super().__init__()
@@ -26,6 +28,25 @@ class ReferenceReviewSimilarityDimension(BaseDimension):
         self._base_url = self.DEFAULT_BASE_URL
         self._lib = None
         self._ollama_available = self._connect_ollama()
+
+    def _report_usage(self, raw_usage: dict | None, latency_ms: float | None, status: str) -> None:
+        """Report embedding token usage when the run has accounting enabled.
+
+        Embedding calls are billable model work, so they are recorded separately
+        from generation. Accounting never issues its own requests.
+        """
+        sink = self.USAGE_SINK
+        if sink is None:
+            return
+        sink({
+            "purpose": "embedding",
+            "provider": "ollama",
+            "model": self.EMBEDDING_MODEL,
+            "raw_usage": raw_usage,
+            "usage": None,
+            "status": status,
+            "latency_ms": latency_ms,
+        })
     
     def _connect_ollama(self) -> bool:
         """Create Ollama client and check availability."""
@@ -55,17 +76,25 @@ class ReferenceReviewSimilarityDimension(BaseDimension):
             return self._embedding_cache[text]
         
         try:
+            started = perf_counter()
             response = self._lib.embed(
                 model=self.EMBEDDING_MODEL,
                 input=text
             )
+            latency_ms = (perf_counter() - started) * 1000
             embedding = response['embeddings'][0] if response.get('embeddings') else None
-            
+            self._report_usage(
+                {"prompt_eval_count": response.get("prompt_eval_count")},
+                latency_ms,
+                "success" if embedding else "failed",
+            )
+
             if embedding:
                 self._embedding_cache[text] = embedding
             return embedding
-        
+
         except Exception as e:
+            self._report_usage(None, None, "failed")
             print(f"Error getting embedding: {e}")
             return None
     

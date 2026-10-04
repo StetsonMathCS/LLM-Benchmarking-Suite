@@ -5,13 +5,64 @@ All providers, benchmarks, and analyzers inherit from these.
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass, field, is_dataclass
-from typing import Any, Optional
+from typing import Any, Iterable, Optional
 from enum import Enum
 from time import perf_counter
 from pathlib import Path
 import math
 from utils import code_runner
+
+def _read_field(source: Any, name: str) -> Any:
+    if isinstance(source, Mapping):
+        return source.get(name)
+    return getattr(source, name, None)
+
+
+def _scalarize(value: Any) -> Any:
+    """Reduce an SDK usage value to plain JSON-compatible data."""
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    if isinstance(value, Mapping):
+        return {
+            str(key): _scalarize(item)
+            for key, item in value.items()
+            if not str(key).startswith("_")
+        }
+    for method in ("model_dump", "to_dict", "dict"):
+        dump = getattr(value, method, None)
+        if callable(dump):
+            try:
+                return _scalarize(dump())
+            except Exception:
+                continue
+    data = getattr(value, "__dict__", None)
+    if isinstance(data, dict):
+        return {
+            str(key): _scalarize(item)
+            for key, item in data.items()
+            if not str(key).startswith("_")
+        }
+    return str(value)
+
+
+def usage_fields(source: Any, names: Iterable[str]) -> dict:
+    """Copy provider-reported usage fields, flattening nested detail objects.
+
+    Providers report the authoritative counts only; this preserves exactly what
+    the API returned so accounting never has to estimate or re-derive values.
+    """
+    if source is None:
+        return {}
+    collected: dict = {}
+    for name in names:
+        value = _read_field(source, name)
+        if value is None:
+            continue
+        collected[name] = _scalarize(value)
+    return collected
+
 
 DIMENSION_ID_BY_NAME = {
     "Code Consistency": "code_consistency",
@@ -64,10 +115,10 @@ class BenchmarkStatus(Enum):
     FAILED = "failed"
     ERROR = "error"
     SKIPPED = "skipped"
-
 @dataclass 
 class LLMResponse:
     """Standardized response from any LLM Provider"""
+
     content: str
     model: str
     provider: str
@@ -82,6 +133,7 @@ class LLMResponse:
     truncated: bool = False
     requested_settings: dict = field(default_factory=dict)
     effective_settings: dict = field(default_factory=dict)
+    usage: dict = field(default_factory=dict)
 
     @property 
     def success(self) -> bool:
@@ -102,6 +154,7 @@ class LLMResponse:
             "truncated": self.truncated,
             "requested_settings": to_jsonable(self.requested_settings),
             "effective_settings": to_jsonable(self.effective_settings),
+            "usage": to_jsonable(self.usage),
         }
 
 @dataclass

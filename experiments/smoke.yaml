@@ -1,0 +1,39 @@
+# A two-model smoke queue: cheap enough to run end to end before a real sweep.
+# Use it to check credentials, the evaluator sandbox, and queue resume behaviour.
+#
+#   facets queue create smoke --config experiments/smoke.yaml
+#   facets queue run smoke
+#   facets analyze reports/runs --output reports/analysis/smoke
+schema_version: 1
+profile: revised-v1
+language: python
+translation_target: javascript
+tasks: [code_generation, bug_fixing]
+samples: 1
+limit: 2
+max_tokens: 1024
+timeouts:
+  provider_s: 180
+  evaluator_s: 15
+retries:
+  attempts: 2
+  initial_backoff_s: 1
+  max_backoff_s: 4
+execution:
+  backend: container
+  image: facets-evaluator:revised-v1
+  memory_mb: 256
+  cpus: 1.0
+  pids_limit: 64
+selection:
+  strategy: prefix_by_stable_dataset_order
+  seed: 0
+output_dir: reports/runs
+generation_concurrency: 1
+evaluator_concurrency: 1
+mutation_preflight: full
+# Short aliases resolve to the canonical registry entry, so these two runs are
+# recorded as claude-sonnet-4-6 and claude-opus-4-6.
+models:
+  - sonnet
+  - opus

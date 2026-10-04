@@ -2,20 +2,24 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict
-from datetime import datetime, timezone
 import importlib.metadata
 import json
 import os
-from pathlib import Path
 import shutil
 import subprocess
 import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Optional
+from datetime import datetime, timezone
+from pathlib import Path
 
-from benchmarks import matrix
-from core.base import BaseProvider, BenchmarkResult, BenchmarkStatus, LLMResponse, ModelConfig
+from core.base import (
+    BaseProvider,
+    BenchmarkResult,
+    BenchmarkStatus,
+    LLMResponse,
+    ModelConfig,
+)
 from core.registry import ProviderRegistry
 from core.scoring import ScoringEngine
 from datasets.mapper import DatasetMapper
@@ -24,6 +28,22 @@ from facets.config import ALL_TASKS, fingerprint, nonsecret_config
 from facets.evaluation.execution import ExecutionSettings, configure_default
 from facets.runstore import RunStore, atomic_json
 from facets.scoring_profile import PROJECT_ROOT, load_profile
+from facets.usage import (
+    LEDGER_RELATIVE_PATH,
+    PURPOSE_EMBEDDING,
+    PURPOSE_GENERATION,
+    STATUS_FAILED,
+    STATUS_SUCCESS,
+    STATUS_TRUNCATED,
+    LedgerScope,
+    UsageLedger,
+    get_context,
+    make_entry,
+    normalize_saved_response,
+    normalize_usage,
+    UsageContext,
+    write_ledger_exports,
+)
 from utils.code_runner import extract_code
 
 
@@ -72,7 +92,7 @@ class ReplayProvider(BaseProvider):
     def is_available(self) -> bool:
         return True
 
-    def complete(self, prompt: str, system_prompt: Optional[str] = None) -> LLMResponse:
+    def complete(self, prompt: str, system_prompt: str | None = None) -> LLMResponse:
         self.calls += 1
         if self.calls > 1:
             raise RuntimeError("replay response consumed more than once")
@@ -82,7 +102,8 @@ class ReplayProvider(BaseProvider):
 def response_from_dict(value: dict) -> LLMResponse:
     allowed = {
         "content", "model", "provider", "prompt_tokens", "completion_tokens", "latency_ms",
-        "error", "status", "stop_reason", "attempts", "truncated", "requested_settings", "effective_settings",
+        "error", "status", "stop_reason", "attempts", "truncated", "requested_settings",
+        "effective_settings", "usage",
     }
     return LLMResponse(**{key: value[key] for key in allowed if key in value})
 
@@ -95,7 +116,12 @@ def _is_transient(error: str) -> bool:
     ))
 
 
-def complete_with_backoff(provider: BaseProvider, prompt: str, config: dict) -> LLMResponse:
+def complete_with_backoff(
+    provider: BaseProvider,
+    prompt: str,
+    config: dict,
+    observer=None,
+) -> LLMResponse:
     retries = config.get("retries", {}) or {}
     attempts = max(1, int(retries.get("attempts", 3)))
     delay = float(retries.get("initial_backoff_s", 1))
@@ -104,6 +130,8 @@ def complete_with_backoff(provider: BaseProvider, prompt: str, config: dict) -> 
     for attempt in range(1, attempts + 1):
         response = provider.complete(prompt, provider.config.system_prompt)
         response.attempts = attempt
+        if observer is not None:
+            observer(attempt, response, attempts)
         if not response.error or not _is_transient(response.error) or attempt == attempts:
             return response
         time.sleep(min(delay, maximum))
@@ -226,6 +254,149 @@ def _prepare_item(item: dict, config: dict, model_config: ModelConfig) -> tuple[
     return record, kwargs, code_input, benchmark_cls, prompt
 
 
+def _usage_block(summary: dict) -> dict:
+    """Compact, report-embedded usage view; full detail stays in usage/summary.json."""
+    return {
+        "requests_total": summary["requests_total"],
+        "requests_with_known_usage": summary["requests_with_known_usage"],
+        "requests_with_unknown_usage": summary["requests_with_unknown_usage"],
+        "known_coverage": summary["known_coverage"],
+        "counted_input_tokens": summary["counted_input_tokens"],
+        "counted_output_tokens": summary["counted_output_tokens"],
+        "counted_total_tokens": summary["counted_total_tokens"],
+        "generation": _usage_scope(summary["by_purpose"], PURPOSE_GENERATION),
+        "embedding": _usage_scope(summary["by_purpose"], PURPOSE_EMBEDDING),
+        "inherited_requests": summary["inherited_requests"],
+        "totals_are_exact": summary["usage_totals_are_exact"],
+        "detail": "usage/summary.json",
+    }
+
+
+def _usage_scope(by_purpose: dict, purpose: str) -> dict:
+    scope = (by_purpose or {}).get(purpose) or {}
+    return {
+        "requests_total": scope.get("requests_total", 0),
+        "requests_with_unknown_usage": scope.get("requests_with_unknown_usage", 0),
+        "counted_input_tokens": scope.get("counted_input_tokens", 0),
+        "counted_output_tokens": scope.get("counted_output_tokens", 0),
+        "counted_total_tokens": scope.get("counted_total_tokens", 0),
+    }
+
+
+def _item_context(item: dict, config: dict, manifest: dict) -> dict:
+    """Request identity fields for one planned record."""
+    identity = item["identity_data"]
+    return {
+        "task": identity.get("task"),
+        "record_id": identity.get("record_id"),
+        "sample_index": identity.get("sample_index", 0),
+        "dataset": identity.get("dataset"),
+        "config": manifest.get("config_fingerprint"),
+        "provider": identity.get("provider"),
+        "model": identity.get("model"),
+    }
+
+
+class UsageRecorder:
+    """Records every provider attempt, embedding call, and reused response.
+
+    Only provider-reported counts are counted. Reused responses are recorded as
+    inherited so an operation's totals include work paid for earlier while
+    keeping that distinction visible.
+    """
+
+    def __init__(self, ledger: UsageLedger, attempts_total: int):
+        self.ledger = ledger
+        self.attempts_total = attempts_total
+
+    def observe_generation(self, attempt: int, response: LLMResponse, attempts_total: int | None) -> None:
+        usage = normalize_usage(response.provider, response.usage or None)
+        if response.error:
+            status = STATUS_FAILED
+        elif response.truncated:
+            status = STATUS_TRUNCATED
+        else:
+            status = STATUS_SUCCESS
+        self.ledger.record(make_entry(
+            purpose=PURPOSE_GENERATION,
+            provider=response.provider,
+            model=response.model,
+            usage=usage,
+            raw_usage=response.usage,
+            status=status,
+            attempt=attempt,
+            attempts_total=attempts_total or self.attempts_total,
+            error=response.error,
+            scope=self.ledger.scope,
+            context=get_context(),
+            sdk_retries_observable=True,
+        ))
+
+    def observe_inherited(self, response: LLMResponse) -> None:
+        usage = normalize_saved_response(response.provider, response.to_dict())
+        self.ledger.record(make_entry(
+            purpose=PURPOSE_GENERATION,
+            provider=response.provider,
+            model=response.model,
+            usage=usage,
+            raw_usage=response.usage,
+            status=STATUS_SUCCESS if response.success else STATUS_FAILED,
+            attempt=max(1, int(response.attempts or 1)),
+            attempts_total=self.attempts_total,
+            error=response.error,
+            scope=self.ledger.scope,
+            context=get_context(),
+            inherited_from="saved_response",
+            sdk_retries_observable=True,
+        ))
+
+    def generation_observer(self, context: dict | None = None) -> Callable[..., None]:
+        """Observer bound to one record's context, safe to call from any thread."""
+        def observe(attempt: int, response: LLMResponse, attempts_total: int | None) -> None:
+            if context is None:
+                self.observe_generation(attempt, response, attempts_total)
+                return
+            with UsageContext(**context):
+                self.observe_generation(attempt, response, attempts_total)
+        return observe
+
+    def embedding_sink(self) -> Callable[[dict], None]:
+        """Sink for embedding dimensions: billable embedding work, accounted apart."""
+        def sink(payload: dict) -> None:
+            self.record_embedding(
+                provider=payload.get("provider") or "ollama",
+                model=payload.get("model"),
+                raw_usage=payload.get("raw_usage"),
+                latency_ms=payload.get("latency_ms"),
+                status=payload.get("status", STATUS_FAILED),
+                error=payload.get("error"),
+            )
+        return sink
+
+    def record_embedding(
+        self,
+        provider: str,
+        model: str,
+        raw_usage: dict | None,
+        latency_ms: float | None,
+        status: str,
+        error: str | None = None,
+    ) -> None:
+        usage = normalize_usage(provider, raw_usage)
+        self.ledger.record(make_entry(
+            purpose=PURPOSE_EMBEDDING,
+            provider=provider,
+            model=model,
+            usage=usage.with_latency(latency_ms),
+            raw_usage=raw_usage,
+            status=status,
+            attempt=1,
+            scope=self.ledger.scope,
+            context=get_context(),
+            sdk_retries_observable=True,
+        ))
+
+
 def execute_run(
     config: dict,
     model_spec: dict,
@@ -233,14 +404,21 @@ def execute_run(
     *,
     resume: bool = False,
     provider_override: BaseProvider | None = None,
+    usage_scope: LedgerScope | None = None,
+    record_usage: bool = True,
 ) -> tuple[Path, int]:
     profile = load_profile(str(config.get("profile", "revised-v1")))
     configure_default(_execution_settings(config))
     embedding = config.get("embedding", {}) or {}
+    similarity_dimension = None
+    if embedding or record_usage:
+        from benchmarks.dimensions.code_review import (
+            ReferenceReviewSimilarityDimension as SimilarityDimension,
+        )
+        similarity_dimension = SimilarityDimension
     if embedding:
-        from benchmarks.dimensions.code_review import ReferenceReviewSimilarityDimension
-        ReferenceReviewSimilarityDimension.DEFAULT_BASE_URL = embedding.get("base_url", ReferenceReviewSimilarityDimension.DEFAULT_BASE_URL)
-        ReferenceReviewSimilarityDimension.EMBEDDING_MODEL = embedding.get("model", ReferenceReviewSimilarityDimension.EMBEDDING_MODEL)
+        similarity_dimension.DEFAULT_BASE_URL = embedding.get("base_url", similarity_dimension.DEFAULT_BASE_URL)
+        similarity_dimension.EMBEDDING_MODEL = embedding.get("model", similarity_dimension.EMBEDDING_MODEL)
     plan = _plan(config, model_spec)
     store = RunStore(run_dir)
     manifest = _manifest(config, model_spec, plan)
@@ -251,6 +429,16 @@ def execute_run(
         manifest["completed_at"] = None
     completed = store.completed_identities()
     model_config = build_model_config(config, model_spec)
+    retries = config.get("retries", {}) or {}
+    scope = usage_scope or LedgerScope(run_id=str(run_dir))
+    scope.extra = {**scope.extra, "run_directory": str(run_dir), "config": manifest["config_fingerprint"]}
+    ledger = UsageLedger(run_dir, scope)
+    recorder = UsageRecorder(ledger, max(1, int(retries.get("attempts", 3))))
+    embedding_sink = recorder.embedding_sink() if record_usage else None
+    previous_embedding_sink = None
+    if embedding_sink is not None and similarity_dimension is not None:
+        previous_embedding_sink = similarity_dimension.USAGE_SINK
+        similarity_dimension.USAGE_SINK = embedding_sink
     generation_provider = provider_override
     generated_count = sum(
         1 for path in store.responses.glob("*.json")
@@ -270,7 +458,14 @@ def execute_run(
                 futures = {}
                 for item in pending:
                     prompt = _prepare_item(item, config, model_config)[4]
-                    future = pool.submit(complete_with_backoff, generation_provider, prompt, config)
+                    context = _item_context(item, config, manifest)
+                    future = pool.submit(
+                        complete_with_backoff,
+                        generation_provider,
+                        prompt,
+                        config,
+                        recorder.generation_observer(context),
+                    )
                     futures[future] = (item, prompt)
                 for future in as_completed(futures):
                     item, prompt = futures[future]
@@ -290,27 +485,31 @@ def execute_run(
 
             saved = store.load_response(identity)
             reused = saved is not None and identity not in generated_this_run
-            if saved is None:
-                if generation_provider is None:
-                    generation_provider = ProviderRegistry.create(model_config)
-                response = complete_with_backoff(generation_provider, prompt, config)
-                saved = {
-                    "schema_version": SCHEMA_VERSION,
-                    "record_identity": identity,
-                    "prompt": prompt,
-                    "response": response.to_dict(),
-                    "saved_at": utc_now(),
-                    "origin": "generated",
-                }
-                store.save_response(identity, saved)
-                generated_count += 1
-            else:
-                if reused:
-                    reused_count += 1
-            response = response_from_dict(saved["response"])
-            replay = ReplayProvider(model_config, response)
-            benchmark = benchmark_cls(config.get("language", "python"), replay)
-            result = benchmark._timed_run(code_input=code_input, **kwargs)
+            with UsageContext(**_item_context(item, config, manifest)):
+                if saved is None:
+                    if generation_provider is None:
+                        generation_provider = ProviderRegistry.create(model_config)
+                    response = complete_with_backoff(
+                        generation_provider, prompt, config, recorder.observe_generation
+                    )
+                    saved = {
+                        "schema_version": SCHEMA_VERSION,
+                        "record_identity": identity,
+                        "prompt": prompt,
+                        "response": response.to_dict(),
+                        "saved_at": utc_now(),
+                        "origin": "generated",
+                    }
+                    store.save_response(identity, saved)
+                    generated_count += 1
+                else:
+                    if reused:
+                        reused_count += 1
+                        recorder.observe_inherited(response_from_dict(saved["response"]))
+                response = response_from_dict(saved["response"])
+                replay = ReplayProvider(model_config, response)
+                benchmark = benchmark_cls(config.get("language", "python"), replay)
+                result = benchmark._timed_run(code_input=code_input, **kwargs)
             result.metadata.update(item["identity_data"])
             result.metadata["response_reused"] = reused
             result.metadata["record_identity"] = identity
@@ -382,6 +581,8 @@ def execute_run(
         }
         for dimension_id, values in dimension_values.items()
     }
+    usage_summary = write_ledger_exports(ledger)
+    report_payload["token_usage"] = _usage_block(usage_summary)
     atomic_json(store.run_dir / "summary.json", report_payload)
     manifest["completed_count"] = len(completed)
     manifest["generated_count"] = generated_count
@@ -398,7 +599,11 @@ def execute_run(
         for value in store.iter_results()
         if ((value.get("details") or {}).get("generated_test_effectiveness") or {}).get("details", {}).get("mutant_pool_hash")
     })
+    manifest["token_usage"] = _usage_block(usage_summary)
+    manifest["usage_ledger"] = str(LEDGER_RELATIVE_PATH)
     atomic_json(store.manifest_path, manifest)
+    if similarity_dimension is not None and (previous_embedding_sink is not None or embedding_sink is not None):
+        similarity_dimension.USAGE_SINK = previous_embedding_sink
     if interrupted:
         return store.run_dir, 130
     return store.run_dir, 0 if manifest["status"] == "complete" else 3

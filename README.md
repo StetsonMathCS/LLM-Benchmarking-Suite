@@ -26,6 +26,8 @@ export ANTHROPIC_API_KEY='...'
 
 Ollama uses the configured local base URL and exact installed tag. The registry preserves aliases for all 13 historically evaluated models. `claude-haiku-4-6` and `qwen3.6` are deliberately marked unresolved because no matching official identifier was verified; `gpt-5.4` and `gpt-5-codex` require an account capability check. FACETS will not replace them with another model.
 
+Short aliases in [`config/models.yaml`](config/models.yaml) — `sonnet`, `opus`, `gpt54`, `phi4` — resolve to a canonical entry, and the canonical name stays the model's identity in manifests, so two spellings of one model cannot fork a comparison cohort.
+
 CLI values override YAML only when explicitly supplied; omitted CLI values preserve YAML values. Provider extras use `--provider-extra key=value` and unsupported keys fail preflight.
 
 ## Preflight and run
@@ -54,17 +56,39 @@ Runs are noninteractive. Each response is atomically saved before evaluation, re
 python run_experiment.py run claude-sonnet-4-6 --config experiments/final-study.yaml --dry-run
 ```
 
+## Queues
+
+`sweep` runs a config's model list through a durable queue. You can also drive one directly, which is the same implementation:
+
+```bash
+facets queue create study --config experiments/final-study.yaml
+facets queue create smoke --config experiments/smoke.yaml --on-error continue
+facets queue run study
+facets queue run study --retry-failed
+facets queue run study --dry-run
+facets queue status study
+facets queue list
+```
+
+A queue freezes its cohort, config fingerprint, model order, and registry fingerprint at creation and refuses to run if any of them changed. It executes strictly one model at a time, stops on the first failure by default, and resumes without re-requesting a model that already completed. Bookkeeping lives in `<output_dir>/queues/<name>/` and an OS file lock prevents two drivers running the same queue.
+
+[`experiments/smoke.yaml`](experiments/smoke.yaml) is a two-model config for checking credentials, the evaluator sandbox, and resume behaviour end to end.
+
 ## Reevaluate and analyze
 
 ```bash
 facets reevaluate OLD_REPORT_OR_RUN_DIRECTORY --profile revised-v1 --output reports/reevaluated/MODEL
 facets summarize reports/runs
 facets analyze reports/runs --output reports/analysis/revised-v1
+facets analyze reports/runs --output reports/analysis/latest --latest-complete
+facets analyze reports/runs --output reports/analysis/one --run study/sonnet
 ```
 
 Reevaluation never calls a generation provider. It can run deterministic code/static evaluators and the explicitly configured embedding service. Legacy repr fields are parsed with a restricted AST adapter, never `eval`; unrecoverable responses stop reevaluation instead of triggering generation.
 
-Analysis exports tidy record/dimension CSVs, task/model summaries, correctness-conditioned quality, raw runtime ratios, prespecified weight sensitivity/rank changes, rank correlations, paired record-level bootstrap intervals, JSON summaries, and charts. Incompatible evaluator/profile/dataset manifests are rejected unless an explicitly descriptive mixed analysis is requested. Bootstrap intervals describe benchmark-record variation, not repeated-inference uncertainty or guaranteed generalization.
+Analysis exports tidy record/dimension CSVs, task/model summaries, correctness-conditioned quality, raw runtime ratios, prespecified weight sensitivity/rank changes, rank correlations, paired record-level bootstrap intervals, JSON summaries, and figures. Incompatible evaluator/profile/dataset manifests are rejected unless an explicitly descriptive mixed analysis is requested, and a model appearing in more than one run is refused unless you pass `--latest-complete` or `--run`. Bootstrap intervals describe benchmark-record variation, not repeated-inference uncertainty or guaranteed generalization.
+
+Each figure is written as PNG, PDF, and SVG, with captions in `figures.json` and an `index.md` gallery: record-level score distributions, a per-task radar, a model/task heatmap, grouped task bars, score against published parameter size, and score against recorded generation latency. Models whose parameter size is undisclosed are excluded from the size scatter rather than assumed. Full key and command reference is in [`docs/EXPERIMENTS.md`](docs/EXPERIMENTS.md).
 
 ## Revised dimensions
 
@@ -80,7 +104,7 @@ Analysis exports tidy record/dimension CSVs, task/model summaries, correctness-c
 | `vulnerabilities` | Vulnerabilities | findings from Bandit/cppcheck/ESLint as recorded |
 | `runtime_analysis` | Runtime Analysis | correctness-gated measured workload time/memory, not asymptotic complexity |
 
-Exact formulas, weights, failure semantics, and limitations are in [`docs/METHODS.md`](docs/METHODS.md). Legacy handling is in [`docs/MIGRATION.md`](docs/MIGRATION.md), and final-sweep checks are in [`docs/READINESS.md`](docs/READINESS.md).
+Exact formulas, weights, failure semantics, and limitations are in [`docs/METHODS.md`](docs/METHODS.md). Experiment YAML keys, model aliases, and queue behaviour are in [`docs/EXPERIMENTS.md`](docs/EXPERIMENTS.md). Legacy handling is in [`docs/MIGRATION.md`](docs/MIGRATION.md), and final-sweep checks are in [`docs/READINESS.md`](docs/READINESS.md).
 
 ## Dataset inventory
 

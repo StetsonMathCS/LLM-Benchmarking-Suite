@@ -4,21 +4,86 @@ from __future__ import annotations
 
 import csv
 import json
-import math
-import re
-from pathlib import Path
 import random
+import re
+from datetime import UTC, datetime
+from pathlib import Path
 from statistics import mean
-from typing import Iterable
 
+from facets.figures import figure_manifest, render_figures, write_index
 from facets.runstore import atomic_json
 from facets.scoring_profile import load_profile
+
+# Directories that hold queue bookkeeping, checkpoints, or previous analysis
+# output. They may contain manifests but are not experiment runs.
+NON_RUN_DIRECTORIES = {"queues", "checkpoints", "analysis", "figures"}
 
 
 def discover_runs(root: Path) -> list[Path]:
     if (root / "manifest.json").exists():
         return [root]
-    return sorted(path.parent for path in root.rglob("manifest.json"))
+    return sorted(
+        path.parent
+        for path in root.rglob("manifest.json")
+        if not NON_RUN_DIRECTORIES.intersection(path.relative_to(root).parts)
+    )
+
+
+def select_runs(
+    runs: list[Path],
+    root: Path,
+    selection: str | None = None,
+    run_ids: list[str] | None = None,
+    allow_mixed: bool = False,
+) -> list[Path]:
+    """Resolve a run set deterministically, refusing ambiguous repeats.
+
+    ``selection`` is ``None`` (every model must appear once), ``"latest-complete"``
+    (newest complete run per model) or ``"explicit"`` (exactly the given run IDs).
+    """
+    if not runs:
+        raise ValueError(f"no structured runs found under {root}")
+    by_id = {run_id(run, root): run for run in runs}
+    if selection == "explicit" or run_ids:
+        wanted = list(dict.fromkeys(str(run_id).strip("/") for run_id in run_ids or []))
+        missing = [run_id for run_id in wanted if run_id not in by_id]
+        if missing:
+            raise ValueError(f"requested run ids not found: {missing}")
+        return [by_id[run_id] for run_id in wanted]
+    if selection not in (None, "latest-complete"):
+        raise ValueError(f"unknown run selection: {selection}")
+
+    by_model: dict[str, list[Path]] = {}
+    manifests = {}
+    for run in runs:
+        manifest = json.loads((run / "manifest.json").read_text(encoding="utf-8"))
+        manifests[run] = manifest
+        by_model.setdefault(_model_name(manifest), []).append(run)
+    repeated = {model: runs for model, runs in by_model.items() if len(runs) > 1}
+    if repeated and selection is None and not allow_mixed:
+        detail = {model: [run_id(run, root) for run in runs] for model, runs in sorted(repeated.items())}
+        raise ValueError(f"ambiguous repeated models {detail}; pass --run <id>... or --latest-complete")
+    chosen = []
+    for model, model_runs in sorted(by_model.items()):
+        if selection == "latest-complete" and len(model_runs) > 1:
+            complete = [run for run in model_runs if manifests[run].get("status") == "complete"] or model_runs
+            chosen.append(max(complete, key=lambda run: _completion_key(run, manifests[run])))
+        else:
+            chosen.extend(model_runs)
+    return chosen
+
+
+def run_id(run: Path, root: Path) -> str:
+    """Stable identifier for a run, relative to the analysed root when possible."""
+    try:
+        return str(run.relative_to(root))
+    except ValueError:
+        return str(run)
+
+
+def _completion_key(run: Path, manifest: dict) -> tuple[str, float]:
+    stamp = str(manifest.get("completed_at") or manifest.get("generated_at") or "")
+    return stamp, run.stat().st_mtime
 
 
 def load_run(path: Path) -> tuple[dict, list[dict]]:
@@ -76,11 +141,21 @@ def summarize_directory(root: Path) -> list[dict]:
 
 def _write_csv(path: Path, rows: list[dict], fields: list[str] | None = None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    fields = fields or sorted({key for row in rows for key in row})
+    fields = fields or _insertion_order(rows)
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()
         writer.writerows(rows)
+
+
+def _insertion_order(rows: list[dict]) -> list[str]:
+    """Columns in first-seen order so tables read predictably, not alphabetically."""
+    fields: list[str] = []
+    for row in rows:
+        for key in row:
+            if key not in fields:
+                fields.append(key)
+    return fields
 
 
 def _rank(values: dict[str, float]) -> dict[str, int]:
@@ -144,13 +219,25 @@ def _bootstrap_pair(records_a: list[dict], records_b: list[dict], weights: dict[
     }
 
 
-def analyze_directory(root: Path, output: Path, allow_mixed: bool = False) -> dict:
-    loaded = [(path, *load_run(path)) for path in discover_runs(root)]
+def analyze_directory(
+    root: Path,
+    output: Path,
+    allow_mixed: bool = False,
+    selection: str | None = None,
+    run_ids: list[str] | None = None,
+) -> dict:
+    discovered = discover_runs(root)
+    runs = select_runs(discovered, root, selection=selection, run_ids=run_ids, allow_mixed=allow_mixed)
+    loaded = [(path, *load_run(path)) for path in runs]
     warnings = ensure_compatible([item[1] for item in loaded], allow_mixed=allow_mixed)
+    skipped = [str(path) for path in discovered if path not in set(runs)]
+    if skipped:
+        warnings.append(f"runs excluded by selection={selection or 'default'}: {skipped}")
     output.mkdir(parents=True, exist_ok=True)
     tidy_records = []
     tidy_dimensions = []
     runtime_rows = []
+    latency_rows = []
     model_records = {}
     manifests = {}
     for run_dir, manifest, records in loaded:
@@ -159,13 +246,22 @@ def analyze_directory(root: Path, output: Path, allow_mixed: bool = False) -> di
         model_records[model] = records
         for record in records:
             metadata = record.get("metadata") or {}
+            response = record.get("llm_response") or {}
+            usage = response.get("usage") or {}
+            latency_ms = response.get("latency_ms")
             tidy_records.append({
                 "model": model, "task": record.get("task"), "record_id": record.get("record_id"),
                 "sample_index": record.get("sample_index", 0), "combined_score": record.get("combined_score"),
                 "composite_pass": record.get("combined_score") is not None and record["combined_score"] >= 0.5,
                 "functional_correct": metadata.get("functional_correct"), "status": record.get("status"),
                 "record_identity": record.get("record_identity"),
+                "latency_ms": latency_ms,
+                "input_tokens": usage.get("input_tokens"),
+                "output_tokens": usage.get("output_tokens"),
             })
+            if latency_ms is not None:
+                latency_rows.append({"model": model, "task": record.get("task"),
+                                     "record_id": record.get("record_id"), "latency_ms": latency_ms})
             for dimension_id, result in (record.get("details") or {}).items():
                 if not isinstance(result, dict):
                     continue
@@ -187,6 +283,7 @@ def analyze_directory(root: Path, output: Path, allow_mixed: bool = False) -> di
     _write_csv(output / "records.csv", tidy_records)
     _write_csv(output / "dimensions.csv", tidy_dimensions)
     _write_csv(output / "runtime_ratios.csv", runtime_rows)
+    _write_csv(output / "generation_latency.csv", latency_rows)
 
     task_summary = []
     dimension_summary = []
@@ -251,7 +348,7 @@ def analyze_directory(root: Path, output: Path, allow_mixed: bool = False) -> di
                 )})
     _write_csv(output / "paired_bootstrap.csv", bootstrap)
 
-    chart_status = "not generated"
+    default_scores = scores_by_profile.get("frozen_default", {})
     known_parameter_sizes = {}
     undisclosed_parameter_sizes = []
     for model, manifest in manifests.items():
@@ -266,78 +363,49 @@ def analyze_directory(root: Path, output: Path, allow_mixed: bool = False) -> di
         {"model": model, "parameter_size_billions": known_parameter_sizes.get(model), "status": "known" if model in known_parameter_sizes else "undisclosed_or_unverified"}
         for model in sorted(manifests)
     ])
-    try:
-        import matplotlib.pyplot as plt
-        default_scores = scores_by_profile.get("frozen_default", {})
-        if default_scores:
-            names = sorted(default_scores, key=default_scores.get, reverse=True)
-            fig, axis = plt.subplots(figsize=(10, 5))
-            axis.bar(names, [default_scores[name] for name in names])
-            axis.set_ylabel("FACETS composite score")
-            axis.tick_params(axis="x", rotation=45)
-            fig.tight_layout()
-            fig.savefig(output / "model_composite_scores.png", dpi=300)
-            plt.close(fig)
-            tasks = sorted({row["task"] for row in task_summary})
-            fig, axes = plt.subplots(len(tasks), 1, figsize=(10, max(4, 2.5 * len(tasks))), squeeze=False)
-            for axis, task in zip(axes[:, 0], tasks):
-                rows = sorted((row for row in task_summary if row["task"] == task), key=lambda row: row["model"])
-                axis.bar([row["model"] for row in rows], [row["mean_score"] for row in rows])
-                axis.set_title(task)
-                axis.set_ylim(0, 1)
-                axis.tick_params(axis="x", rotation=45)
-            fig.tight_layout()
-            fig.savefig(output / "task_comparisons.png", dpi=300)
-            plt.close(fig)
-            dimensions = sorted({row["dimension_id"] for row in dimension_summary})
-            fig, axes = plt.subplots(len(dimensions), 1, figsize=(10, max(4, 2.5 * len(dimensions))), squeeze=False)
-            for axis, dimension in zip(axes[:, 0], dimensions):
-                rows = sorted((row for row in dimension_summary if row["dimension_id"] == dimension), key=lambda row: row["model"])
-                axis.bar([row["model"] for row in rows], [row["mean_score"] for row in rows])
-                axis.set_title(dimension)
-                axis.set_ylim(0, 1)
-                axis.tick_params(axis="x", rotation=45)
-            fig.tight_layout()
-            fig.savefig(output / "dimension_comparisons.png", dpi=300)
-            plt.close(fig)
-            sized = [(model, known_parameter_sizes[model], default_scores[model]) for model in known_parameter_sizes if model in default_scores]
-            if sized:
-                fig, axis = plt.subplots(figsize=(8, 5))
-                axis.scatter([row[1] for row in sized], [row[2] for row in sized])
-                for model, size, score in sized:
-                    axis.annotate(model, (size, score))
-                axis.set_xlabel("Known parameter size (billions)")
-                axis.set_ylabel("FACETS composite score")
-                fig.tight_layout()
-                fig.savefig(output / "known_parameter_size_relationship.png", dpi=300)
-                plt.close(fig)
-            measured_runtime = [row for row in runtime_rows if row["functional_correct"] is True and row["raw_time_ratio"] is not None and row["raw_memory_ratio"] is not None]
-            if measured_runtime:
-                fig, axis = plt.subplots(figsize=(8, 5))
-                for model in sorted({row["model"] for row in measured_runtime}):
-                    rows = [row for row in measured_runtime if row["model"] == model]
-                    axis.scatter([row["raw_time_ratio"] for row in rows], [row["raw_memory_ratio"] for row in rows], label=model, alpha=0.7)
-                axis.axvline(1, color="grey", linewidth=0.8)
-                axis.axhline(1, color="grey", linewidth=0.8)
-                axis.set_xlabel("Baseline/generated time ratio (uncapped)")
-                axis.set_ylabel("Baseline/generated peak-memory ratio (uncapped)")
-                axis.legend(fontsize="small")
-                fig.tight_layout()
-                fig.savefig(output / "correct_runtime_raw_ratios.png", dpi=300)
-                plt.close(fig)
-            chart_status = "generated"
-    except Exception as exc:
-        warnings.append(f"charts unavailable: {exc}")
+
+    tasks = sorted({row["task"] for row in task_summary if row["task"]})
+    figures = render_figures(
+        output=output,
+        records=tidy_records,
+        task_summary=task_summary,
+        model_scores=default_scores,
+        parameter_sizes=known_parameter_sizes,
+        undisclosed_sizes=sorted(undisclosed_parameter_sizes),
+        latency_rows=latency_rows,
+        models=models,
+        tasks=tasks,
+    )
+    warnings.extend(f"figure unavailable: {failure}" for failure in figures["failures"])
+    index = write_index(output, figures["figures"], {
+        "generated_at": _generated_at(),
+        "runs": len(loaded),
+        "evaluator_version": next(iter(manifests.values())).get("evaluator_version") if manifests else None,
+        "scoring_profile": next(iter(manifests.values())).get("scoring_profile") if manifests else None,
+        "models": models,
+        "warnings": warnings,
+    })
+    figure_manifest(figures, output, index)
+
     summary = {
         "models": models,
         "runs": len(loaded),
+        "run_ids": [run_id(path, root) for path in runs],
+        "selection": selection or ("explicit" if run_ids else "default"),
         "warnings": warnings,
-        "chart_status": chart_status,
+        "chart_status": "generated" if figures["figures"] else "not generated",
+        "figures": figures["stems"],
+        "figure_directory": output.name,
         "known_parameter_sizes_billions": known_parameter_sizes,
         "undisclosed_or_unverified_parameter_sizes": sorted(undisclosed_parameter_sizes),
         "correctness_note": "functional correctness uses actual applicable functional outcomes; composite pass is reported separately",
         "runtime_note": "raw time/memory ratios are exported separately and only correctness-gated measurements should be interpreted",
+        "latency_note": "provider-reported generation latency only; hardware and provider paths differ between models",
         "cross_benchmark_note": "no numeric FACETS/LiveCodeBench equivalence is computed",
     }
     atomic_json(output / "analysis.json", summary)
     return summary
+
+
+def _generated_at() -> str:
+    return datetime.now(UTC).isoformat()

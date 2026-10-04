@@ -1,4 +1,12 @@
 schema_version: 1
+# Short, memorable names for models people ask for by hand. An alias resolves to
+# the canonical key below and never introduces a second model identity, so runs
+# recorded as "sonnet" and "claude-sonnet-4-6" land in the same cohort.
+aliases:
+  sonnet: claude-sonnet-4-6
+  opus: claude-opus-4-6
+  gpt54: gpt-5.4
+  phi4: phi4-mini
 models:
   claude-opus-4-6:
     provider: anthropic

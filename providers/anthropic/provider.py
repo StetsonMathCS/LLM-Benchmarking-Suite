@@ -4,9 +4,18 @@ Anthropic API provider
 """
 from typing import Optional
 from core.registry import ProviderRegistry
-from core.base import BaseProvider, LLMResponse
+from core.base import BaseProvider, LLMResponse, usage_fields
 import asyncio
 from time import perf_counter
+
+MESSAGE_USAGE_FIELDS = (
+    "input_tokens",
+    "output_tokens",
+    "cache_creation_input_tokens",
+    "cache_read_input_tokens",
+    "cache_creation",
+    "server_tool_use",
+)
 
 @ProviderRegistry.register("anthropic")
 class AnthropicProvider(BaseProvider):
@@ -55,7 +64,8 @@ class AnthropicProvider(BaseProvider):
                 stop_reason=getattr(response, "stop_reason", None),
                 truncated=getattr(response, "stop_reason", None) == "max_tokens",
                 requested_settings={key: value for key, value in {"temperature": self.config.temperature, "max_tokens": self.config.max_tokens, **provider_extras}.items() if value is not None},
-                effective_settings={key: value for key, value in {"temperature": self.config.temperature, "max_tokens": self.config.max_tokens, **provider_extras}.items() if value is not None},
+effective_settings={key: value for key, value in {"temperature": self.config.temperature, "max_tokens": self.config.max_tokens, **provider_extras}.items() if value is not None},
+                usage=usage_fields(getattr(response, "usage", None), MESSAGE_USAGE_FIELDS),
             )
         except Exception as e:
             return LLMResponse(
