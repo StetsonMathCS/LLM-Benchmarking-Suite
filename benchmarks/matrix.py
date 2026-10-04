@@ -1,98 +1,56 @@
-"""
-benchmarks/matrix.py
-
-Benchmark Matrix — maps each task to the dimensions it should be evaluated on.
-Provides a central lookup so tasks can discover which dimensions apply to them.
-"""
+"""Frozen task-to-dimension matrix for the revised-v1 evaluator."""
 
 from benchmarks.dimensions.functional_correctness import FunctionalCorrectnessDimension
-from benchmarks.dimensions.semantic_drift import SemanticDriftDimension
+from benchmarks.dimensions.structural_similarity import StructuralSimilarityDimension
 from benchmarks.dimensions.code_consistency import CodeConsistencyDimension
 from benchmarks.dimensions.linting import LintingDimension
 from benchmarks.dimensions.runtime_analysis import RuntimeAnalysisDimension
-from benchmarks.dimensions.test_pass_rate import TestPassRateDimension
+from benchmarks.dimensions.generated_test_effectiveness import GeneratedTestEffectivenessDimension
 from benchmarks.dimensions.vulnerabilities import VulnerabilitiesDimension
-from benchmarks.dimensions.code_review import CodeReviewDimension
-from benchmarks.dimensions.code_generation_tests import CodeGenerationTestsDimension
+from benchmarks.dimensions.reference_review_similarity import ReferenceReviewSimilarityDimension
+from benchmarks.dimensions.reference_test_success import ReferenceTestSuccessDimension
+from facets.scoring_profile import DEFAULT_PROFILE, LEGACY_DIMENSION_NAMES
 
-# Matrix Definition 
-# Keys   = task names (must match BaseBenchmark.name on each task)
-# Values = list of BaseDimension *classes* to instantiate at eval time
 
 BENCHMARK_MATRIX: dict[str, list[type]] = {
-    "bug_fixing" : [
+    "bug_fixing": [
         CodeConsistencyDimension,
         FunctionalCorrectnessDimension,
         LintingDimension,
         VulnerabilitiesDimension,
-        SemanticDriftDimension
+        StructuralSimilarityDimension,
     ],
-    "code_generation" : [
-        CodeConsistencyDimension,
-        CodeGenerationTestsDimension,
-    ],
-    "code_review" : [
-        CodeReviewDimension
-    ],
-    "refactoring" : [
+    "code_generation": [CodeConsistencyDimension, ReferenceTestSuccessDimension],
+    "code_review": [ReferenceReviewSimilarityDimension],
+    "refactoring": [
         CodeConsistencyDimension,
         FunctionalCorrectnessDimension,
         LintingDimension,
         RuntimeAnalysisDimension,
-        VulnerabilitiesDimension
+        VulnerabilitiesDimension,
     ],
-    "test_generation" : [   
-        CodeConsistencyDimension,
-        TestPassRateDimension
-    ],
-    "translation":[
+    "test_generation": [CodeConsistencyDimension, GeneratedTestEffectivenessDimension],
+    "translation": [
         CodeConsistencyDimension,
         LintingDimension,
         VulnerabilitiesDimension,
-        FunctionalCorrectnessDimension
+        FunctionalCorrectnessDimension,
     ],
 }
 
-# Weights per dimension
-DIMENSION_WEIGHTS = {
-    "bug_fixing": {
-        "Functional Correctness": 0.70,
-        "Linting":                0.10,
-        "Code Consistency":       0.10,
-        "Vulnerabilities":        0.05,
-        "Semantic Drift":         0.05, 
-    },
-    "code_generation" : {
-        "Code Consistency" :      0.40,
-        "Code Generation Tests" : 0.60,
-    },
-    "code_review" : {
-        "Code Review Quality" : 1.00,
-    },
-    "refactoring": {
-        "Functional Correctness": 0.40,
-        "Runtime Analysis":       0.35,
-        "Code Consistency":       0.10,
-        "Linting":                0.10,
-        "Vulnerabilities":        0.05,
-    },
-    "test_generation": {
-        "Code Consistency" : 0.25,
-        "Test Pass Rate" : 0.75,
-    },
-    "translation": {
-        "Code Consistency": 0.30,
-        "Linting": 0.10,
-        "Vulnerabilities": 0.10,
-        "Functional Correctness": 0.50,
-    },
-}
+# Compatibility symbol; keys are stable IDs, never display names.
+DIMENSION_WEIGHTS = DEFAULT_PROFILE.dimension_weights
+
 
 def get_dimensions_for_task(task_name: str) -> list[type]:
-    """Return the dimension classes mapped to a given task name."""
     return BENCHMARK_MATRIX.get(task_name, [])
 
 
 def get_all_task_names() -> list[str]:
-    """Return every task name registered in the matrix."""
-    return list(BENCHMARK_MATRIX.keys())
+    return list(BENCHMARK_MATRIX)
+
+
+def resolve_dimension_id(name_or_id: str) -> str:
+    """Map explicit legacy configuration names at the import boundary."""
+    return LEGACY_DIMENSION_NAMES.get(name_or_id, name_or_id)
+

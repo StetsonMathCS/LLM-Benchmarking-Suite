@@ -45,7 +45,7 @@ class TestDimensionWeights:
 
     def test_weights_cover_all_dimensions(self):
         for task, dims in BENCHMARK_MATRIX.items():
-            dim_names = {cls().name for cls in dims}
+            dim_names = {cls.dimension_id for cls in dims}
             weight_names = set(DIMENSION_WEIGHTS[task].keys())
             assert dim_names.issubset(weight_names), (
                 f"{task}: dimensions {dim_names - weight_names} have no weight"
@@ -85,16 +85,15 @@ class TestLookupFunctions:
 class TestSpecificMappings:
     def test_bug_fixing_has_functional_correctness(self):
         dims = get_dimensions_for_task("bug_fixing")
-        dim_names = [cls().name for cls in dims]
+        dim_names = [cls.name for cls in dims]
         assert "Functional Correctness" in dim_names
 
     def test_code_review_only_has_review_dimension(self):
         dims = get_dimensions_for_task("code_review")
         assert len(dims) == 1
-        assert dims[0]().name == "Code Review Quality"
+        assert dims[0].name == "Reference Review Similarity (RRS)"
 
-    def test_test_generation_has_test_pass_rate(self):
+    def test_test_generation_has_generated_test_effectiveness(self):
         dims = get_dimensions_for_task("test_generation")
-        dim_names = [cls().name for cls in dims]
-        assert "Test Pass Rate" in dim_names
-
+        dim_names = [cls.name for cls in dims]
+        assert "Generated Test Effectiveness (GTE)" in dim_names

@@ -1,0 +1,52 @@
+profile_id: revised-v1
+evaluator_version: revised-v1
+composite_threshold: 0.5
+samples_per_problem: 1
+functional_pass_dimensions:
+  code_generation: reference_test_success
+  bug_fixing: functional_correctness
+  refactoring: functional_correctness
+  translation: functional_correctness
+task_weights:
+  code_generation: 0.27
+  translation: 0.16
+  bug_fixing: 0.15
+  code_review: 0.15
+  refactoring: 0.15
+  test_generation: 0.12
+dimension_weights:
+  bug_fixing:
+    functional_correctness: 0.70
+    linting: 0.10
+    code_consistency: 0.10
+    vulnerabilities: 0.05
+    structural_similarity: 0.05
+  code_generation:
+    code_consistency: 0.40
+    reference_test_success: 0.60
+  code_review:
+    reference_review_similarity: 1.00
+  refactoring:
+    functional_correctness: 0.40
+    runtime_analysis: 0.35
+    code_consistency: 0.10
+    linting: 0.10
+    vulnerabilities: 0.05
+  test_generation:
+    code_consistency: 0.25
+    generated_test_effectiveness: 0.75
+  translation:
+    code_consistency: 0.30
+    linting: 0.10
+    vulnerabilities: 0.10
+    functional_correctness: 0.50
+not_applicable:
+  runtime_analysis: [bug_fixing, code_generation, code_review, test_generation, translation]
+failure_policy:
+  candidate_failure: score_zero_keep_planned_denominator
+  infrastructure_failure: run_incomplete_no_official_aggregate
+  not_applicable: frozen_profile_only
+active_weight_policy: deterministic_profile_subset_recorded
+performance_formula: geometric_mean(min(1, baseline_time/generated_time), min(1, baseline_memory/generated_memory))
+gte_formula: validity_times_mutation_detection
+

@@ -72,7 +72,8 @@ class TestCodeReviewRun:
             expected_output="Use enumerate instead of range(len(data))",
         )
         assert isinstance(result, BenchmarkResult)
-        assert result.combined_score is not None
+        assert result.combined_score is None
+        assert result.status == BenchmarkStatus.ERROR
 
     def test_run_with_mocked_dimension(self):
         """Mock the dimension to test the task orchestration logic."""
@@ -80,7 +81,8 @@ class TestCodeReviewRun:
         bm = CodeReviewBenchmark(code_language="python", provider=provider)
 
         mock_result = DimensionResult(
-            dimension_name="Code Review Quality",
+            dimension_name="Reference Review Similarity (RRS)",
+            dimension_id="reference_review_similarity",
             score=0.85,
             passed=True,
             details={"similarity_method": "cosine"},

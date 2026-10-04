@@ -5,12 +5,58 @@ All providers, benchmarks, and analyzers inherit from these.
 """
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field, is_dataclass
 from typing import Any, Optional
 from enum import Enum
 from time import perf_counter
 from pathlib import Path
+import math
 from utils import code_runner
+
+DIMENSION_ID_BY_NAME = {
+    "Code Consistency": "code_consistency",
+    "Functional Correctness": "functional_correctness",
+    "Linting": "linting",
+    "Runtime Analysis": "runtime_analysis",
+    "Vulnerabilities": "vulnerabilities",
+    "Structural Similarity (SS)": "structural_similarity",
+    "Reference Review Similarity (RRS)": "reference_review_similarity",
+    "Reference Test Success (RTS)": "reference_test_success",
+    "Generated Test Effectiveness (GTE)": "generated_test_effectiveness",
+    # Accepted only at configuration/import boundaries. Migration retains the
+    # historical label and evaluator provenance rather than relabeling scores.
+    "Semantic Drift": "structural_similarity",
+    "Code Review Quality": "reference_review_similarity",
+    "Code Generation Tests": "reference_test_success",
+    "Code Completion Tests": "reference_test_success",
+    "Test Pass Rate": "generated_test_effectiveness",
+}
+
+
+def to_jsonable(value: Any) -> Any:
+    """Convert FACETS result values to genuine JSON-compatible objects.
+
+    Provider SDK response objects are deliberately not stringified: their
+    useful, stable fields belong on ``LLMResponse`` and opaque SDK objects are
+    represented by their type.  This prevents accidental secret/header dumps.
+    """
+    if value is None or isinstance(value, (str, int, bool)):
+        return value
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            return None
+        return value
+    if isinstance(value, Enum):
+        return value.value
+    if hasattr(value, "to_dict") and callable(value.to_dict):
+        return to_jsonable(value.to_dict())
+    if is_dataclass(value):
+        return to_jsonable(asdict(value))
+    if isinstance(value, dict):
+        return {str(k): to_jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        return [to_jsonable(v) for v in value]
+    return {"opaque_type": f"{type(value).__module__}.{type(value).__name__}"}
 class BenchmarkStatus(Enum):
     PENDING = "pending"
     RUNNING = "running"
@@ -30,10 +76,33 @@ class LLMResponse:
     latency_ms: float=0.0
     raw_response: Any=None
     error: Optional[str]=None
+    status: str = "completed"
+    stop_reason: Optional[str] = None
+    attempts: int = 1
+    truncated: bool = False
+    requested_settings: dict = field(default_factory=dict)
+    effective_settings: dict = field(default_factory=dict)
 
     @property 
     def success(self) -> bool:
-        return self.error is None and bool(self.content)
+        return self.error is None and bool(self.content and self.content.strip())
+
+    def to_dict(self) -> dict:
+        return {
+            "content": self.content,
+            "model": self.model,
+            "provider": self.provider,
+            "prompt_tokens": self.prompt_tokens,
+            "completion_tokens": self.completion_tokens,
+            "latency_ms": self.latency_ms,
+            "error": self.error,
+            "status": self.status,
+            "stop_reason": self.stop_reason,
+            "attempts": self.attempts,
+            "truncated": self.truncated,
+            "requested_settings": to_jsonable(self.requested_settings),
+            "effective_settings": to_jsonable(self.effective_settings),
+        }
 
 @dataclass
 class ModelConfig:
@@ -42,8 +111,8 @@ class ModelConfig:
     model_name: str
     api_key: Optional[str]=None
     base_url: Optional[str]=None
-    temperature: Optional[str]=None
-    max_tokens: Optional[str]=None
+    temperature: Optional[float]=None
+    max_tokens: Optional[int]=None
     system_prompt: Optional[str]=None  # User-defined system instruction
     extra_params: dict = field(default_factory=dict)
 
@@ -60,7 +129,7 @@ class BenchmarkResult:
     llm_response: Optional[LLMResponse] = None
 
     def to_dict(self) -> dict:
-            return {
+            data = {
                 "benchmark": self.benchmark_name,
                 "status": self.status.value,
                 "combined_score": self.combined_score,
@@ -68,8 +137,10 @@ class BenchmarkResult:
                 "issues": self.issues_found,
                 "details": self.details,
                 "duration_s": self.duration_s,
-                "llm_response" : self.llm_response,
+                "metadata": self.metadata,
+                "llm_response" : self.llm_response.to_dict() if self.llm_response else None,
             }
+            return to_jsonable(data)
 
 
 class BaseProvider(ABC):
@@ -181,6 +252,27 @@ class DimensionResult:
     passed: bool = True       # used for dimension tests passing without error
     details: dict = field(default_factory=dict)
     issues: list = field(default_factory=list)
+    dimension_id: str = ""
+    status: str = "ok"  # ok | candidate_failure | infrastructure_error | not_applicable
+    applicable: bool = True
+
+    def __post_init__(self) -> None:
+        if not self.dimension_id:
+            self.dimension_id = DIMENSION_ID_BY_NAME.get(self.dimension_name, self.dimension_name)
+        if not math.isfinite(float(self.score)) or not 0.0 <= float(self.score) <= 1.0:
+            raise ValueError(f"dimension score must be finite and in [0, 1], got {self.score!r}")
+
+    def to_dict(self) -> dict:
+        return to_jsonable({
+            "dimension_id": self.dimension_id,
+            "display_name": self.dimension_name,
+            "score": self.score,
+            "passed": self.passed,
+            "status": self.status,
+            "applicable": self.applicable,
+            "details": self.details,
+            "issues": self.issues,
+        })
 
 
 class BaseDimension(ABC):
@@ -192,6 +284,7 @@ class BaseDimension(ABC):
     """
     runner = code_runner.CodeRunner
     name: str = "base_dimension"
+    dimension_id: str = "base_dimension"
     description: str = ""
     lang_map = {
         "python" : runner.run_python,

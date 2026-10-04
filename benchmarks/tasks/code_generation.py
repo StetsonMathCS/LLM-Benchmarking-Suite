@@ -14,7 +14,7 @@ from core.base import (
     DimensionResult
 )
 from benchmarks import matrix
-from benchmarks.dimensions.code_generation_tests import CodeGenerationTestsDimension
+from benchmarks.dimensions.reference_test_success import ReferenceTestSuccessDimension
 from core.scoring import PASS_THRESHOLD
 
 class CodeGenerationBenchmark(BaseBenchmark):
@@ -36,12 +36,18 @@ class CodeGenerationBenchmark(BaseBenchmark):
 
     def run(self, prompt: str, system_prompt: str | None, **kwargs) -> BenchmarkResult:
         llm_response = self.provider.complete(prompt, system_prompt)
-        if not llm_response.success:
+        if llm_response.error:
             return BenchmarkResult(
                 benchmark_name=self.name,
                 status=BenchmarkStatus.ERROR,
                 details={"error": llm_response.error or "LLM returned empty response"},
                 llm_response=llm_response,
+            )
+        if not llm_response.content or not llm_response.content.strip():
+            return BenchmarkResult(
+                benchmark_name=self.name, status=BenchmarkStatus.FAILED, combined_score=0.0,
+                details={"candidate_failure": "model returned empty output"},
+                llm_response=llm_response, metadata={"functional_correct": False},
             )
         from utils.code_runner import extract_code
         generated_code = extract_code(llm_response.content)
@@ -51,30 +57,18 @@ class CodeGenerationBenchmark(BaseBenchmark):
         results = {}
         issues = {}
         combined_score = 0.0
-        active_weight = 0.0
+        infrastructure_error = False
         for cls in dimensions:
             dimension = cls()
-            skipped = False
             try:
-                if isinstance(dimension, CodeGenerationTestsDimension):
-                    test = kwargs.get("test")
-                    entry_point = kwargs.get("entry_point")
-                    if test and entry_point and self.language == "python":
-                        result = dimension.evaluate(
-                            language=self.language,
-                            generated_code=generated_code,
-                            test=test,
-                            entry_point=entry_point,
-                        )
-                    else:
-                        # No tests available for this language/row — exclude from scoring
-                        skipped = True
-                        result = DimensionResult(
-                            dimension_name=dimension.name,
-                            score=0.0,
-                            passed=False,
-                            details={"skipped": "No test/entry_point provided or non-Python"}
-                        )
+                if isinstance(dimension, ReferenceTestSuccessDimension):
+                    result = dimension.evaluate(
+                        language=self.language,
+                        generated_code=generated_code,
+                        test=kwargs.get("test"),
+                        entry_point=kwargs.get("entry_point"),
+                        dataset_hash=kwargs.get("dataset_hash"),
+                    )
                 else:
                     # code_input is a natural-language prompt, not code — pass None
                     result = dimension.evaluate(
@@ -89,24 +83,23 @@ class CodeGenerationBenchmark(BaseBenchmark):
                     score=0.0,
                     passed=False,
                     details={"error": str(e)},
-                    issues=[str(e)]
+                    issues=[str(e)],
+                    status="infrastructure_error",
                 )
-            if not skipped:
-                active_weight += weights[dimension.name]
-                combined_score += weights[dimension.name] * result.score
-            if not result.passed and not skipped:
-                issues[dimension.name] = result.details.get("error") or f"Score below threshold ({result.score:.2f})"
-            results[dimension.name] = result
+            infrastructure_error = infrastructure_error or result.status == "infrastructure_error"
+            combined_score += weights[dimension.dimension_id] * result.score
+            if not result.passed:
+                issues[dimension.dimension_id] = result.details.get("diagnostic") or result.details.get("error") or f"Score below threshold ({result.score:.2f})"
+            results[dimension.dimension_id] = result
 
-        # Renormalize so skipped dimensions don't dilute the score
-        if active_weight > 0:
-            combined_score /= active_weight
-        status = BenchmarkStatus.PASSED if combined_score >= PASS_THRESHOLD else BenchmarkStatus.FAILED
+        status = BenchmarkStatus.ERROR if infrastructure_error else (BenchmarkStatus.PASSED if combined_score >= PASS_THRESHOLD else BenchmarkStatus.FAILED)
+        functional = results.get("reference_test_success")
         return BenchmarkResult(
             benchmark_name=self.name,
             status=status,
-            combined_score=combined_score,
+            combined_score=None if infrastructure_error else combined_score,
             details=results,
             issues_found=issues,
             llm_response=llm_response,
+            metadata={"functional_correct": bool(functional and functional.score == 1.0 and functional.status == "ok")},
         )

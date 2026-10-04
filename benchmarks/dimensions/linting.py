@@ -4,6 +4,7 @@ benchmarks/dimensions/linting.py
 Dimension that evaluates code quality via linting.
 """
 import subprocess
+import shutil
 import tempfile
 from pathlib import Path
 from core.base import (
@@ -13,6 +14,7 @@ from core.base import (
 from typing import Optional
 
 class LintingDimension(BaseDimension):
+    dimension_id = "linting"
     name = "Linting"
     description = "Code quality violations: pylint (Python), cppcheck (C++), eslint (JS)."
 
@@ -20,6 +22,17 @@ class LintingDimension(BaseDimension):
         try:
             # Get the language for the generated code (may differ from source language in translation tasks)
             generated_code_language = kwargs.get('generated_code_language', language)
+            tools = {"python": "pylint", "cpp": "cppcheck", "javascript": "eslint"}
+            required = {tools.get(generated_code_language)}
+            if original_code:
+                required.add(tools.get(language))
+            missing = sorted(tool for tool in required if tool and shutil.which(tool) is None)
+            if missing:
+                return DimensionResult(
+                    self.name, 0.0, False,
+                    {"error": f"Missing required lint tool(s): {', '.join(missing)}", "tools": sorted(required)},
+                    dimension_id=self.dimension_id, status="infrastructure_error",
+                )
             
             # If no original code provided, only lint generated code and return 1.0
             if not original_code:
@@ -41,7 +54,8 @@ class LintingDimension(BaseDimension):
                     score=1.0,
                     details={
                         "generated_violations": gen_violations,
-                        "note": "No original code provided for comparison"
+                        "note": "No original code provided for comparison",
+                        "tool": tools[generated_code_language],
                     }
                 )
             
@@ -81,14 +95,16 @@ class LintingDimension(BaseDimension):
                 details={
                     "original_violations": orig_violations,
                     "generated_violations": gen_violations,
-                    "regression": gen_violations > orig_violations
+                    "regression": gen_violations > orig_violations,
+                    "tools": sorted(required),
                 }
             )
         except Exception as e:
             return DimensionResult(
                 dimension_name=self.name,
                 score=0.0,
-                details={"error": str(e)}
+                details={"error": str(e)},
+                status="infrastructure_error",
             )
 
     @staticmethod
@@ -109,10 +125,10 @@ class LintingDimension(BaseDimension):
 
             output = result.stdout + result.stderr
             return output.count(':') if result.returncode != 0 else 0
-        except FileNotFoundError:
-            return 0
-        except Exception:
-            return 0
+        except FileNotFoundError as exc:
+            raise RuntimeError("pylint executable not found") from exc
+        except Exception as exc:
+            raise RuntimeError(f"pylint failed: {exc}") from exc
 
     @staticmethod
     def _lint_cpp(code: str) -> int:
@@ -133,10 +149,10 @@ class LintingDimension(BaseDimension):
             output = result.stdout + result.stderr
             lines = [l for l in output.split('\n') if 'error:' in l or 'warning:' in l]
             return len(lines)
-        except FileNotFoundError:
-            return 0
-        except Exception:
-            return 0
+        except FileNotFoundError as exc:
+            raise RuntimeError("cppcheck executable not found") from exc
+        except Exception as exc:
+            raise RuntimeError(f"cppcheck failed: {exc}") from exc
 
     @staticmethod
     def _lint_javascript(code: str) -> int:
@@ -164,10 +180,10 @@ class LintingDimension(BaseDimension):
                 except json.JSONDecodeError:
                     return 0
             return 0
-        except FileNotFoundError:
-            return 0
-        except Exception:
-            return 0
+        except FileNotFoundError as exc:
+            raise RuntimeError("eslint executable not found") from exc
+        except Exception as exc:
+            raise RuntimeError(f"eslint failed: {exc}") from exc
 
     @staticmethod
     def _calculate_score(original_violations: int, generated_violations: int) -> float:

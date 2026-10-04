@@ -76,7 +76,8 @@ class TestSingleTask:
         engine = ScoringEngine(results)
         report = engine.compute()
         assert report.total_errors == 1
-        assert report.final_score == 0.0
+        assert report.final_score is None
+        assert report.complete is False
 
 
 # ── Multi-task scoring ────────────────────────────────────────────────────
@@ -197,7 +198,7 @@ class TestScoringEdgeCases:
         results = [_make_error_result("bug_fixing"), _make_error_result("code_generation")]
         engine = ScoringEngine(results)
         report = engine.compute()
-        assert report.final_score == 0.0
+        assert report.final_score is None
         assert report.total_errors == 2
 
     def test_pass_rate_calculation(self):

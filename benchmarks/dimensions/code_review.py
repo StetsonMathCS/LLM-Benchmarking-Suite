@@ -11,12 +11,13 @@ from core.base import (
 from typing import Optional, List
 
 
-class CodeReviewDimension(BaseDimension):
-    name = "Code Review Quality"
-    description = "Semantic similarity between generated and expected code review using embeddings"
+class ReferenceReviewSimilarityDimension(BaseDimension):
+    dimension_id = "reference_review_similarity"
+    name = "Reference Review Similarity (RRS)"
+    description = "Embedding similarity to a reference review; it does not establish expert review accuracy."
     # Default Ollama embedding model and host
     EMBEDDING_MODEL = "nomic-embed-text:latest"
-    DEFAULT_BASE_URL = "http://localhost:1561"
+    DEFAULT_BASE_URL = "http://localhost:11434"
     
     def __init__(self):
         """Initialize the dimension and create Ollama client."""
@@ -107,6 +108,7 @@ class CodeReviewDimension(BaseDimension):
         expected_output = kwargs.get('expected_output')
         # Validate inputs
         if not expected_output or not generated_review:
+            status = "infrastructure_error" if not expected_output else "candidate_failure"
             return DimensionResult(
                 dimension_name=self.name,
                 score=0.0,
@@ -115,7 +117,8 @@ class CodeReviewDimension(BaseDimension):
                     "error": "Missing expected_output or generated_review",
                     "expected_empty": not expected_output,
                     "generated_empty": not generated_review,
-                }
+                },
+                status=status,
             )
         
         # Get embeddings
@@ -131,7 +134,8 @@ class CodeReviewDimension(BaseDimension):
                 details={
                     "error": "Failed to generate embeddings",
                     "ollama_available": self._ollama_available,
-                }
+                },
+                status="infrastructure_error",
             )
         
         # Calculate cosine similarity
@@ -149,3 +153,6 @@ class CodeReviewDimension(BaseDimension):
                 "embedding_dim": len(expected_embedding) if expected_embedding else 0,
             }
         )
+
+
+CodeReviewDimension = ReferenceReviewSimilarityDimension

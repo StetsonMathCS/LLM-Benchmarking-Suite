@@ -6,6 +6,8 @@ and match them with the appropriate task classes.
 """
 
 import csv
+import hashlib
+import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Type
 from dataclasses import dataclass
@@ -26,6 +28,14 @@ class DatasetRecord:
     language: str
     record_id: str
     data: Dict[str, Any]
+
+    @property
+    def fingerprint(self) -> str:
+        payload = json.dumps(
+            {"task": self.task_name, "language": self.language, "id": self.record_id, "data": self.data},
+            sort_keys=True, separators=(",", ":"), ensure_ascii=False,
+        )
+        return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 class DatasetMapper:
@@ -159,6 +169,8 @@ class DatasetMapper:
         """
         dataset_path = self.get_dataset_path(task_name, language)
         records = []
+        contracts_path = dataset_path.with_name(f"{dataset_path.stem}_contracts.json")
+        contracts = json.loads(contracts_path.read_text(encoding="utf-8")) if contracts_path.exists() else {}
         
         with open(dataset_path, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
@@ -166,11 +178,14 @@ class DatasetMapper:
                 if limit and i >= limit:
                     break
                 
+                row_data = dict(row)
+                if str(row.get("id", str(i))) in contracts:
+                    row_data["_facets_contract"] = contracts[str(row.get("id", str(i)))]
                 record = DatasetRecord(
                     task_name=task_name,
                     language=language,
                     record_id=row.get("id", str(i)),
-                    data=dict(row)
+                    data=row_data
                 )
                 records.append(record)
         
@@ -244,16 +259,19 @@ class DatasetMapper:
         dataset_path = self.get_dataset_path(task_name, language)
         task_config = self.TASK_DATASET_MAP[task_name]
         
-        # Count records
-        record_count = 0
-        with open(dataset_path, "r", encoding="utf-8") as f:
-            record_count = sum(1 for _ in f) - 1  # -1 for header
+        records = self.load_dataset(task_name, language)
+        ids = [record.record_id for record in records]
+        contracts_path = dataset_path.with_name(f"{dataset_path.stem}_contracts.json")
+        hash_material = dataset_path.read_bytes() + (contracts_path.read_bytes() if contracts_path.exists() else b"")
+        file_hash = hashlib.sha256(hash_material).hexdigest()
         
         return {
             "task_name": task_name,
             "language": language,
             "csv_path": str(dataset_path),
-            "record_count": record_count,
+            "record_count": len(records),
+            "record_ids_unique": len(ids) == len(set(ids)),
+            "dataset_hash": file_hash,
             "columns": task_config["csv_columns"],
             "benchmark_class": task_config["class"].__name__,
         }
@@ -277,6 +295,7 @@ class DatasetMapper:
      
         # Base kwargs that apply to all tasks
         kwargs: Dict[str, Any] = {}
+        kwargs["dataset_hash"] = record.fingerprint
         
         # Task-specific mapping
         if task_name == "bug_fixing":
@@ -288,7 +307,7 @@ class DatasetMapper:
         elif task_name == "code_generation":
             kwargs.update({
                 "code_input": data.get("prompt") or data.get("instruction"),
-                "expected_output": data.get("completed") or data.get("expected_output"),
+                "reference_implementation": data.get("completed") or data.get("expected_output"),
                 "test": data.get("test", ""),
                 "entry_point": data.get("entry_point", ""),
             })
@@ -301,12 +320,16 @@ class DatasetMapper:
             })
         
         elif task_name == "refactoring":
+            contract = data.get("_facets_contract") or {}
             kwargs.update({
                 "code_input": data.get("original_code"),
                 "refactoring_task": data.get("refactoring_task"),
-                "expected_output": data.get("output_expected"),
-                "expected_console_output": data.get("expected_console_output"),
-                "test_harness": data.get("test_harness", ""),
+                "expected_output": data.get("output_expected"),  # compatibility
+                "reference_implementation": data.get("output_expected"),
+                "expected_output_is_implementation": True,
+                "expected_console_output": contract.get("expected_console_output", data.get("expected_console_output")),
+                "test_harness": contract.get("test_harness", data.get("test_harness", "")),
+                "test_contract": contract.get("contract", "exact_console_output"),
             })
 
         elif task_name == "test_generation":

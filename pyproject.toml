@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "facets-benchmark"
+version = "1.0.0"
+description = "FACETS reproducible LLM software-engineering benchmark"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["PyYAML>=6.0", "pytest>=8.0"]
+
+[project.optional-dependencies]
+providers = ["openai>=1.12", "anthropic>=0.20", "ollama>=0.1.7"]
+analysis = ["matplotlib>=3.8"]
+quality = ["pylint>=3.0", "bandit>=1.7.7", "apted", "tree-sitter", "tree-sitter-cpp"]
+all = ["openai>=1.12", "anthropic>=0.20", "ollama>=0.1.7", "matplotlib>=3.8", "pylint>=3.0", "bandit>=1.7.7", "apted", "tree-sitter", "tree-sitter-cpp"]
+
+[project.scripts]
+facets = "facets.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["facets*", "benchmarks*", "core*", "datasets*", "providers*", "utils*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+

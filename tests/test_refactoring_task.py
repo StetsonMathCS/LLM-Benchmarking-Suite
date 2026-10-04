@@ -64,9 +64,8 @@ class TestRefactoringRun:
             expected_output="[2, 6, 10]",
         )
         assert isinstance(result, BenchmarkResult)
-        assert result.status in (BenchmarkStatus.PASSED, BenchmarkStatus.FAILED)
-        assert result.combined_score is not None
-        assert 0.0 <= result.combined_score <= 1.0
+        assert result.status == BenchmarkStatus.ERROR
+        assert result.combined_score is None
 
     def test_error_response(self, benchmark_error):
         result = benchmark_error._timed_run(

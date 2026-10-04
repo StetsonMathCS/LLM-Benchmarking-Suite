@@ -21,10 +21,11 @@ import tempfile
 import json
 from typing import Optional
 
-class SemanticDriftDimension(BaseDimension):
+class StructuralSimilarityDimension(BaseDimension):
 
-    name = "Semantic Drift"
-    description = "Dimension that tests the code snippet for semantic drift. Returns the percentage similarity"
+    dimension_id = "structural_similarity"
+    name = "Structural Similarity (SS)"
+    description = "AST/tree structural similarity heuristic; it does not establish semantic equivalence."
     _CPP_LANGUAGE = Language(tscpp.language())
     _cpp_parser = Parser(_CPP_LANGUAGE)
 
@@ -55,7 +56,7 @@ class SemanticDriftDimension(BaseDimension):
     def safe_parse_python(code: str) -> ast.Module:
         """Safely parse Python code, handling indentation errors gracefully."""
         # Extract markdown code block if present
-        code = SemanticDriftDimension.extract_code_block(code, "python")
+        code = StructuralSimilarityDimension.extract_code_block(code, "python")
         
         # Strategy 1: Try as-is
         try:
@@ -106,20 +107,20 @@ class SemanticDriftDimension(BaseDimension):
         children = list(ast.iter_child_nodes(node))
         if not children:
             return f"{{{name}}}"
-        child_str = "".join(SemanticDriftDimension.ast_to_bracket(c) for c in children)
+        child_str = "".join(StructuralSimilarityDimension.ast_to_bracket(c) for c in children)
         return f"{{{name}{child_str}}}"
 
     @staticmethod
     def measure_similarity_python(original_code: str, generated_code: str) -> float:
         """Measures the percentage of semantic similarity in python code. returns a score from 0.0 to 1.0"""
         try:
-            orig_code = SemanticDriftDimension.safe_parse_python(original_code)
-            gen_code = SemanticDriftDimension.safe_parse_python(generated_code)
+            orig_code = StructuralSimilarityDimension.safe_parse_python(original_code)
+            gen_code = StructuralSimilarityDimension.safe_parse_python(generated_code)
         except SyntaxError as e:
             raise ValueError(f"Failed to parse code: {e}")
         
-        orig_children = SemanticDriftDimension.ast_to_bracket(orig_code)
-        gen_children = SemanticDriftDimension.ast_to_bracket(gen_code)
+        orig_children = StructuralSimilarityDimension.ast_to_bracket(orig_code)
+        gen_children = StructuralSimilarityDimension.ast_to_bracket(gen_code)
         tree1 = Tree.from_text(orig_children)
         tree2 = Tree.from_text(gen_children)
         # compute the tree edit distance
@@ -138,8 +139,8 @@ class SemanticDriftDimension(BaseDimension):
     def measure_similarity_cpp(original_code: str, generated_code: str) -> float:
         """Measures semantic similarity between two C++ snippets. Returns a score from 0.0 to 1.0."""
         # Extract markdown code blocks if present
-        original_code = SemanticDriftDimension.extract_code_block(original_code, "cpp")
-        generated_code = SemanticDriftDimension.extract_code_block(generated_code, "cpp")
+        original_code = StructuralSimilarityDimension.extract_code_block(original_code, "cpp")
+        generated_code = StructuralSimilarityDimension.extract_code_block(generated_code, "cpp")
         
         def node_to_bracket(node) -> str:
             node_type = node.type.replace("{", "").replace("}", "")
@@ -152,8 +153,8 @@ class SemanticDriftDimension(BaseDimension):
             children = [c for c in node.children if not c.is_extra]
             return 1 + sum(count_nodes(c) for c in children)
 
-        root1 = SemanticDriftDimension._cpp_parser.parse(original_code.encode()).root_node
-        root2 = SemanticDriftDimension._cpp_parser.parse(generated_code.encode()).root_node
+        root1 = StructuralSimilarityDimension._cpp_parser.parse(original_code.encode()).root_node
+        root2 = StructuralSimilarityDimension._cpp_parser.parse(generated_code.encode()).root_node
 
         tree1 = Tree.from_text(node_to_bracket(root1))
         tree2 = Tree.from_text(node_to_bracket(root2))
@@ -171,13 +172,13 @@ class SemanticDriftDimension(BaseDimension):
         if isinstance(node, dict):
             label = node.get("type", "X")
             children = "".join(
-                SemanticDriftDimension.js_ast_to_bracket(v)
+                StructuralSimilarityDimension.js_ast_to_bracket(v)
                 for v in node.values()
                 if isinstance(v, (dict, list))
             )
             return f"{{{label}{children}}}"
         elif isinstance(node, list):
-            return "".join(SemanticDriftDimension.js_ast_to_bracket(item) for item in node)
+            return "".join(StructuralSimilarityDimension.js_ast_to_bracket(item) for item in node)
         return ""
 
     @staticmethod
@@ -203,16 +204,16 @@ class SemanticDriftDimension(BaseDimension):
     def measure_similarity_javascript(original_code: str, generated_code: str) -> float:
             """Measures semantic similarity between two Javascript code snippets. Returns a score from 0.0 to 1.0"""
             # Extract markdown code blocks if present
-            original_code = SemanticDriftDimension.extract_code_block(original_code, "javascript")
-            generated_code = SemanticDriftDimension.extract_code_block(generated_code, "javascript")
+            original_code = StructuralSimilarityDimension.extract_code_block(original_code, "javascript")
+            generated_code = StructuralSimilarityDimension.extract_code_block(generated_code, "javascript")
 
             # Install esprima in nodejs
             subprocess.run(['npm','install','esprima'], capture_output=True)
             with tempfile.NamedTemporaryFile(suffix='_one.js', delete=False) as f1, \
                  tempfile.NamedTemporaryFile(suffix='_two.js', delete=False) as f2:
                 tmp1, tmp2 = f1.name, f2.name
-            bracket1 = SemanticDriftDimension.js_ast_to_bracket(SemanticDriftDimension.parse_js(original_code, tmp1))
-            bracket2 = SemanticDriftDimension.js_ast_to_bracket(SemanticDriftDimension.parse_js(generated_code, tmp2))
+            bracket1 = StructuralSimilarityDimension.js_ast_to_bracket(StructuralSimilarityDimension.parse_js(original_code, tmp1))
+            bracket2 = StructuralSimilarityDimension.js_ast_to_bracket(StructuralSimilarityDimension.parse_js(generated_code, tmp2))
             tree1 = Tree.from_text(bracket1) 
             tree2 = Tree.from_text(bracket2)
             distance = APTED(tree1, tree2, Config()).compute_edit_distance()
@@ -255,3 +256,8 @@ class SemanticDriftDimension(BaseDimension):
             dimension_name=self.name,
             score=result,
         )
+
+
+# Import compatibility only. Historical "Semantic Drift" reports remain
+# historical and are not relabeled during migration.
+SemanticDriftDimension = StructuralSimilarityDimension

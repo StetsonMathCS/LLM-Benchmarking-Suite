@@ -456,8 +456,9 @@ def main():
         "results": [r.to_dict() for r in all_raw_results],
     }
 
+    from core.base import to_jsonable
     with open(report_path, "w", encoding="utf-8") as f:
-        json.dump(report, f, indent=2, default=str)
+        json.dump(to_jsonable(report), f, indent=2, allow_nan=False)
     print()
     print(f"  Report saved: {green(str(report_path))}")
     print()

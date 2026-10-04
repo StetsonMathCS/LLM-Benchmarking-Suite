@@ -51,7 +51,8 @@ class CodeCompletionBenchmark(BaseBenchmark):
 
         from utils.code_runner import extract_code
         completed_code = extract_code(llm_response.content)
-        weights = matrix.DIMENSION_WEIGHTS["code_completion"]
+        # Removed duplicate task retained only as a compatibility adapter.
+        weights = matrix.DIMENSION_WEIGHTS["code_generation"]
         dimensions = matrix.get_dimensions_for_task("code_completion")
         results = {}
         issues = {}
@@ -90,11 +91,11 @@ class CodeCompletionBenchmark(BaseBenchmark):
                     issues=[str(e)]
                 )
             if not skipped:
-                active_weight += weights[dimension.name]
-                combined_score += weights[dimension.name] * result.score
+                active_weight += weights[dimension.dimension_id]
+                combined_score += weights[dimension.dimension_id] * result.score
             if not result.passed and not skipped:
-                issues[dimension.name] = result.details.get("error") or f"Score below threshold ({result.score:.2f})"
-            results[dimension.name] = result
+                issues[dimension.dimension_id] = result.details.get("error") or f"Score below threshold ({result.score:.2f})"
+            results[dimension.dimension_id] = result
 
         if active_weight > 0:
             combined_score /= active_weight

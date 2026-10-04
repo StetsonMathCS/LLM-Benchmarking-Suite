@@ -27,13 +27,14 @@ from dataclasses import dataclass, field, asdict
 from typing import Optional
 
 from core.base import BenchmarkResult, BenchmarkStatus
+from facets.scoring_profile import DEFAULT_PROFILE
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
 # Minimum combined_score for a single record to count as "passed"
-PASS_THRESHOLD: float = 0.5
+PASS_THRESHOLD: float = DEFAULT_PROFILE.composite_threshold
 
 # Per-task weights used to compute the final LLM score.
 # Weights are re-normalised over only the tasks that were actually run,
@@ -43,14 +44,7 @@ PASS_THRESHOLD: float = 0.5
 #     weight because they probe deeper reasoning.
 #   - test_generation is important but more mechanical.
 #   - translation is a narrower skill.
-TASK_WEIGHTS: dict[str, float] = {
-    "bug_fixing":      0.15,
-    "code_generation": 0.27,
-    "code_review":     0.15,
-    "refactoring":     0.15,
-    "test_generation": 0.12,
-    "translation":     0.16,
-}
+TASK_WEIGHTS: dict[str, float] = DEFAULT_PROFILE.task_weights
 # Verify at import time that weights sum to ~1.0
 assert abs(sum(TASK_WEIGHTS.values()) - 1.0) < 1e-9, "TASK_WEIGHTS must sum to 1.0"
 
@@ -122,7 +116,7 @@ class TaskScore:
     min_score: float
     max_score: float
     std_score: float        # 0.0 if only one record
-    pass_at_k: dict[int, float] = field(default_factory=dict)  # {k: estimated_pass_at_k}
+    pass_at_k: dict[int, Optional[float]] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -145,7 +139,7 @@ class BenchmarkReport:
     category_scores: dict[str, float]
 
     # Overall LLM score and grade
-    final_score: float      # 0.0 – 1.0, weighted across tasks
+    final_score: Optional[float]  # unavailable for incomplete/invalid runs
     grade: str              # A+, A, A-, B+, …, F
 
     # Aggregate record counts
@@ -157,11 +151,15 @@ class BenchmarkReport:
 
     # pass@k per task — populated only in multi-sample mode
     # { task_name: {k: estimated_pass_at_k} }
-    pass_at_k: dict[str, dict[int, float]] = field(default_factory=dict)
+    pass_at_k: dict[str, dict[int, Optional[float]]] = field(default_factory=dict)
+    complete: bool = True
+    scoring_profile: str = DEFAULT_PROFILE.profile_id
 
     def to_dict(self) -> dict:
         d = {
             "final_score": self.final_score,
+            "complete": self.complete,
+            "scoring_profile": self.scoring_profile,
             "grade": self.grade,
             "overall_pass_rate": self.overall_pass_rate,
             "total_records": self.total_records,
@@ -207,7 +205,11 @@ class ScoringEngine:
         self._weights = task_weights if task_weights is not None else TASK_WEIGHTS
         self._threshold = pass_threshold if pass_threshold is not None else PASS_THRESHOLD
         self._num_samples = num_samples
-        self._pass_k_values = pass_k_values or [1, 5, 10]
+        self._pass_k_values = pass_k_values or [1]
+        if abs(sum(self._weights.values()) - 1.0) > 1e-9:
+            raise ValueError(f"task weights must sum to 1.0; got {sum(self._weights.values()):.12g}")
+        if not 0 <= self._threshold <= 1:
+            raise ValueError("composite threshold must be in [0, 1]")
 
     # ------------------------------------------------------------------ #
     # Public API                                                           #
@@ -217,8 +219,9 @@ class ScoringEngine:
         """Run the full scoring pipeline and return a BenchmarkReport."""
         task_scores = self._compute_task_scores()
         category_scores = self._compute_category_scores(task_scores)
-        final = self._compute_final_score(task_scores)
-        grade = self._assign_grade(final)
+        complete = all(r.combined_score is not None for r in self._results)
+        final = self._compute_final_score(task_scores) if complete else None
+        grade = self._assign_grade(final) if final is not None else "INCOMPLETE"
 
         total = len(self._results)
         scored = [r for r in self._results if r.combined_score is not None]
@@ -239,6 +242,7 @@ class ScoringEngine:
             total_errors=len(errors),
             overall_pass_rate=round(len(passed) / total, 4) if total else 0.0,
             pass_at_k=pak,
+            complete=complete,
         )
 
     # ------------------------------------------------------------------ #
@@ -295,7 +299,7 @@ class ScoringEngine:
 
     def _compute_pass_at_k(
         self, task_scores: dict[str, TaskScore]
-    ) -> dict[str, dict[int, float]]:
+    ) -> dict[str, dict[int, Optional[float]]]:
         """
         Compute pass@k for each task using the unbiased estimator.
 
@@ -306,9 +310,6 @@ class ScoringEngine:
 
         Returns an empty dict when num_samples <= 1 (single-run mode).
         """
-        if self._num_samples <= 1:
-            return {}
-
         # Group results by (task, record_id)
         groups: dict[str, dict[str, list[BenchmarkResult]]] = {}
         for r in self._results:
@@ -316,29 +317,28 @@ class ScoringEngine:
             rid = r.metadata.get("record_id", "unknown")
             groups.setdefault(task, {}).setdefault(rid, []).append(r)
 
-        pak: dict[str, dict[int, float]] = {}
+        pak: dict[str, dict[int, Optional[float]]] = {}
         for task_name, records_by_id in groups.items():
+            if not any("functional_correct" in sample.metadata for samples in records_by_id.values() for sample in samples):
+                continue
             k_sums: dict[int, float] = {k: 0.0 for k in self._pass_k_values}
             k_counts: dict[int, int] = {k: 0 for k in self._pass_k_values}
 
             for _rid, samples in records_by_id.items():
                 n = len(samples)
-                c = sum(
-                    1
-                    for s in samples
-                    if s.combined_score is not None
-                    and s.combined_score >= self._threshold
-                )
+                c = sum(1 for s in samples if s.metadata.get("functional_correct") is True)
                 for k in self._pass_k_values:
                     val = pass_at_k_estimator(n, c, k)
                     if not math.isnan(val):
                         k_sums[k] += val
                         k_counts[k] += 1
 
-            task_pak: dict[int, float] = {}
+            task_pak: dict[int, Optional[float]] = {}
             for k in self._pass_k_values:
                 if k_counts[k] > 0:
                     task_pak[k] = round(k_sums[k] / k_counts[k], 4)
+                else:
+                    task_pak[k] = None
             pak[task_name] = task_pak
 
             # Attach to TaskScore object as well

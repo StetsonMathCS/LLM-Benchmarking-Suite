@@ -1,0 +1,7 @@
+{
+  "1": {
+    "contract": "structured_attributes",
+    "expected_console_output": "FACETS_CONTRACT_OK",
+    "test_harness": "order = {'id': 1, 'status': 'pending', 'items': [{'price': 5, 'quantity': 7}], 'user_id': 100}\nresult = process_order(order)\nassert result is not None\nassert result.order_id == 1\nassert result.total == 35\nassert result.user_id == 100\nprint('FACETS_CONTRACT_OK')"
+  }
+}

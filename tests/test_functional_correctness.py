@@ -25,12 +25,11 @@ class TestNormalizeOutput:
         assert _normalize_output("null", "javascript") == "None"
         assert _normalize_output("undefined", "javascript") == "None"
 
-    def test_js_whitespace_collapsed(self):
-        assert _normalize_output("[ 1,  2, 3 ]", "javascript") == "[1, 2, 3]"
+    def test_js_whitespace_is_not_broadly_rewritten(self):
+        assert _normalize_output("[ 1,  2, 3 ]", "javascript") == "[ 1,  2, 3 ]"
 
-    def test_js_object_keys_quoted(self):
-        result = _normalize_output("{cat: 3}", "javascript")
-        assert "'cat'" in result
+    def test_js_object_keys_are_not_rewritten(self):
+        assert _normalize_output("{cat: 3}", "javascript") == "{cat: 3}"
 
     def test_python_unchanged(self):
         text = "True False None"
@@ -142,7 +141,7 @@ class TestUnsupportedLanguage:
             original_code="fn main() {}",
         )
         assert result.score == 0.0
-        assert "error" in result.details
+        assert "diagnostic" in result.details
 
     def test_unsupported_generated_code_language(self, dimension):
         result = dimension.evaluate(

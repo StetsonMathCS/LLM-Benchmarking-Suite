@@ -12,8 +12,9 @@ import re
 from typing import Optional
 
 class CodeConsistencyDimension(BaseDimension):
+    dimension_id = "code_consistency"
     name = "Code Consistency"
-    description = "Evaluates code for consistent style conventions including indentation, naming patterns, and language-specific formatting rules."
+    description = "Style-consistency heuristic; it is not a functional-correctness measure."
 
     @staticmethod
     def _python_check(code):

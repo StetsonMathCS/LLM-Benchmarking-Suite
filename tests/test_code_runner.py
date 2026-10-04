@@ -36,24 +36,24 @@ class TestInjectTypingImports:
 class TestRunPython:
     def test_simple_print(self):
         output = CodeRunner.run_python('print("hello")')
-        assert "hello" in output
+        assert output.succeeded and "hello" in output.stdout
 
     def test_arithmetic(self):
         output = CodeRunner.run_python('print(2 + 3)')
-        assert "5" in output
+        assert output.succeeded and "5" in output.stdout
 
     def test_syntax_error(self):
         output = CodeRunner.run_python('def foo(\n')
-        assert "Error" in output or "SyntaxError" in output
+        assert not output.succeeded and "SyntaxError" in output.stderr
 
     def test_timeout(self):
         output = CodeRunner.run_python('import time; time.sleep(100)')
-        assert "timed out" in output.lower() or "Error" in output
+        assert output.timed_out
 
     def test_multiline_code(self):
         code = "x = 10\ny = 20\nprint(x + y)"
         output = CodeRunner.run_python(code)
-        assert "30" in output
+        assert "30" in output.stdout
 
     def test_typing_imports_injected(self):
         code = """\
@@ -63,7 +63,7 @@ def greet(name: Optional[str] = None) -> str:
 print(greet())
 """
         output = CodeRunner.run_python(code)
-        assert "Hello, World" in output
+        assert "Hello, World" in output.stdout
 
 
 # ── JavaScript execution ──────────────────────────────────────────────────
@@ -71,15 +71,15 @@ print(greet())
 class TestRunJavaScript:
     def test_simple_log(self):
         output = CodeRunner.run_javascript('console.log("hello");')
-        assert "hello" in output
+        assert "hello" in output.stdout
 
     def test_arithmetic(self):
         output = CodeRunner.run_javascript('console.log(2 + 3);')
-        assert "5" in output
+        assert "5" in output.stdout
 
     def test_syntax_error(self):
         output = CodeRunner.run_javascript('console.log(')
-        assert "Error" in output or "SyntaxError" in output.lower() or "error" in output.lower()
+        assert not output.succeeded and "error" in output.stderr.lower()
 
 
 # ── C++ execution ─────────────────────────────────────────────────────────
@@ -88,12 +88,12 @@ class TestRunCpp:
     def test_simple_program(self):
         code = '#include <iostream>\nint main() { std::cout << "hello"; return 0; }'
         output = CodeRunner.run_cpp(code)
-        assert "hello" in output
+        assert "hello" in output.stdout
 
     def test_compile_error(self):
         code = "int main( { return 0; }"
         output = CodeRunner.run_cpp(code)
-        assert "error" in output.lower() or "Error" in output
+        assert output.compiled is False and "error" in output.stderr.lower()
 
 
 # ── Edge cases ────────────────────────────────────────────────────────────
@@ -102,12 +102,12 @@ class TestCodeRunnerEdgeCases:
     def test_empty_python_code(self):
         output = CodeRunner.run_python("")
         # Empty code produces no output, no error
-        assert isinstance(output, str)
+        assert output.succeeded and output.stdout == ""
 
     def test_exception_in_python(self):
         output = CodeRunner.run_python("raise ValueError('test')")
-        assert "ValueError" in output or "Error" in output
+        assert "ValueError" in output.stderr
 
     def test_large_output_python(self):
         output = CodeRunner.run_python("print('x' * 10000)")
-        assert len(output) > 0
+        assert len(output.stdout) > 0

@@ -14,6 +14,7 @@ def multiply(a, b):
 
 GENERATED_TESTS = """\
 import unittest
+from candidate import multiply
 
 class TestMultiply(unittest.TestCase):
     def test_positive(self):
@@ -63,7 +64,11 @@ class TestTestGenerationPrompt:
 
 class TestTestGenerationRun:
     def test_successful_run(self, benchmark):
-        result = benchmark._timed_run(SOURCE_CODE)
+        result = benchmark._timed_run(
+            SOURCE_CODE,
+            entry_point="multiply",
+            reference_tests="def check(candidate):\n    assert candidate(2, 3) == 6\n    assert candidate(-2, 3) == -6\n",
+        )
         assert isinstance(result, BenchmarkResult)
         assert result.status in (BenchmarkStatus.PASSED, BenchmarkStatus.FAILED)
         assert result.combined_score is not None
@@ -73,12 +78,20 @@ class TestTestGenerationRun:
         assert result.status == BenchmarkStatus.ERROR
 
     def test_dimensions_evaluated(self, benchmark):
-        result = benchmark._timed_run(SOURCE_CODE)
+        result = benchmark._timed_run(
+            SOURCE_CODE,
+            entry_point="multiply",
+            reference_tests="def check(candidate):\n    assert candidate(2, 3) == 6\n",
+        )
         # Should have CodeConsistency, TestPassRate, Linting
         assert len(result.details) > 0
 
     def test_report_generation(self, benchmark):
-        benchmark._timed_run(SOURCE_CODE)
+        benchmark._timed_run(
+            SOURCE_CODE,
+            entry_point="multiply",
+            reference_tests="def check(candidate):\n    assert candidate(2, 3) == 6\n",
+        )
         report = benchmark.generate_report()
         assert report["benchmark"] == "Test Generation Benchmark"
         assert report["runs"] == 1

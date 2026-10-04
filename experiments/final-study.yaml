@@ -1,0 +1,52 @@
+schema_version: 1
+profile: revised-v1
+language: python
+translation_target: javascript
+tasks: [bug_fixing, code_generation, code_review, refactoring, test_generation, translation]
+samples: 1
+temperature:
+max_tokens: 4096
+timeouts:
+  provider_s: 180
+  evaluator_s: 15
+retries:
+  attempts: 3
+  initial_backoff_s: 1
+  max_backoff_s: 8
+execution:
+  backend: container
+  image: facets-evaluator:revised-v1
+  memory_mb: 256
+  cpus: 1.0
+  pids_limit: 64
+selection:
+  strategy: prefix_by_stable_dataset_order
+  seed: 0
+expected_counts:
+  code_generation: 164
+  bug_fixing: 31
+  code_review: 20
+  refactoring: 20
+  test_generation: 80
+  translation: 30
+output_dir: reports/runs
+generation_concurrency: 1
+evaluator_concurrency: 1
+mutation_preflight: full
+embedding:
+  base_url: http://localhost:11434
+  model: nomic-embed-text:latest
+models:
+  - claude-opus-4-6
+  - claude-sonnet-4-6
+  - claude-haiku-4-6
+  - gpt-5-codex
+  - gpt-5.4
+  - gpt-5-nano
+  - deepseek-r1
+  - qwen3.6
+  - gpt-oss
+  - ministral-3
+  - llama3
+  - mistral
+  - phi4-mini

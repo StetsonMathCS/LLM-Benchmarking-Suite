@@ -13,7 +13,7 @@ from core.base import (
     LLMResponse,
 )
 from benchmarks import matrix
-from benchmarks.dimensions.semantic_drift import SemanticDriftDimension
+from benchmarks.dimensions.structural_similarity import StructuralSimilarityDimension
 from benchmarks.dimensions.code_consistency import CodeConsistencyDimension
 from core.scoring import PASS_THRESHOLD
 
@@ -38,12 +38,18 @@ class BugFixingBenchmark(BaseBenchmark):
     def run(self, prompt: str, system_prompt: Optional[str], **kwargs) -> BenchmarkResult:
         llm_response = self.provider.complete(prompt, system_prompt)
 
-        if not llm_response.success:
+        if llm_response.error:
             return BenchmarkResult(
                 benchmark_name=self.name,
                 status=BenchmarkStatus.ERROR,
                 details={"error": llm_response.error or "LLM returned empty response"},
                 llm_response=llm_response,
+            )
+        if not llm_response.content or not llm_response.content.strip():
+            return BenchmarkResult(
+                benchmark_name=self.name, status=BenchmarkStatus.FAILED, combined_score=0.0,
+                details={"candidate_failure": "model returned empty output"},
+                llm_response=llm_response, metadata={"functional_correct": False},
             )
 
         from utils.code_runner import extract_code
@@ -53,10 +59,11 @@ class BugFixingBenchmark(BaseBenchmark):
         results = {}
         issues = {}
         combined_score = 0.00
+        infrastructure_error = False
         for cls in dimensions:
             dimension = cls()
             try:
-                if isinstance(dimension, SemanticDriftDimension):
+                if isinstance(dimension, StructuralSimilarityDimension):
                     result = dimension.evaluate(language=self.language, original_code=self.code_input, generated_code=fixed_code, **kwargs)
                 else:
                     result = dimension.evaluate(language=self.language, generated_code=fixed_code, **kwargs)
@@ -67,18 +74,22 @@ class BugFixingBenchmark(BaseBenchmark):
                     score=0.0,
                     passed=False,
                     details={"error": str(e)},
-                    issues=[str(e)]
+                    issues=[str(e)],
+                    status="infrastructure_error",
                 )
+            infrastructure_error = infrastructure_error or result.status == "infrastructure_error"
             if not result.passed:
-                issues[dimension.name] = result.details.get("error") or f"Score below threshold ({result.score:.2f})"
-            results[dimension.name] = result
-            combined_score += (weights[dimension.name]*result.score) if result.score else 0.00
-        status = BenchmarkStatus.PASSED if combined_score >= PASS_THRESHOLD else BenchmarkStatus.FAILED
+                issues[dimension.dimension_id] = result.details.get("diagnostic") or result.details.get("error") or f"Score below threshold ({result.score:.2f})"
+            results[dimension.dimension_id] = result
+            combined_score += weights[dimension.dimension_id] * result.score
+        status = BenchmarkStatus.ERROR if infrastructure_error else (BenchmarkStatus.PASSED if combined_score >= PASS_THRESHOLD else BenchmarkStatus.FAILED)
+        functional = results.get("functional_correctness")
         return BenchmarkResult(
             benchmark_name=self.name,
             status=status,
-            combined_score=combined_score,
+            combined_score=None if infrastructure_error else combined_score,
             details=results,
             issues_found=issues,
             llm_response=llm_response,
+            metadata={"functional_correct": bool(functional and functional.score == 1.0 and functional.status == "ok")},
         )

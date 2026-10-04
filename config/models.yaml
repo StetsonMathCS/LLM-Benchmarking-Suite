@@ -1,0 +1,94 @@
+schema_version: 1
+models:
+  claude-opus-4-6:
+    provider: anthropic
+    model: claude-opus-4-6
+    credential_env: ANTHROPIC_API_KEY
+    availability: active
+    source: https://docs.anthropic.com/en/docs/about-claude/model-deprecations
+  claude-sonnet-4-6:
+    provider: anthropic
+    model: claude-sonnet-4-6
+    credential_env: ANTHROPIC_API_KEY
+    availability: active
+    source: https://docs.anthropic.com/en/docs/about-claude/model-deprecations
+  claude-haiku-4-6:
+    provider: anthropic
+    model: claude-haiku-4-6
+    credential_env: ANTHROPIC_API_KEY
+    availability: unresolved
+    note: No official Anthropic API identifier was verified; do not silently substitute Haiku 4.5.
+  gpt-5-codex:
+    provider: openai
+    model: gpt-5-codex
+    credential_env: OPENAI_API_KEY
+    availability: verify_with_provider
+    endpoint: responses
+  gpt-5.4:
+    provider: openai
+    model: gpt-5.4
+    credential_env: OPENAI_API_KEY
+    availability: verify_with_provider
+    endpoint: responses
+  gpt-5-nano:
+    provider: openai
+    model: gpt-5-nano
+    credential_env: OPENAI_API_KEY
+    availability: active
+    endpoint: responses
+    source: https://platform.openai.com/docs/models
+  deepseek-r1:
+    provider: ollama
+    model: deepseek-r1:32b
+    base_url: http://localhost:11434
+    parameter_size: 32B
+    availability: local_model_required
+  qwen3.6:
+    provider: ollama
+    model: qwen3.6
+    base_url: http://localhost:11434
+    parameter_size: 35B
+    availability: unresolved
+    note: Historical local tag; no matching official Ollama library identifier was verified. Edit this entry to the exact installed tag.
+  gpt-oss:
+    provider: ollama
+    model: gpt-oss:20b
+    base_url: http://localhost:11434
+    parameter_size: 20B
+    availability: local_model_required
+  ministral-3:
+    provider: ollama
+    model: ministral-3:3b
+    base_url: http://localhost:11434
+    parameter_size: 3B
+    availability: local_model_required
+  llama3:
+    provider: ollama
+    model: llama3:70b
+    base_url: http://localhost:11434
+    parameter_size: 70B
+    availability: local_model_required
+  mistral:
+    provider: ollama
+    model: mistral:7b
+    base_url: http://localhost:11434
+    parameter_size: 7B
+    availability: local_model_required
+  phi4-mini:
+    provider: ollama
+    model: phi4-mini:3.8b
+    base_url: http://localhost:11434
+    parameter_size: 3.8B
+    availability: local_model_required
+
+provider_capabilities:
+  openai:
+    credential_env: OPENAI_API_KEY
+    supported_options: [temperature, max_tokens, reasoning_effort, seed]
+  anthropic:
+    credential_env: ANTHROPIC_API_KEY
+    supported_options: [temperature, max_tokens, top_p, top_k]
+  ollama:
+    credential_env: null
+    supported_options: [temperature, max_tokens, seed, top_p, top_k, num_ctx]
+

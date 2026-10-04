@@ -12,6 +12,13 @@ from core.base import (
     LLMResponse,
     ModelConfig,
 )
+from facets.evaluation.execution import ExecutionSettings, configure_default
+
+
+@pytest.fixture(autouse=True)
+def _controlled_local_execution_backend():
+    """Tests use the documented non-isolating backend with controlled fixtures."""
+    configure_default(ExecutionSettings(backend="local", timeout_s=2))
 
 
 class FakeProvider(BaseProvider):
