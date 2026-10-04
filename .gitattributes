@@ -1,0 +1,26 @@
+# Normalize line endings in the repository, not in each contributor's editor.
+#
+# Without this, a checkout on Windows or an editor configured for CRLF rewrites
+# whole files and every diff becomes unreadable. `text=auto` lets git detect
+# text files, and `eol=lf` forces LF in the working tree so scripts, prompts,
+# and datasets are byte-identical on every platform.
+* text=auto eol=lf
+
+# Generated and binary artifacts must never be line-ending normalized, or the
+# bytes change and the files stop being valid images/PDFs.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.pdf binary
+*.zip binary
+*.gz binary
+
+# Datasets are read as CSVs and prompts are hashed into run manifests, so both
+# must be LF-only for fingerprints to be reproducible across platforms.
+*.csv text eol=lf
+*.txt text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
