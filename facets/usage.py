@@ -649,7 +649,7 @@ def collect_run_ledgers(root: Path) -> list[dict]:
     """Read every run ledger beneath ``root`` in a stable order."""
     root = Path(root)
     entries: list[dict] = []
-    for path in sorted(root.rglob(LEDGER_RELATIVE_PATH)):
+    for path in sorted(root.rglob(str(LEDGER_RELATIVE_PATH))):
         entries.extend(iter_ledger(path))
     return entries
 
