@@ -19,9 +19,6 @@ execution:
   memory_mb: 256
   cpus: 1.0
   pids_limit: 64
-selection:
-  strategy: prefix_by_stable_dataset_order
-  seed: 0
 expected_counts:
   code_generation: 164
   bug_fixing: 31
@@ -34,19 +31,15 @@ generation_concurrency: 1
 evaluator_concurrency: 1
 mutation_preflight: full
 embedding:
-  base_url: http://localhost:11434
+  base_url: http://127.0.0.1:1561
   model: nomic-embed-text:latest
 models:
-  - claude-opus-4-6
-  - claude-sonnet-4-6
-  - claude-haiku-4-6
-  - gpt-5-codex
-  - gpt-5.4
-  - gpt-5-nano
+  - nemotron-3.5-lightning
+  - qwen3.8
   - deepseek-r1
   - qwen3.6
+  - llama3
   - gpt-oss
   - ministral-3
-  - llama3
   - mistral
   - phi4-mini

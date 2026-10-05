@@ -224,7 +224,6 @@ def _manifest(config: dict, model_spec: dict, plan: list[dict]) -> dict:
         },
         "git": _git_metadata(),
         "dataset": dataset_info,
-        "dataset_selection": config.get("selection", {}),
         "prompt_hashes": prompts,
         "dependency_versions": _tool_versions(),
         "runtime": {

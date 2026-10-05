@@ -25,15 +25,12 @@ execution:
   memory_mb: 256
   cpus: 1.0
   pids_limit: 64
-selection:
-  strategy: prefix_by_stable_dataset_order
-  seed: 0
 output_dir: reports/runs
 generation_concurrency: 1
 evaluator_concurrency: 1
 mutation_preflight: full
 # Short aliases resolve to the canonical registry entry, so these two runs are
-# recorded as claude-sonnet-4-6 and claude-opus-4-6.
+# recorded as qwen3.8:27b and phi4-mini:3.8b.
 models:
-  - sonnet
-  - opus
+  - qwen38
+  - phi4

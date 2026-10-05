@@ -15,13 +15,12 @@ silently does nothing rather than failing loudly.
 | `profile` | Scoring profile id. Defines task weights and per-dimension weights; changing it changes the composite. |
 | `language`, `translation_target` | `language` must be `python`; revised-v1 is Python-focused and preflight rejects anything else. `translation_target` is the target for the `translation` task. |
 | `tasks` | Subset of the six task ids. Omitted tasks are never planned. |
-| `samples`, `limit` | Sample count and per-task record cap. Both feed the cohort fingerprint. |
+| `samples`, `limit` | Sample count and per-task record cap. `limit` is a prefix of the dataset's stable CSV order; omit it for the whole dataset. Both feed the cohort fingerprint. |
 | `temperature`, `max_tokens` | Requested generation settings. Prefer omitting both so a provider default is used and recorded as effective. |
 | `provider_extras` | Provider-specific extras; keys unsupported by the provider fail preflight. |
 | `timeouts` | `provider_s` and `evaluator_s` walls. |
 | `retries` | `attempts`, `initial_backoff_s`, `max_backoff_s`. |
 | `execution` | Evaluator sandbox: `backend`, `image`, `memory_mb`, `cpus`, `pids_limit`. |
-| `selection` | Dataset subset strategy and `seed`. Same seed and strategy means same records. |
 | `mutation_preflight` | `full` (the default) makes `doctor` validate the shared dataset once. Later models in a multi-model pass use `already_validated_for_shared_dataset` to skip the repeat; any other value skips it too, so this key is trusted rather than validated. |
 | `embedding` | `base_url` and `model` for reference-review similarity. Omit to disable the dimension. |
 | `generation_concurrency`, `evaluator_concurrency` | `evaluator_concurrency` must be `1`; revised-v1 requires sequential isolated evaluation. `generation_concurrency` defaults to `1` and may be raised, since usage attribution is thread-bound per record. |
