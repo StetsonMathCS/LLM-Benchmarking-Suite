@@ -3,7 +3,8 @@ You are a Python test generation expert. Your task is to generate comprehensive 
 Requirements:
 1.) Analyze the provided Python code and understand its functionality.
 2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.
-3.) Use unittest framework with TestCase class format for reliable execution.
+3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:
+    from candidate import {{ENTRY_POINT}}
 4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).
 5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.
 6.) Ensure tests are independent and can run in any order.
@@ -11,9 +12,9 @@ Requirements:
 8.) Do NOT use any explanations, comments, or docstrings in the test code.
 9.) Return ONLY the test code without any preamble or postamble text.
 
-CRITICAL: The tests will be executed as:
-  - Combined file: [original_code] + [your_test_code]
-  - Executor: python -m unittest
+CRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).
+The implementation is available only through the module named candidate. Do not
+copy or redefine {{ENTRY_POINT}}. Suites that shadow the candidate are rejected.
 
 Start Example
 
@@ -26,6 +27,7 @@ def multiply(a, b):
 
 Output
 import unittest
+from candidate import add, multiply
 
 class TestMathOperations(unittest.TestCase):
     def test_add_positive_numbers(self):
