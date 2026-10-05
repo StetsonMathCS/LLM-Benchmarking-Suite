@@ -34,6 +34,15 @@ def run_doctor(config: dict, model_spec: dict, registry: dict, live_provider_che
             hashes[task] = info["dataset_hash"]
             if not info["record_ids_unique"]:
                 issues.append({"severity": "error", "code": "duplicate_record_id", "detail": task})
+            for row in mapper.malformed_rows(task, language):
+                issues.append({
+                    "severity": "error",
+                    "code": "dataset_row_malformed",
+                    "detail": (
+                        f"{task}:{language} line {row['line']} has {row['actual_fields']} fields, "
+                        f"expected {row['expected_fields']} (unescaped comma or quote?)"
+                    ),
+                })
             for record in records:
                 data = record.data
                 if task == "code_generation":

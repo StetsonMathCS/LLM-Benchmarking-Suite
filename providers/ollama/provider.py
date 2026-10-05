@@ -19,7 +19,6 @@ class OllamaProvider(BaseProvider):
             self._lib = ollama.Client(
                 host=self._base_url,
                 timeout=self.config.extra_params.get("_provider_timeout_s", 180),
-                max_retries=0,
             )
             return True
         except ImportError:

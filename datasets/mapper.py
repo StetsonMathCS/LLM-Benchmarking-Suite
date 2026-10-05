@@ -245,6 +245,31 @@ class DatasetMapper:
         
         return self.TASK_DATASET_MAP[task_name]["languages"]
 
+    def malformed_rows(self, task_name: str, language: str) -> List[Dict[str, Any]]:
+        """Rows whose field count disagrees with the header.
+
+        An unescaped comma or quote inside a quoted field makes the parser emit
+        extra columns, which ``DictReader`` files under a ``None`` key and which
+        later breaks key-sorted serialisation. Reported per line so the source row
+        is identifiable.
+        """
+        path = self.get_dataset_path(task_name, language)
+        findings: List[Dict[str, Any]] = []
+        with path.open("r", newline="", encoding="utf-8") as handle:
+            reader = csv.reader(handle)
+            try:
+                header = next(reader)
+            except StopIteration:
+                return findings
+            for line_number, row in enumerate(reader, start=2):
+                if len(row) != len(header):
+                    findings.append({
+                        "line": line_number,
+                        "expected_fields": len(header),
+                        "actual_fields": len(row),
+                    })
+        return findings
+
     def get_dataset_info(self, task_name: str, language: str) -> Dict[str, Any]:
         """
         Get metadata information about a dataset.

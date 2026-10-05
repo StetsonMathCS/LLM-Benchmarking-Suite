@@ -100,7 +100,7 @@ print(counter())","1
 print(pairs)","[(1, 'a'), (2, 'b'), (3, 'c')]"
 26,"import json
 data = {'key': 'value', 'num': 42}
-print(json.dumps(data))","{"key": "value", "num": 42}"
+print(json.dumps(data))","{""key"": ""value"", ""num"": 42}"
 27,"def bubble_sort(arr):
     n = len(arr)
     for i in range(n):
