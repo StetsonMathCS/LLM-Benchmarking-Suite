@@ -161,7 +161,7 @@ class LocalBackend:
         self, files: Mapping[str, str], entry_file: str, *, timeout_s: Optional[float] = None
     ) -> ExecutionResult:
         return self.run_files(
-            files, [os.fspath(Path(os.sys.executable).resolve()), "-I", entry_file], timeout_s=timeout_s
+            files, [os.fspath(Path(os.sys.executable).resolve()), "-E", "-s", entry_file], timeout_s=timeout_s
         )
 
 
@@ -215,7 +215,7 @@ class ContainerBackend:
     def run_python_files(
         self, files: Mapping[str, str], entry_file: str, *, timeout_s: Optional[float] = None
     ) -> ExecutionResult:
-        return self.run_files(files, ["python", "-I", entry_file], timeout_s=timeout_s)
+        return self.run_files(files, ["python", "-E", "-s", entry_file], timeout_s=timeout_s)
 
 
 def get_backend(settings: ExecutionSettings) -> ExecutionBackend:
