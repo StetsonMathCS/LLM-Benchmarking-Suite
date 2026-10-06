@@ -437,7 +437,7 @@ def execute_run(
     previous_embedding_sink = None
     if embedding_sink is not None and similarity_dimension is not None:
         previous_embedding_sink = similarity_dimension.USAGE_SINK
-        similarity_dimension.USAGE_SINK = embedding_sink
+        similarity_dimension.USAGE_SINK = staticmethod(embedding_sink)
     generation_provider = provider_override
     generated_count = sum(
         1 for path in store.responses.glob("*.json")

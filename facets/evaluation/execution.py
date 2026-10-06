@@ -193,6 +193,10 @@ class ContainerBackend:
                 target = workdir / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_text(content, encoding="utf-8")
+            # TemporaryDirectory is 0700 and owned by the invoking user. The image
+            # runs as its own unprivileged account, so without traversal permission
+            # on the bind mount every harness file is unreadable inside the container.
+            workdir.chmod(0o755)
             container_name = f"facets-{uuid.uuid4().hex[:16]}"
             command = [
                 self.runtime, "run", "--rm", "--name", container_name, "--network=none", "--read-only",
