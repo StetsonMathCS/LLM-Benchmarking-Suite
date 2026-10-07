@@ -1402,6 +1402,7 @@ METADATA = {}
 
 
 def check(candidate):
+    from candidate import poly
     import math
     import random
     rng = random.Random(42)
@@ -1449,9 +1450,6 @@ METADATA = {}
 
 
 def check(candidate):
-    assert tuple(candidate([1, 2, 3])) == tuple(sort_third([1, 2, 3]))
-    assert tuple(candidate([5, 3, -5, 2, -3, 3, 9, 0, 123, 1, -10])) == tuple(sort_third([5, 3, -5, 2, -3, 3, 9, 0, 123, 1, -10]))
-    assert tuple(candidate([5, 8, -12, 4, 23, 2, 3, 11, 12, -10])) == tuple(sort_third([5, 8, -12, 4, 23, 2, 3, 11, 12, -10]))
     assert tuple(candidate([5, 6, 3, 4, 8, 9, 2])) == tuple([2, 6, 3, 4, 8, 9, 5])
     assert tuple(candidate([5, 8, 3, 4, 6, 9, 2])) == tuple([2, 8, 3, 4, 6, 9, 5])
     assert tuple(candidate([5, 6, 9, 4, 8, 3, 2])) == tuple([2, 6, 9, 4, 8, 3, 5])
@@ -1644,6 +1642,7 @@ METADATA = {}
 
 
 def check(candidate):
+    from candidate import encode_cyclic
     from random import randint, choice
     import string
 
@@ -2205,6 +2204,7 @@ METADATA = {}
 
 
 def check(candidate):
+    from candidate import encode_shift
     from random import randint, choice
     import copy
     import string
