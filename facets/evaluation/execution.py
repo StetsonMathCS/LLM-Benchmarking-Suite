@@ -19,7 +19,7 @@ import uuid
 from typing import Mapping, Optional, Protocol
 
 
-OUTPUT_LIMIT = 32_768
+OUTPUT_LIMIT = 1_048_576
 SAFE_ENV_KEYS = ("PATH", "LANG", "LC_ALL", "SYSTEMROOT", "WINDIR")
 
 

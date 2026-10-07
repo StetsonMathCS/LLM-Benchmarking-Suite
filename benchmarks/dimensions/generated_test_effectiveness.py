@@ -19,9 +19,21 @@ _records = {}
 _collection_errors = []
 FACETS_PAYLOAD = None
 
+# The payload rides on stdout, and stdout is truncated to OUTPUT_LIMIT keeping
+# its head. Anything emitted after the marker is therefore unreachable, so the
+# payload must stay small enough to fit ahead of pytest's own output.
+_DIAGNOSTIC_CHARS = 300
+_MAX_DIAGNOSTICS = 20
+
+def _diagnostic(report):
+    if sum(1 for item in _records.values() if "diagnostic" in item) >= _MAX_DIAGNOSTICS:
+        return "<diagnostic omitted: per-record diagnostic budget exhausted>"
+    return str(report.longrepr)[:_DIAGNOSTIC_CHARS]
+
 def pytest_collectreport(report):
     if report.failed:
-        _collection_errors.append({"nodeid": report.nodeid, "diagnostic": str(report.longrepr)[:4000]})
+        if len(_collection_errors) < _MAX_DIAGNOSTICS:
+            _collection_errors.append({"nodeid": report.nodeid, "diagnostic": str(report.longrepr)[:_DIAGNOSTIC_CHARS]})
 
 def pytest_runtest_logreport(report):
     if report.when not in ("setup", "call", "teardown"):
@@ -34,7 +46,7 @@ def pytest_runtest_logreport(report):
     current["phases"][report.when] = outcome
     current["duration_s"] = current.get("duration_s", 0.0) + float(getattr(report, "duration", 0.0))
     if report.failed:
-        current["diagnostic"] = str(report.longrepr)[:4000]
+        current["diagnostic"] = _diagnostic(report)
 
 def pytest_sessionfinish(session, exitstatus):
     global FACETS_PAYLOAD
@@ -64,7 +76,9 @@ PYTEST_RUNNER = r'''\
 import json
 import pytest
 import facets_pytest_plugin
-status = pytest.main(["-q", "-p", "no:cacheprovider", "-p", "facets_pytest_plugin", "test_generated.py"])
+# --tb=no: pytest otherwise echoes every failure message on stdout, which the host
+# truncates before reaching the trailing result marker.
+status = pytest.main(["-q", "--tb=no", "-p", "no:cacheprovider", "-p", "facets_pytest_plugin", "test_generated.py"])
 if facets_pytest_plugin.FACETS_PAYLOAD is not None:
     print("FACETS_TEST_RESULT=" + json.dumps(facets_pytest_plugin.FACETS_PAYLOAD, separators=(",", ":")), flush=True)
 raise SystemExit(status)
