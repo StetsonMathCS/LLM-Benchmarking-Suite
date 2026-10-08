@@ -14,7 +14,7 @@ limit: 2
 max_tokens: 1024
 timeouts:
   provider_s: 180
-  evaluator_s: 15
+  evaluator_s: 60
 retries:
   attempts: 2
   initial_backoff_s: 1
