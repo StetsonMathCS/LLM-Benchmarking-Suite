@@ -6,7 +6,29 @@ aliases:
   qwen36: qwen3.6
   qwen38: qwen3.8
   nemotron: nemotron-3.5-lightning
+  gemma: gemma4
+  north: north-mini-code
 models:
+  gemma4:
+    provider: ollama
+    model: gemma4:31b
+    base_url: http://127.0.0.1:1561
+    parameter_size: 31B
+    availability: local_model_required
+    note: Dense, 30.7B total parameters per the Google model card. The local tag does not
+      state a quantization, so precision is unrecorded and comparisons against explicitly
+      quantized entries carry a precision confound.
+  north-mini-code:
+    provider: ollama
+    model: north-mini-code-1.0:q4_K_M
+    base_url: http://127.0.0.1:1561
+    parameter_size: 30B
+    quantization: q4_K_M
+    availability: local_model_required
+    note: Mixture of experts, 30B total and 3B active per Cohere. parameter_size records
+      total parameters to match the size scatter convention; the 3B active figure is the
+      one relevant to throughput. Locally served as a 4-bit quantisation, which is a
+      precision confound against the unquantified entries.
   nemotron-3.5-lightning:
     provider: ollama
     model: nemotron-3.5-lightning:30b

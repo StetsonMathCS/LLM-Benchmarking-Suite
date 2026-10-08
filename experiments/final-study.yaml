@@ -34,6 +34,8 @@ embedding:
   base_url: http://127.0.0.1:1561
   model: nomic-embed-text:latest
 models:
+  - gemma4
+  - north-mini-code
   - nemotron-3.5-lightning
   - qwen3.8
   - qwen3.6
