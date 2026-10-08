@@ -7,7 +7,7 @@ samples: 1
 temperature:
 max_tokens: 4096
 timeouts:
-  provider_s: 180
+  provider_s: 900
   evaluator_s: 60
 retries:
   attempts: 3
