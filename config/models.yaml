@@ -19,12 +19,6 @@ models:
     base_url: http://127.0.0.1:1561
     parameter_size: 3B
     availability: local_model_required
-  deepseek-r1:
-    provider: ollama
-    model: deepseek-r1:32b
-    base_url: http://127.0.0.1:1561
-    parameter_size: 32B
-    availability: local_model_required
   qwen3.8:
     provider: ollama
     model: qwen3.8:27b

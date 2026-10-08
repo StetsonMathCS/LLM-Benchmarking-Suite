@@ -36,7 +36,6 @@ embedding:
 models:
   - nemotron-3.5-lightning
   - qwen3.8
-  - deepseek-r1
   - qwen3.6
   - llama3
   - gpt-oss
