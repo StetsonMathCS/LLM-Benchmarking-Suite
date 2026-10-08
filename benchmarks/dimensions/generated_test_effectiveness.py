@@ -300,13 +300,21 @@ class GeneratedTestEffectivenessDimension(BaseDimension):
             })
 
         baseline = self._run_suite(original_code, adapted or "", timeout_s)
+        # A suite the wall clock kills emits no marker, so missing structured
+        # results must be read alongside the exit status. A timeout is the
+        # candidate's own doing, not a harness fault, and belongs to the
+        # candidate_failure path below.
+        if baseline["execution"].get("timed_out"):
+            return self._result(0.0, "candidate_failure", {
+                **common, "diagnostic": "generated suite timed out", "baseline": baseline,
+            })
         if baseline.get("structured_results_missing"):
             return self._result(0.0, "infrastructure_error", {
                 **common, "diagnostic": "structured pytest reporting unavailable", "baseline": baseline,
             })
-        if baseline["execution"].get("timed_out") or baseline.get("collection_errors"):
+        if baseline.get("collection_errors"):
             return self._result(0.0, "candidate_failure", {
-                **common, "diagnostic": "generated suite timed out or failed collection", "baseline": baseline,
+                **common, "diagnostic": "generated suite failed collection", "baseline": baseline,
             })
         outcomes = {item["id"]: item["status"] for item in baseline.get("tests", [])}
         executable = {key: value for key, value in outcomes.items() if value not in {"skipped", "xfail"}}

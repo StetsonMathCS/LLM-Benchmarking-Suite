@@ -7,7 +7,7 @@ import json
 import sys
 from pathlib import Path
 
-from core.base import BaseProvider, LLMResponse, ModelConfig
+from core.base import BaseProvider, ModelConfig
 from facets.analysis import analyze_directory, summarize_directory
 from facets.config import (
     ALL_TASKS,
@@ -298,7 +298,19 @@ def _reevaluate(args) -> int:
             for line in handle:
                 record = json.loads(line)
                 source_results[(record["task"], str(record["record_id"]), int(record.get("sample_index", 0)))] = record
-        model_spec = {"alias": source_manifest.get("model_alias"), "provider": source_manifest["provider"], "model": source_manifest["model"], "credential_env": None, "availability": "saved_response"}
+        # Carry over the registry metadata recorded by the source run. Analysis
+        # reads parameter_size from here to draw the size scatter, and base_url
+        # documents where responses came from; dropping them silently made every
+        # reevaluated model look like it had an undisclosed parameter count.
+        recorded = dict((source_manifest.get("resolved_config") or {}).get("model") or {})
+        recorded.update({
+            "alias": source_manifest.get("model_alias"),
+            "provider": source_manifest["provider"],
+            "model": source_manifest["model"],
+            "credential_env": None,
+            "availability": "saved_response",
+        })
+        model_spec = recorded
         source_provenance = source_manifest
     else:
         legacy = json.loads(source.read_text(encoding="utf-8"))
@@ -334,8 +346,18 @@ def _reevaluate(args) -> int:
         if content is None:
             missing.append(key)
             continue
-        response = LLMResponse(content=content, model=model_spec["model"], provider=model_spec["provider"], status="saved_response")
-        store.save_response(item["identity"], {"schema_version": "2.0", "record_identity": item["identity"], "prompt": None, "response": response.to_dict(), "reevaluation_source": str(source), "origin": "reevaluation_source"})
+        # Preserve the recorded generation telemetry. Generation is not repeated,
+        # so the latency and token usage measured originally remain the truth for
+        # this record. Rebuilding a bare response zeroed latency, and analysis
+        # cannot draw score against generation latency without it.
+        recorded_response = dict(old.get("llm_response") or {})
+        recorded_response.update({
+            "content": content,
+            "model": model_spec["model"],
+            "provider": model_spec["provider"],
+            "status": "saved_response",
+        })
+        store.save_response(item["identity"], {"schema_version": "2.0", "record_identity": identity, "prompt": None, "response": recorded_response, "reevaluation_source": str(source), "origin": "reevaluation_source"})
     if missing:
         atomic_json(output / "reevaluation-error.json", {"missing_saved_responses": missing})
         print(f"reevaluation refused: {len(missing)} responses could not be recovered", file=sys.stderr)
