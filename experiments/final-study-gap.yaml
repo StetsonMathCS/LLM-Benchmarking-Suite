@@ -1,0 +1,48 @@
+# Complements final-study.yaml for the two models that were installed after the
+# October 8-11 sweep had already been frozen. Every scoring-relevant field is
+# held identical to final-study.yaml so the two runs are directly comparable;
+# only the model list differs. Do not diverge these two configs.
+#
+#   facets queue create study-gap --config experiments/final-study-gap.yaml --on-error continue
+#   facets queue run study-gap --on-error continue
+#
+# The October sweep wrote to reports/study under an older config; this one writes
+# to reports/runs, so the two do not collide.
+schema_version: 1
+profile: revised-v1
+language: python
+translation_target: javascript
+tasks: [bug_fixing, code_generation, code_review, refactoring, test_generation, translation]
+samples: 1
+temperature:
+max_tokens: 4096
+timeouts:
+  provider_s: 900
+  evaluator_s: 60
+retries:
+  attempts: 3
+  initial_backoff_s: 1
+  max_backoff_s: 8
+execution:
+  backend: container
+  image: facets-evaluator:revised-v1
+  memory_mb: 256
+  cpus: 1.0
+  pids_limit: 64
+expected_counts:
+  code_generation: 164
+  bug_fixing: 31
+  code_review: 20
+  refactoring: 20
+  test_generation: 80
+  translation: 30
+output_dir: reports/runs
+generation_concurrency: 1
+evaluator_concurrency: 1
+mutation_preflight: full
+embedding:
+  base_url: http://127.0.0.1:1561
+  model: nomic-embed-text:latest
+models:
+  - gemma4
+  - north-mini-code
