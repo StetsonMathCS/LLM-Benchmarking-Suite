@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef search(lst):\n    '''\n    You are given a non-empty list of positive integers. Return the greatest integer that is greater than \n    zero, and has a frequency greater than or equal to the value of the integer itself. \n    The frequency of an integer is the number of times it appears in the list.\n    If no such a value exist, return -1.\n    Examples:\n        search([4, 1, 2, 2, 3, 1]) == 2\n        search([1, 2, 2, 3, 3, 3, 4, 4, 4]) == 3\n        search([5, 5, 4, 4, 4]) == -1\n    '''\n\n\nGenerated Code:",
+  "record_identity": "88dcf0a142a7c1c4a2d25f3a7f974d5dec40c9494418237c99c78141b0845ccc",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 52,
+    "content": "def search(lst):\n    counts = {x: lst.count(x) for x in lst}\n    result = -1\n    for num, freq in counts.items():\n        if freq >= num:\n            result = max(result, num)\n    return result",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 3561.339088,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 327,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 52,
+      "prompt_eval_count": 327
+    }
+  },
+  "saved_at": "2026-10-11T02:58:36.075861+00:00",
+  "schema_version": "2.0"
+}

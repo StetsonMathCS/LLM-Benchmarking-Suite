@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code review model. Your task is to analyze Python code and provide a structured review highlighting issues, potential improvements, and best practices.\n\n1.) Carefully analyze the provided Python code for correctness, readability, and maintainability.\n2.) Identify syntax issues, logical errors, potential runtime problems, and edge cases.\n3.) Detect inefficient algorithms, unnecessary complexity, or poor use of Python features.\n4.) Suggest improvements following idiomatic Python practices and common style conventions.\n5.) Highlight missing error handling, validation, or unsafe operations when relevant.\n6.) Point out maintainability concerns such as unclear variable names, deeply nested logic, or duplicated code.\n7.) Recommend improvements while preserving the original intent of the code.\n8.) Do not rewrite the entire program unless necessary to demonstrate a fix or improvement.\n9.) Present the review in a clear and structured manner.\n10.) If improvements are suggested, provide concise corrected snippets where appropriate.\n\nStart Example\n\nInput:\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n-1)\n\nOutput:\n\nIssues:\nThe function does not handle negative inputs.\nRecursive implementation may cause recursion depth issues for large values.\nSuggestions:\nAdd input validation to ensure n is non-negative.\nConsider an iterative implementation for better scalability.\n\nEnd Example\n\nYour turn now.\n\nCode to review:def cache_result(func):\n    cache = {}\n    def wrapper(*args):\n        if args in cache:\n            return cache[args]\n        result = func(*args)\n        cache[args] = result\n        return result\n    return wrapper\n\n",
+  "record_identity": "f9e158c0de28f5505c9ed0e954946f609b9e839546b0413f7ce57b0ee9c82c02",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 3991,
+    "content": "### Issues:\n1. **Ignores keyword arguments (`**kwargs`):** The wrapper only accepts `*args`. Calls using named parameters will either fail or bypass the caching logic entirely.\n2. **Fails on unhashable argument values:** Dictionary keys must be hashable. If the decorated function receives lists, dicts, sets, or other unhashable objects as arguments or keyword values, a `TypeError` will be raised at runtime.\n3. **Unbounded memory growth:** The cache dictionary grows indefinitely with no eviction policy. In long-running applications, this can lead to memory exhaustion.\n4. **Not thread-safe:** Concurrent calls can cause race conditions when checking and updating the `cache` dictionary, potentially resulting in duplicate computations or inconsistent state.\n5. **Lacks type hints & documentation:** Missing annotations and docstrings reduce readability, IDE support, and long-term maintainability.\n\n### Suggestions:\n- Accept `**kwargs` and construct a hashable key using `(args, frozenset(kwargs.items()))`.\n- Explicitly document that argument/keyword values must be hashable, or handle unhashable types gracefully (e.g., by skipping cache lookup or raising a clear custom error).\n- Add thread safety if the decorator is used in concurrent contexts.\n- Implement a maximum cache size with an eviction strategy to prevent memory leaks.\n- Prefer Python’s built-in `@functools.cache` (Python 3.9+) or `@functools.lru_cache` for production code, as they are optimized, handle edge cases, and are thoroughly tested.\n\n### Corrected Snippet (Fixed Implementation):\n```python\nimport threading\nfrom typing import Any, Callable\n\ndef cache_result(func: Callable[..., Any]) -> Callable[..., Any]:\n    \"\"\"Thread-safe decorator that caches results for hashable arguments.\"\"\"\n    cache = {}\n    lock = threading.Lock()\n\n    def wrapper(*args, **kwargs) -> Any:\n        # Combine positional and keyword arguments into a single hashable key\n        key = (args, frozenset(kwargs.items()))\n        \n        with lock:\n            if key in cache:\n                return cache[key]\n            \n            result = func(*args, **kwargs)\n            cache[key] = result\n            return result\n\n    # Optional utility to inspect cache size during debugging\n    wrapper.cache_info = lambda: len(cache)\n    return wrapper\n```\n\n### Production Recommendation:\nUnless you strictly need custom caching behavior, replace this decorator with Python's standard library implementation. It handles argument serialization, provides configurable LRU eviction, and is highly optimized:\n```python\nfrom functools import lru_cache\n\n@lru_cache(maxsize=128)  # Use maxsize=None for unbounded cache (caution advised)\ndef my_function(x, y):\n    return x + y\n```\n**Note on `frozenset(kwargs.items())`:** This works reliably only when all keyword argument values are hashable. If your use case requires caching with unhashable types (e.g., lists or dicts as values), consider serializing them to strings via `json.dumps(..., sort_keys=True)` or using a library like `cachetools` that supports custom key generation and eviction policies.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 206455.522335,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 362,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 3991,
+      "prompt_eval_count": 362
+    }
+  },
+  "saved_at": "2026-10-09T18:57:21.456422+00:00",
+  "schema_version": "2.0"
+}

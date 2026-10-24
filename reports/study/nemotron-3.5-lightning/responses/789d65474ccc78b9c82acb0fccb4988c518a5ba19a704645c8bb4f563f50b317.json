@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import has_close_elements\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine has_close_elements. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Check if in given list of numbers, are any two numbers closer to each other than given threshold.\nCode to test:\nfrom typing import List\n\n\ndef has_close_elements(numbers: List[float], threshold: float) -> bool:\n    \"\"\" Check if in given list of numbers, are any two numbers closer to each other than\n    given threshold.\n    >>> has_close_elements([1.0, 2.0, 3.0], 0.5)\n    False\n    >>> has_close_elements([1.0, 2.8, 3.0, 4.0, 5.0, 2.0], 0.3)\n    True\n    \"\"\"\n    for idx, elem in enumerate(numbers):\n        for idx2, elem2 in enumerate(numbers):\n            if idx != idx2:\n                distance = abs(elem - elem2)\n                if distance < threshold:\n                    return True\n\n    return False\n\nGenerated Tests:\n",
+  "record_identity": "789d65474ccc78b9c82acb0fccb4988c518a5ba19a704645c8bb4f563f50b317",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 3004,
+    "content": "import unittest\nfrom candidate import has_close_elements\n\n\nclass TestHasCloseElements(unittest.TestCase):\n    def test_has_close_elements_normal_case_returns_true(self):\n        self.assertTrue(has_close_elements([1.0, 2.8, 3.0, 4.0, 5.0, 2.0], 0.3))\n\n    def test_has_close_elements_normal_case_returns_false(self):\n        self.assertFalse(has_close_elements([1.0, 2.0, 3.0], 0.5))\n\n    def test_has_close_elements_boundary_threshold_equal_distance_returns_false(self):\n        self.assertFalse(has_close_elements([1.0, 2.0], 1.0))\n\n    def test_has_close_elements_empty_input_list_returns_false(self):\n        self.assertFalse(has_close_elements([], 0.5))\n\n    def test_has_close_elements_single_element_list_returns_false(self):\n        self.assertFalse(has_close_elements([5.0], 0.5))\n\n    def test_has_close_elements_duplicate_values_within_threshold_returns_true(self):\n        self.assertTrue(has_close_elements([1.0, 1.0], 0.1))\n\n    def test_has_close_elements_none_for_numbers_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            has_close_elements(None, 0.5)\n\n    def test_has_close_elements_none_for_threshold_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            has_close_elements([1.0, 2.0], None)\n\n    def test_has_close_elements_negative_threshold_returns_false(self):\n        self.assertFalse(has_close_elements([1.0, 2.0], -0.1))\n\n    def test_has_close_elements_large_threshold_covering_all_pairs_returns_true(self):\n        self.assertTrue(has_close_elements([1.0, 10.0], 100.0))\n\n    def test_has_close_elements_unsorted_list_returns_true(self):\n        self.assertTrue(has_close_elements([5.0, 1.0, 3.0], 2.1))\n\n    def test_has_close_elements_returns_false_when_no_pairs_below_threshold(self):\n        self.assertFalse(has_close_elements([0.0, 10.0, 20.0], 5.0))\n\n    def test_has_close_elements_threshold_zero_returns_false(self):\n        self.assertFalse(has_close_elements([1.0, 2.0], 0.0))",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 159187.108758,
+    "model": "nemotron-3.5-lightning:30b",
+    "prompt_tokens": 787,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 3004,
+      "prompt_eval_count": 787
+    }
+  },
+  "saved_at": "2026-10-08T09:45:36.428470+00:00",
+  "schema_version": "2.0"
+}

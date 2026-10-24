@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Refactor TaskRunner to use a TaskResult dataclass; eliminate the running flag and parallel error/result lists; expose a summary property\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\nclass TaskRunner:\n    def __init__(self):\n        self.tasks = []\n        self.results = []\n        self.errors = []\n        self.running = False\n\n    def add_task(self, func, *args, **kwargs):\n        self.tasks.append((func, args, kwargs))\n\n    def run(self):\n        self.running = True\n        self.results = []\n        self.errors = []\n        for func, args, kwargs in self.tasks:\n            try:\n                result = func(*args, **kwargs)\n                self.results.append({'status': 'ok', 'result': result})\n            except Exception as e:\n                self.errors.append({'status': 'error', 'error': str(e), 'func': func.__name__})\n                self.results.append({'status': 'error', 'error': str(e)})\n        self.running = False\n        return self.results\n\n    def get_errors(self):\n        return self.errors\n\n    def get_successes(self):\n        return [r for r in self.results if r['status'] == 'ok']\n\nRefactored Code:",
+  "record_identity": "63a20f1c82acd7cf48872922091ef96b5b3e28c332d770e6ed6cadf6fc8b6c3d",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1174,
+    "content": "from dataclasses import dataclass\nfrom typing import Any, Callable, Optional\n\n\n@dataclass\nclass TaskResult:\n    status: str\n    func_name: str\n    result: Any = None\n    error: Optional[str] = None\n\n\nclass TaskRunner:\n    def __init__(self):\n        self.tasks: list[tuple[Callable, tuple, dict]] = []\n        self.results: list[TaskResult] = []\n\n    def add_task(self, func: Callable, *args, **kwargs) -> None:\n        self.tasks.append((func, args, kwargs))\n\n    def run(self) -> list[TaskResult]:\n        self.results = []\n        for func, args, kwargs in self.tasks:\n            try:\n                result = func(*args, **kwargs)\n                self.results.append(TaskResult(\n                    status=\"ok\",\n                    func_name=func.__name__,\n                    result=result,\n                ))\n            except Exception as e:\n                self.results.append(TaskResult(\n                    status=\"error\",\n                    func_name=func.__name__,\n                    error=str(e),\n                ))\n        return self.results\n\n    @property\n    def summary(self) -> dict[str, int]:\n        successes = sum(1 for r in self.results if r.status == \"ok\")\n        errors = sum(1 for r in self.results if r.status == \"error\")\n        return {\n            \"total\": len(self.results),\n            \"successes\": successes,\n            \"errors\": errors,\n        }\n\n    def get_errors(self) -> list[TaskResult]:\n        return [r for r in self.results if r.status == \"error\"]\n\n    def get_successes(self) -> list[TaskResult]:\n        return [r for r in self.results if r.status == \"ok\"]",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 202287.989473,
+    "model": "qwen3.8:27b",
+    "prompt_tokens": 561,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1174,
+      "prompt_eval_count": 561
+    }
+  },
+  "saved_at": "2026-10-09T01:02:24.520645+00:00",
+  "schema_version": "2.0"
+}

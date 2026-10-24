@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef Strongest_Extension(class_name, extensions):\n    \"\"\"You will be given the name of a class (a string) and a list of extensions.\n    The extensions are to be used to load additional classes to the class. The\n    strength of the extension is as follows: Let CAP be the number of the uppercase\n    letters in the extension's name, and let SM be the number of lowercase letters \n    in the extension's name, the strength is given by the fraction CAP - SM. \n    You should find the strongest extension and return a string in this \n    format: ClassName.StrongestExtensionName.\n    If there are two or more extensions with the same strength, you should\n    choose the one that comes first in the list.\n    For example, if you are given \"Slices\" as the class and a list of the\n    extensions: ['SErviNGSliCes', 'Cheese', 'StuFfed'] then you should\n    return 'Slices.SErviNGSliCes' since 'SErviNGSliCes' is the strongest extension \n    (its strength is -1).\n    Example:\n    for Strongest_Extension('my_class', ['AA', 'Be', 'CC']) == 'my_class.AA'\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "8df5d6181c90ef62ee0635ca499e8212ff79a4f9cd41714e6308d7b6528d0b19",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 285,
+    "content": "```python\ndef Strongest_Extension(class_name, extensions):\n    \"\"\"\n    Return the strongest extension in the format ClassName.ExtensionName.\n\n    Strength of an extension is defined as:\n        CAP - SM\n    where CAP is the count of uppercase letters and SM is the count of\n    lowercase letters in the extension name.\n    \"\"\"\n    best_ext = None\n    best_strength = None\n\n    for ext in extensions:\n        cap = sum(1 for c in ext if c.isupper())\n        sm = sum(1 for c in ext if c.islower())\n        strength = cap - sm\n\n        if best_strength is None or strength > best_strength:\n            best_strength = strength\n            best_ext = ext\n\n    return f\"{class_name}.{best_ext}\" if best_ext is not None else class_name\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 22447.711059,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 498,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 285,
+      "prompt_eval_count": 498
+    }
+  },
+  "saved_at": "2026-10-10T17:00:45.107003+00:00",
+  "schema_version": "2.0"
+}

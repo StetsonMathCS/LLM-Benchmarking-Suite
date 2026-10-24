@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef anti_shuffle(s):\n    \"\"\"\n    Write a function that takes a string and returns an ordered version of it.\n    Ordered version of string, is a string where all words (separated by space)\n    are replaced by a new word where all the characters arranged in\n    ascending order based on ascii value.\n    Note: You should keep the order of words and blank spaces in the sentence.\n\n    For example:\n    anti_shuffle('Hi') returns 'Hi'\n    anti_shuffle('hello') returns 'ehllo'\n    anti_shuffle('Hello World!!!') returns 'Hello !!!Wdlor'\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "08401cd5feb857043db5da0efff9a499e3b72dc6ea91b26b2a0d8aeef7aa5799",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 814,
+    "content": "```python\ndef anti_shuffle(s: str) -> str:\n    \"\"\"\n    Return a string where each word (sequence of non-space characters)\n    is sorted in ascending order by ASCII value, while preserving\n    the original sequence of words and spaces.\n\n    Examples:\n        >>> anti_shuffle('Hi')\n        'Hi'\n        >>> anti_shuffle('hello')\n        'ehllo'\n        >>> anti_shuffle('Hello World!!!')\n        'Hello !!!Wdlor'\n    \"\"\"\n    result: list[str] = []\n    word: list[str] = []\n\n    for ch in s:\n        if ch == ' ':\n            if word:\n                result.extend(sorted(word))\n                word.clear()\n            result.append(ch)\n        else:\n            word.append(ch)\n\n    if word:\n        result.extend(sorted(word))\n\n    return ''.join(result)\n\n# Example usage\nif __name__ == \"__main__\":\n    tests = [\n        ('Hi', 'Hi'),\n        ('hello', 'ehllo'),\n        ('Hello World!!!', 'Hello !!!Wdlor'),\n        ('  spaced   words  ', '  aedps   dorrws  '),\n    ]\n\n    for inp, expected in tests:\n        out = anti_shuffle(inp)\n        print(f\"Input: {inp!r}\\nOutput: {out!r}\\nExpected: {expected!r}\\n{'✓' if out == expected else '✗'}\\n\")\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 57541.367753,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 354,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 814,
+      "prompt_eval_count": 354
+    }
+  },
+  "saved_at": "2026-10-10T16:10:43.141988+00:00",
+  "schema_version": "2.0"
+}

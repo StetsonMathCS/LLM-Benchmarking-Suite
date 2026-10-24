@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import filter_integers\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine filter_integers. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Filter given list of any python values only for integers\nCode to test:\nfrom typing import List, Any\n\n\ndef filter_integers(values: List[Any]) -> List[int]:\n    \"\"\" Filter given list of any python values only for integers\n    >>> filter_integers(['a', 3.14, 5])\n    [5]\n    >>> filter_integers([1, 2, 3, 'abc', {}, []])\n    [1, 2, 3]\n    \"\"\"\n    return [x for x in values if isinstance(x, int)]\n\nGenerated Tests:\n",
+  "record_identity": "a10d92be36beebd2893ee86a50404029b77814ebe77d1a571e387c5948af7e4b",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 4096,
+    "content": "import unittest",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 215053.202946,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 702,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "length",
+    "truncated": true,
+    "usage": {
+      "eval_count": 4096,
+      "prompt_eval_count": 702
+    }
+  },
+  "saved_at": "2026-10-09T21:38:07.131538+00:00",
+  "schema_version": "2.0"
+}

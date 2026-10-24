@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import intersperse\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine intersperse. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Insert a number 'delimeter' between every two consecutive elements of input list `numbers'\nCode to test:\nfrom typing import List\n\n\ndef intersperse(numbers: List[int], delimeter: int) -> List[int]:\n    \"\"\" Insert a number 'delimeter' between every two consecutive elements of input list `numbers'\n    >>> intersperse([], 4)\n    []\n    >>> intersperse([1, 2, 3], 4)\n    [1, 4, 2, 4, 3]\n    \"\"\"\n    if not numbers:\n        return []\n\n    result = []\n\n    for n in numbers[:-1]:\n        result.append(n)\n        result.append(delimeter)\n\n    result.append(numbers[-1])\n\n    return result\n\nGenerated Tests:\n",
+  "record_identity": "d1cacf6c43f85c69e731338cdad0e4489c15a9fab6fbcfa03d3c2aa4191d9b6e",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 757,
+    "content": "```python\nimport unittest\nfrom candidate import intersperse\n\nclass TestIntersperse(unittest.TestCase):\n    def test_empty_list(self):\n        self.assertEqual(intersperse([], 4), [])\n\n    def test_single_element(self):\n        self.assertEqual(intersperse([5], 0), [5])\n\n    def test_normal_case_multiple_elements(self):\n        self.assertEqual(intersperse([1, 2, 3], 4), [1, 4, 2, 4, 3])\n\n    def test_normal_case_with_negative_numbers(self):\n        self.assertEqual(intersperse([-1, -2, -3], 0), [-1, 0, -2, 0, -3])\n\n    def test_normal_case_with_floats(self):\n        self.assertEqual(intersperse([1.5, 2.5, 3.5], 0.5), [1.5, 0.5, 2.5, 0.5, 3.5])\n\n    def test_delimeter_at_start_and_end(self):\n        self.assertEqual(intersperse([1, 2, 3], 1), [1, 1, 2, 1, 3])\n\n    def test_boundary_case_two_elements(self):\n        self.assertEqual(intersperse([10, 20], 5), [10, 5, 20])\n\n    def test_boundary_case_last_element_only(self):\n        self.assertEqual(intersperse([10], 5), [10])\n\n    def test_boundary_case_first_element_only(self):\n        self.assertEqual(intersperse([10, 20, 30], 5)[0:2], [10, 5])\n\n    def test_none_input(self):\n        with self.assertRaises(TypeError):\n            intersperse(None, 4)\n\n    def test_none_delimeter(self):\n        with self.assertRaises(TypeError):\n            intersperse([1, 2, 3], None)\n\n    def test_non_list_input(self):\n        with self.assertRaises(TypeError):\n            intersperse(\"not a list\", 4)\n\n    def test_non_int_delimeter(self):\n        with self.assertRaises(TypeError):\n            intersperse([1, 2, 3], \"delimeter\")\n\n    def test_list_with_non_integer_elements(self):\n        with self.assertRaises(TypeError):\n            intersperse([1, \"two\", 3], 4)\n\n    def test_large_input(self):\n        large_list = list(range(1, 101))\n        expected = [1] + [4] * 100 + [100]\n        self.assertEqual(intersperse(large_list, 4), expected)\n\n    def test_mixed_types_with_valid_delimeter(self):\n        with self.assertRaises(TypeError):\n            intersperse([1, \"two\", 3], 4)\n\n    def test_delimeter_equals_first_element(self):\n        self.assertEqual(intersperse([4, 5, 6], 4), [4, 4, 5, 4, 6])\n\n    def test_delimeter_equals_last_element(self):\n        self.assertEqual(intersperse([1, 2, 4], 4), [1, 4, 2, 4, 4])\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 42734.122467,
+    "model": "ministral-3:3b",
+    "prompt_tokens": 1290,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 757,
+      "prompt_eval_count": 1290
+    }
+  },
+  "saved_at": "2026-10-10T22:13:31.233911+00:00",
+  "schema_version": "2.0"
+}

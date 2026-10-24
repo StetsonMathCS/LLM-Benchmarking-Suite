@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import prime_fib\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine prime_fib. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: prime_fib returns n-th number that is a Fibonacci number and it's also prime.\nCode to test:\ndef prime_fib(n: int):\n    \"\"\"\n    prime_fib returns n-th number that is a Fibonacci number and it's also prime.\n    >>> prime_fib(1)\n    2\n    >>> prime_fib(2)\n    3\n    >>> prime_fib(3)\n    5\n    >>> prime_fib(4)\n    13\n    >>> prime_fib(5)\n    89\n    \"\"\"\n    import math\n\n    def is_prime(p):\n        if p < 2:\n            return False\n        for k in range(2, min(int(math.sqrt(p)) + 1, p - 1)):\n            if p % k == 0:\n                return False\n        return True\n    f = [0, 1]\n    while True:\n        f.append(f[-1] + f[-2])\n        if is_prime(f[-1]):\n            n -= 1\n        if n == 0:\n            return f[-1]\n\nGenerated Tests:\n",
+  "record_identity": "954f331e41c0ba8a0838ea71faa0edebbc4c21ed7b2b6436f912f0baa86786a5",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 240,
+    "content": "from candidate import prime_fib\n\ndef test_prime_fib_normal_case():\n    assert prime_fib(1) == 2\n    assert prime_fib(2) == 3\n    assert prime_fib(3) == 5\n    assert prime_fib(4) == 13\n    assert prime_fib(5) == 89\n\ndef test_prime_fib_boundary_case():\n    assert prime_fib(6) == 233\n\ndef test_prime_fib_empty_input():\n    with pytest.raises(TypeError):\n        prime_fib(\"\")\n\ndef test_prime_fib_none_input():\n    with pytest.raises(TypeError):\n        prime_fib(None)\n\ndef test_prime_fib_negative_input():\n    with pytest.raises(ValueError):\n        prime_fib(-1)\n\ndef test_prime_fib_large_input():\n    assert prime_fib(100) == 934169\n\ndef test_prime_fib_type_error():\n    with pytest.raises(TypeError):\n        prime_fib(0.5)  # expecting an integer input, a TypeError to occur\n\ndef test_prime_fib_large_input():\n    assert prime_fib(10000) == 514229\n",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 16989.942796,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 774,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 240,
+      "prompt_eval_count": 774
+    }
+  },
+  "saved_at": "2026-10-11T03:54:09.000914+00:00",
+  "schema_version": "2.0"
+}

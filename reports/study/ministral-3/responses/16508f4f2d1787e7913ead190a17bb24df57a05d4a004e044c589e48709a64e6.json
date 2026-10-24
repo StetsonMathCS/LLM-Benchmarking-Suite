@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: from typing import List\n\n\ndef has_close_elements(numbers: List[float], threshold: float) -> bool:\n    \"\"\" Check if in given list of numbers, are any two numbers closer to each other than\n    given threshold.\n    >>> has_close_elements([1.0, 2.0, 3.0], 0.5)\n    False\n    >>> has_close_elements([1.0, 2.8, 3.0, 4.0, 5.0, 2.0], 0.3)\n    True\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "16508f4f2d1787e7913ead190a17bb24df57a05d4a004e044c589e48709a64e6",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 77,
+    "content": "```python\nfrom typing import List\n\ndef has_close_elements(numbers: List[float], threshold: float) -> bool:\n    sorted_numbers = sorted(numbers)\n    for i in range(len(sorted_numbers) - 1):\n        if abs(sorted_numbers[i] - sorted_numbers[i + 1]) <= threshold:\n            return True\n    return False\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 5561.942651,
+    "model": "ministral-3:3b",
+    "prompt_tokens": 842,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 77,
+      "prompt_eval_count": 842
+    }
+  },
+  "saved_at": "2026-10-10T21:28:40.913037+00:00",
+  "schema_version": "2.0"
+}

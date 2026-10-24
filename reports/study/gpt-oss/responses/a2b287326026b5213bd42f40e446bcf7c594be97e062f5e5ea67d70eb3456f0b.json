@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: from typing import List, Tuple\n\n\ndef rolling_max(numbers: List[int]) -> List[int]:\n    \"\"\" From a given list of integers, generate a list of rolling maximum element found until given moment\n    in the sequence.\n    >>> rolling_max([1, 2, 3, 2, 3, 4, 2])\n    [1, 2, 3, 3, 3, 4, 4]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "a2b287326026b5213bd42f40e446bcf7c594be97e062f5e5ea67d70eb3456f0b",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 242,
+    "content": "```python\nfrom typing import List\n\ndef rolling_max(numbers: List[int]) -> List[int]:\n    \"\"\"From a given list of integers, generate a list of rolling maximum elements\n    found up to each position in the sequence.\n\n    Args:\n        numbers: A list of integers.\n\n    Returns:\n        A list of the same length where each element is the maximum of all\n        elements seen so far.\n\n    Example:\n        >>> rolling_max([1, 2, 3, 2, 3, 4, 2])\n        [1, 2, 3, 3, 3, 4, 4]\n    \"\"\"\n    if not numbers:\n        return []\n\n    result: List[int] = []\n    current_max = numbers[0]\n    result.append(current_max)\n\n    for n in numbers[1:]:\n        if n > current_max:\n            current_max = n\n        result.append(current_max)\n\n    return result\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 17230.08753,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 325,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 242,
+      "prompt_eval_count": 325
+    }
+  },
+  "saved_at": "2026-10-10T15:29:39.993666+00:00",
+  "schema_version": "2.0"
+}

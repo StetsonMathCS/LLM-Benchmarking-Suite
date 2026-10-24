@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code debugger and bug-fixing model. Your task is to take incorrect or broken Python code and return a corrected version that runs and behaves as intended.\n\n1.) Identify and fix all syntax errors, logical errors, type issues, and potential runtime problems.\n2.) Ensure the corrected code runs under standard Python (prefer clear, idiomatic Python where appropriate).\n3.) Preserve the original program structure, intent, and logic whenever possible.\n4.) Do not rewrite the entire program unless necessary to fix correctness or runtime issues.\n5.) Respect existing imports, variables, classes, and function definitions unless they are inconsistent, incorrect or missing.\n6.) Fix incorrect conditions, loops, indentation issues, type mismatches, and undefined behavior if present.\n7.) Add missing imports, return statements, or definitions only if required for the code to run.\n8.) Maintain consistent and clean formatting and indentation following Python conventions.\n9.) Ensure the final code runs without syntax errors or obvious runtime failures.\n10.) Make sure output is ONLY an executeable and parseable chunk of code.\nStart Example\n\nInput:\ndef factorial(n):\n    if n = 0:\n        return 1\n    else\n        return n * factorial(n - 1)\n\nprint(factorial(5)\n\nOutput:\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n - 1)\n\nprint(factorial(5))\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the corrected Python code.\n\nCode to fix:\n\ndef rpn_eval(tokens):\n    def op(symbol, a, b):\n        return {\n            '+': lambda a, b: a + b,\n            '-': lambda a, b: a - b,\n            '*': lambda a, b: a * b,\n            '/': lambda a, b: a / b\n        }[symbol](a, b)\n\n    stack = []\n\n    for token in tokens:\n        if isinstance(token, float):\n            stack.append(token)\n        else:\n            a = stack.pop()\n            b = stack.pop()\n            stack.append(\n                op(token, a, b)\n            )\n\n    return stack.pop()\n\nprint(rpn_eval([3.0, 5.0, '+', 2.0, '/']))\nprint(rpn_eval([2.0, 2.0, '+']))\nprint(rpn_eval([7.0, 4.0, '+', 3.0, '-']))\n\nCorrected Code:",
+  "record_identity": "1e677deca49665c679e445997a8ae2bb607d6a38529657e55296b31338b9937f",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 842,
+    "content": "def rpn_eval(tokens):\n    \"\"\"Evaluate a Reverse Polish Notation expression.\n\n    Parameters\n    ----------\n    tokens : list\n        List containing numbers (int or float) and operators as strings.\n\n    Returns\n    -------\n    float\n        The result of evaluating the RPN expression.\n    \"\"\"\n    def op(symbol, a, b):\n        # Operands are passed in the order they were popped from the stack\n        # (a is the second popped, b is the first popped), so b is the left\n        # operand and a is the right operand.\n        if symbol == '+':\n            return b + a\n        if symbol == '-':\n            return b - a\n        if symbol == '*':\n            return b * a\n        if symbol == '/':\n            return b / a\n        raise ValueError(f\"Unsupported operator: {symbol}\")\n\n    stack = []\n\n    for token in tokens:\n        if isinstance(token, (int, float)):\n            stack.append(float(token))\n        else:\n            if len(stack) < 2:\n                raise ValueError(\"Insufficient operands for the operator.\")\n            a = stack.pop()\n            b = stack.pop()\n            stack.append(op(token, a, b))\n\n    if len(stack) != 1:\n        raise ValueError(\"The RPN expression did not resolve to a single result.\")\n    return stack.pop()\n\n\nprint(rpn_eval([3.0, 5.0, '+', 2.0, '/']))\nprint(rpn_eval([2.0, 2.0, '+']))\nprint(rpn_eval([7.0, 4.0, '+', 3.0, '-']))",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 63293.11585,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 576,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 842,
+      "prompt_eval_count": 576
+    }
+  },
+  "saved_at": "2026-10-10T15:19:11.675069+00:00",
+  "schema_version": "2.0"
+}

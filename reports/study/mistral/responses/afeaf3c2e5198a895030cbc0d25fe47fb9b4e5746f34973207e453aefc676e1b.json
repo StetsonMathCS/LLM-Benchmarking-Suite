@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import factorize\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine factorize. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Return list of prime factors of given integer in the order from smallest to largest. Each of the factors should be listed number of times corresponding to how many times it appeares in factorization. Input number should be equal to the product of all factors\nCode to test:\nfrom typing import List\n\n\ndef factorize(n: int) -> List[int]:\n    \"\"\" Return list of prime factors of given integer in the order from smallest to largest.\n    Each of the factors should be listed number of times corresponding to how many times it appeares in factorization.\n    Input number should be equal to the product of all factors\n    >>> factorize(8)\n    [2, 2, 2]\n    >>> factorize(25)\n    [5, 5]\n    >>> factorize(70)\n    [2, 5, 7]\n    \"\"\"\n    import math\n    fact = []\n    i = 2\n    while i <= int(math.sqrt(n) + 1):\n        if n % i == 0:\n            fact.append(i)\n            n //= i\n        else:\n            i += 1\n\n    if n > 1:\n        fact.append(n)\n    return fact\n\nGenerated Tests:\n",
+  "record_identity": "afeaf3c2e5198a895030cbc0d25fe47fb9b4e5746f34973207e453aefc676e1b",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 460,
+    "content": " ```python\nimport unittest\nfrom candidate import factorize\n\nclass TestFactorize(unittest.TestCase):\n    def test_factorize_normal_case(self):\n        self.assertEqual(factorize(8), [2, 2, 2])\n\n    def test_factorize_prime_number(self):\n        self.assertEqual(factorize(7), [7])\n\n    def test_factorize_perfect_square(self):\n        self.assertEqual(factorize(16), [2, 2, 2, 2])\n\n    def test_factorize_square_root(self):\n        self.assertEqual(factorize(9), [3, 3])\n\n    def test_factorize_larger_number(self):\n        self.assertEqual(factorize(70), [2, 5, 7])\n\n    def test_factorize_even_number(self):\n        self.assertEqual(factorize(12), [2, 2, 3])\n\n    def test_factorize_smallest_prime(self):\n        self.assertEqual(factorize(2), [2])\n\n    def test_factorize_negative_number(self):\n        self.assertEqual(factorize(-8), [2, 2, 2])\n\n    def test_factorize_zero(self):\n        self.assertEqual(factorize(0), [])\n\n    def test_factorize_large_even_number(self):\n        self.assertEqual(factorize(100), [2, 2, 5, 5])\n\n    def test_factorize_large_odd_number(self):\n        self.assertEqual(factorize(101), [101])\n\n    def test_factorize_edge_case_sqrt_plus_one(self):\n        self.assertEqual(factorize(11), [11])\n\nif __name__ == '__main__':\n    unittest.main()\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 54429.860446,
+    "model": "mistral:7b",
+    "prompt_tokens": 981,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 460,
+      "prompt_eval_count": 981
+    }
+  },
+  "saved_at": "2026-10-11T01:34:51.185733+00:00",
+  "schema_version": "2.0"
+}

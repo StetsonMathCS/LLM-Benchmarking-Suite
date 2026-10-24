@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import monotonic\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine monotonic. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Return True is list elements are monotonically increasing or decreasing.\nCode to test:\ndef monotonic(l: list):\n    \"\"\"Return True is list elements are monotonically increasing or decreasing.\n    >>> monotonic([1, 2, 4, 20])\n    True\n    >>> monotonic([1, 20, 4, 10])\n    False\n    >>> monotonic([4, 1, 0, -10])\n    True\n    \"\"\"\n    if l == sorted(l) or l == sorted(l, reverse=True):\n        return True\n    return False\n\nGenerated Tests:\n",
+  "record_identity": "bc4dba7761828e40985932f4a2d6356977c631a74ac9a2c252565aeee67f300e",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 364,
+    "content": "import pytest\nfrom candidate import monotonic\n\ndef test_monotonic_increasing():\n    assert monotonic([1, 2, 3, 4]) == True\n\ndef test_monotonic_decreasing():\n    assert monotonic([4, 3, 2, 1]) == True\n\ndef test_monotonic_non_increasing():\n    assert monotonic([1, 2, 1, 0]) == True\n\ndef test_monotonic_non_increasing_non_monotonic():\n    assert monotonic([1, 3, 2, 4]) == False\n\ndef test_monotonic_empty_list():\n    assert monotonic([]) == True\n\ndef test_monotonic_none():\n    with pytest.raises(TypeError):\n        monotonic(None)\n\ndef test_monotonic_single_element_list():\n    assert monotonic([1]) == True\n\ndef test_monotonic_mixed_types():\n    with pytest.raises(TypeError):\n        monotonic([1, 'a', 3])\n\ndef test_monotonic_large_number():\n    assert monotonic([1000000, 1000000, 1000000]) == True\n\ndef test_monotonic_large_different_number():\n    assert monotonic([1000000, 1000001, 1000002]) == True\n\ndef test_monotonic_large_different_number_non_monotonic():\n    assert monotonic([1000000, 999999, 1000002]) == False\n\ndef test_monotonic_large_decreasing():\n    assert monotonic([1000000, 999999, 999998]) == True\n\ndef test_monotonic_large_increasing():\n    with pytest.raises(TypeError):\n        monotonic([1, 2, 'a', 4])",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 22976.115201,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 668,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 364,
+      "prompt_eval_count": 668
+    }
+  },
+  "saved_at": "2026-10-11T04:03:42.107793+00:00",
+  "schema_version": "2.0"
+}

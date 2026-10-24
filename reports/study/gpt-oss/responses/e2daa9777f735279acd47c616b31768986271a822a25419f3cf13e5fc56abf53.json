@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: from typing import List\n\n\ndef separate_paren_groups(paren_string: str) -> List[str]:\n    \"\"\" Input to this function is a string containing multiple groups of nested parentheses. Your goal is to\n    separate those group into separate strings and return the list of those.\n    Separate groups are balanced (each open brace is properly closed) and not nested within each other\n    Ignore any spaces in the input string.\n    >>> separate_paren_groups('( ) (( )) (( )( ))')\n    ['()', '(())', '(()())']\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "e2daa9777f735279acd47c616b31768986271a822a25419f3cf13e5fc56abf53",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 629,
+    "content": "```python\nfrom typing import List\n\ndef separate_paren_groups(paren_string: str) -> List[str]:\n    \"\"\"\n    Split a string of parentheses into top‑level balanced groups.\n\n    Parameters\n    ----------\n    paren_string : str\n        Input string containing parentheses and optional whitespace.\n\n    Returns\n    -------\n    List[str]\n        A list of strings, each representing a balanced group of parentheses\n        that is not nested within another group.\n\n    Examples\n    --------\n    >>> separate_paren_groups('( ) (( )) (( )( ))')\n    ['()', '(())', '(()())']\n    \"\"\"\n    cleaned = paren_string.replace(' ', '')\n    groups: List[str] = []\n    current: List[str] = []\n    depth = 0\n\n    for char in cleaned:\n        if char not in '()':\n            continue  # ignore any non‑parenthesis characters\n\n        if char == '(':\n            if depth == 0:\n                current = []  # start a new group\n            depth += 1\n            current.append(char)\n        else:  # char == ')'\n            depth -= 1\n            current.append(char)\n            if depth == 0:\n                groups.append(''.join(current))\n\n    return groups\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 43826.975851,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 340,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 629,
+      "prompt_eval_count": 340
+    }
+  },
+  "saved_at": "2026-10-10T15:27:10.555026+00:00",
+  "schema_version": "2.0"
+}

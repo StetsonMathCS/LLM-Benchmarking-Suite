@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef how_many_times(string: str, substring: str) -> int:\n    \"\"\" Find how many times a given substring can be found in the original string. Count overlaping cases.\n    >>> how_many_times('', 'a')\n    0\n    >>> how_many_times('aaa', 'a')\n    3\n    >>> how_many_times('aaaa', 'aa')\n    3\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "8fd0e837294efb9b5923e8a6ddfe525d1d52cd3688f13cf5a03a62aa7467a539",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 311,
+    "content": "```python\ndef how_many_times(string: str, substring: str) -> int:\n    \"\"\"Find how many times a given substring can be found in the original string.\n    Count overlapping cases.\n\n    >>> how_many_times('', 'a')\n    0\n    >>> how_many_times('aaa', 'a')\n    3\n    >>> how_many_times('aaaa', 'aa')\n    3\n    \"\"\"\n    if not substring:\n        return 0\n\n    count = 0\n    index = 0\n    while True:\n        index = string.find(substring, index)\n        if index == -1:\n            break\n        count += 1\n        index += 1  # allow overlap by moving only one step forward\n    return count\n\n\nif __name__ == \"__main__\":\n    import doctest\n    doctest.testmod()\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 22032.938464,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 314,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 311,
+      "prompt_eval_count": 314
+    }
+  },
+  "saved_at": "2026-10-10T15:33:08.355572+00:00",
+  "schema_version": "2.0"
+}

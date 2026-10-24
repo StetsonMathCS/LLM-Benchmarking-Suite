@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Refactor into a ReportAccumulator class with an update(order) method and a summary property, replacing the raw loop with a clean API\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\ndef generate_report(orders):\n    total_revenue = 0\n    total_orders = 0\n    total_items = 0\n    max_order = 0\n    min_order = float('inf')\n    status_counts = {}\n    product_revenue = {}\n\n    for order in orders:\n        val = order['value']\n        total_revenue += val\n        total_orders += 1\n        total_items += len(order['items'])\n        if val > max_order:\n            max_order = val\n        if val < min_order:\n            min_order = val\n        status = order['status']\n        status_counts[status] = status_counts.get(status, 0) + 1\n        for item in order['items']:\n            pid = item['product_id']\n            product_revenue[pid] = product_revenue.get(pid, 0) + item['price'] * item['qty']\n\n    return {\n        'total_revenue': total_revenue,\n        'total_orders': total_orders,\n        'total_items': total_items,\n        'avg_order_value': total_revenue / total_orders if total_orders else 0,\n        'max_order': max_order,\n        'min_order': min_order if min_order != float('inf') else 0,\n        'status_counts': status_counts,\n        'top_products': sorted(product_revenue.items(), key=lambda x: x[1], reverse=True)[:5]\n    }\n\nRefactored Code:",
+  "record_identity": "e3d3b41d5ff6204e954b2af1f232f2e57163f7b298f3ca173573403e76bc483b",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 393,
+    "content": "class ReportAccumulator:\n    def __init__(self):\n        self.total_revenue = 0\n        self.total_orders = 0\n        self.total_items = 0\n        self.max_order = 0\n        self.min_order = float('inf')\n        self.status_counts = {}\n        self.product_revenue = {}\n\n    def update(self, order):\n        val = order['value']\n        self.total_revenue += val\n        self.total_orders += 1\n        self.total_items += len(order['items'])\n        if val > self.max_order:\n            self.max_order = val\n        if val < self.min_order:\n            self.min_order = val\n        status = order['status']\n        self.status_counts[status] = self.status_counts.get(status, 0) + 1\n        for item in order['items']:\n            pid = item['product_id']\n            self.product_revenue[pid] = self.product_revenue.get(pid, 0) + item['price'] * item['qty']\n\n    @property\n    def summary(self):\n        avg_order_value = self.total_revenue / self.total_orders if self.total_orders else 0\n        min_order = self.min_order if self.min_order != float('inf') else 0\n        top_products = sorted(self.product_revenue.items(), key=lambda x: x[1], reverse=True)[:5]\n        return {\n            'total_revenue': self.total_revenue,\n            'total_orders': self.total_orders,\n            'total_items': self.total_items,\n            'avg_order_value': avg_order_value,\n            'max_order': self.max_order,\n            'min_order': min_order,\n            'status_counts': self.status_counts,\n            'top_products': top_products\n        }\n\ndef generate_report(orders):\n    accumulator = ReportAccumulator()\n    for order in orders:\n        accumulator.update(order)\n    return accumulator.summary",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 320444.184813,
+    "model": "llama3:70b",
+    "prompt_tokens": 609,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 393,
+      "prompt_eval_count": 609
+    }
+  },
+  "saved_at": "2026-10-10T07:42:18.152589+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import digitSum\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine digitSum. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Task Write a function that takes a string as input and returns the sum of the upper characters only' ASCII codes.\nCode to test:\ndef digitSum(s):\n    \"\"\"Task\n    Write a function that takes a string as input and returns the sum of the upper characters only'\n    ASCII codes.\n\n    Examples:\n        digitSum(\"\") => 0\n        digitSum(\"abAB\") => 131\n        digitSum(\"abcCd\") => 67\n        digitSum(\"helloE\") => 69\n        digitSum(\"woArBld\") => 131\n        digitSum(\"aAaaaXa\") => 153\n    \"\"\"\n    if s == \"\": return 0\n    return sum(ord(char) if char.isupper() else 0 for char in s)\n\nGenerated Tests:\n",
+  "record_identity": "16ffb7db3b7451e2dbf28b7dafa11e337224746ba18ae06f65e358c9d489f297",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 462,
+    "content": "```python\nimport unittest\nfrom candidate import digitSum\n\nclass TestDigitSum(unittest.TestCase):\n    def test_empty_string(self):\n        self.assertEqual(digitSum(\"\"), 0)\n\n    def test_no_uppercase_chars(self):\n        self.assertEqual(digitSum(\"abcdef\"), 0)\n\n    def test_single_uppercase_char(self):\n        self.assertEqual(digitSum(\"A\"), 65)\n\n    def test_multiple_uppercase_chars(self):\n        self.assertEqual(digitSum(\"ABC\"), 65 + 66 + 67)\n\n    def test_mixed_case_string(self):\n        self.assertEqual(digitSum(\"abAB\"), 65 + 66 + 65 + 66)\n\n    def test_case_with_decimal(self):\n        self.assertEqual(digitSum(\"aBcD123\"), 65 + 66 + 68)\n\n    def test_case_with_numbers(self):\n        self.assertEqual(digitSum(\"123A45B\"), 65 + 66)\n\n    def test_case_with_special_chars(self):\n        self.assertEqual(digitSum(\"!@#ABC\"), 65 + 66 + 67)\n\n    def test_case_with_lowercase_and_uppercase_mixed(self):\n        self.assertEqual(digitSum(\"aAaaaXa\"), 65 + 65 + 65 + 88)\n\n    def test_case_with_whitespace(self):\n        self.assertEqual(digitSum(\"a B c D\"), 65 + 68)\n\n    def test_case_with_non_ascii_uppercase(self):\n        self.assertEqual(digitSum(\"αΒΓ\"), 0)  # Assuming ASCII-only behavior\n\n    def test_case_with_none_input(self):\n        with self.assertRaises(TypeError):\n            digitSum(None)\n\n    def test_case_with_non_string_input(self):\n        with self.assertRaises(TypeError):\n            digitSum(123)\n        with self.assertRaises(TypeError):\n            digitSum([1, 2, 3])\n\nif __name__ == '__main__':\n    unittest.main()\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 27413.12135,
+    "model": "ministral-3:3b",
+    "prompt_tokens": 1298,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 462,
+      "prompt_eval_count": 1298
+    }
+  },
+  "saved_at": "2026-10-10T22:59:07.540231+00:00",
+  "schema_version": "2.0"
+}

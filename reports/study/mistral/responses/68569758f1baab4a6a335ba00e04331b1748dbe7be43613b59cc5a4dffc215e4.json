@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef iscube(a):\n    '''\n    Write a function that takes an integer a and returns True \n    if this ingeger is a cube of some integer number.\n    Note: you may assume the input is always valid.\n    Examples:\n    iscube(1) ==> True\n    iscube(2) ==> False\n    iscube(-1) ==> True\n    iscube(64) ==> True\n    iscube(0) ==> True\n    iscube(180) ==> False\n    '''\n\n\nGenerated Code:",
+  "record_identity": "68569758f1baab4a6a335ba00e04331b1748dbe7be43613b59cc5a4dffc215e4",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 186,
+    "content": " Here is the Python code for the requested function:\n\n```python\nimport math\n\ndef iscube(n):\n    \"\"\"\n    Returns True if the number n is a cube of some integer number.\n    \"\"\"\n    cube_root = math.isqrt(n)\n    return math.isqrt(cube_root * cube_root * cube_root) == n\n```\n\nIn this code, I've used the `math` library to calculate the square root and cube root of a number. The function `math.isqrt(n)` returns the largest integer not greater than the square root of `n`, and `math.isqrt(cube_root * cube_root * cube_root)` checks if `n` is a cube of some integer.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 17948.922095,
+    "model": "mistral:7b",
+    "prompt_tokens": 326,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 186,
+      "prompt_eval_count": 326
+    }
+  },
+  "saved_at": "2026-10-11T00:02:37.450853+00:00",
+  "schema_version": "2.0"
+}

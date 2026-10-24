@@ -1,0 +1,23 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Replace magic-string discount codes with a DiscountCode dataclass registry; replace repeated subtotal calls with a computed property\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\nclass Cart:\n    def __init__(self):\n        self.items = []\n        self.discount_code = None\n\n    def add_item(self, name, price, qty):\n        self.items.append({'name': name, 'price': price, 'qty': qty})\n\n    def get_subtotal(self):\n        total = 0\n        for item in self.items:\n            total += item['price'] * item['qty']\n        return total\n\n    def get_discount(self):\n        subtotal = self.get_subtotal()\n        if self.discount_code == 'SAVE10':\n            return subtotal * 0.10\n        elif self.discount_code == 'SAVE20':\n            return subtotal * 0.20\n        elif self.discount_code == 'HALFOFF':\n            return subtotal * 0.50\n        return 0\n\n    def get_tax(self):\n        return (self.get_subtotal() - self.get_discount()) * 0.08\n\n    def get_total(self):\n        return self.get_subtotal() - self.get_discount() + self.get_tax()\n\nRefactored Code:",
+  "record_identity": "93debf5e23e0e852d0a94db1f1f0dd2522c25df1bf94409da7bff486b337df6d",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 0,
+    "content": "",
+    "effective_settings": {},
+    "error": "model 'deepseek-r1:32b' not found (status code: 404)",
+    "latency_ms": 0.0,
+    "model": "deepseek-r1:32b",
+    "prompt_tokens": 0,
+    "provider": "ollama",
+    "requested_settings": {},
+    "status": "completed",
+    "stop_reason": null,
+    "truncated": false,
+    "usage": {}
+  },
+  "saved_at": "2026-10-09T09:38:52.745510+00:00",
+  "schema_version": "2.0"
+}

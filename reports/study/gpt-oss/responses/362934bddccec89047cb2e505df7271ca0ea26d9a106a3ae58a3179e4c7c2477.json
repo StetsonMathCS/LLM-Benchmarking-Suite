@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef int_to_mini_roman(number):\n    \"\"\"\n    Given a positive integer, obtain its roman numeral equivalent as a string,\n    and return it in lowercase.\n    Restrictions: 1 <= num <= 1000\n\n    Examples:\n    >>> int_to_mini_roman(19) == 'xix'\n    >>> int_to_mini_roman(152) == 'clii'\n    >>> int_to_mini_roman(426) == 'cdxxvi'\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "362934bddccec89047cb2e505df7271ca0ea26d9a106a3ae58a3179e4c7c2477",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 327,
+    "content": "```python\ndef int_to_mini_roman(number: int) -> str:\n    \"\"\"\n    Convert a positive integer (1 <= number <= 1000) to its Roman numeral representation\n    in lowercase.\n    \"\"\"\n    if not (1 <= number <= 1000):\n        raise ValueError(\"Number must be between 1 and 1000 inclusive.\")\n\n    # Define roman numeral mappings\n    roman_map = [\n        (1000, \"M\"),\n        (900,  \"CM\"),\n        (500,  \"D\"),\n        (400,  \"CD\"),\n        (100,  \"C\"),\n        (90,   \"XC\"),\n        (50,   \"L\"),\n        (40,   \"XL\"),\n        (10,   \"X\"),\n        (9,    \"IX\"),\n        (5,    \"V\"),\n        (4,    \"IV\"),\n        (1,    \"I\"),\n    ]\n\n    result = []\n    for value, numeral in roman_map:\n        while number >= value:\n            result.append(numeral)\n            number -= value\n\n    return \"\".join(result).lower()\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 24094.982771,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 331,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 327,
+      "prompt_eval_count": 331
+    }
+  },
+  "saved_at": "2026-10-10T17:02:55.172715+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import filter_by_prefix\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine filter_by_prefix. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Filter an input list of strings only for ones that start with a given prefix.\nCode to test:\nfrom typing import List\n\n\ndef filter_by_prefix(strings: List[str], prefix: str) -> List[str]:\n    \"\"\" Filter an input list of strings only for ones that start with a given prefix.\n    >>> filter_by_prefix([], 'a')\n    []\n    >>> filter_by_prefix(['abc', 'bcd', 'cde', 'array'], 'a')\n    ['abc', 'array']\n    \"\"\"\n    return [x for x in strings if x.startswith(prefix)]\n\nGenerated Tests:\n",
+  "record_identity": "05013a773a8bf26dc54556b77f410c29b8f24511493217ab3a79eb76c95c7cd3",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 4096,
+    "content": "import unittest\nfrom candidate import filter_by_prefix\n\nclass TestFilterByPrefix(unittest.TestCase):\n    def test_filter_by_prefix_normal_case_with_matches(self):\n        self.assertEqual(filter_by_prefix(['abc', 'bcd', 'cde', 'array'], 'a'), ['abc', 'array'])\n    \n    def test_filter_by_prefix_normal_case_no_matches(self):\n        self.assertEqual(filter_by_prefix(['bc', 'cd', 'de'], 'a'), [])\n    \n    def test_filter_by_prefix_empty_input_list(self):\n        self.assertEqual(filter_by_prefix([], 'a'), [])\n    \n    def test_filter_by_prefix_empty_prefix(self):\n        self.assertEqual(filter_by_prefix(['abc', 'def'], ''), ['abc', 'def'])\n    \n    def test_filter_by_prefix_none_strings_list_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            filter_by_prefix(None, 'a')\n    \n    def test_filter_by_prefix_none_prefix_raises_type_error(self):\n",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 219347.419448,
+    "model": "nemotron-3.5-lightning:30b",
+    "prompt_tokens": 708,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "length",
+    "truncated": true,
+    "usage": {
+      "eval_count": 4096,
+      "prompt_eval_count": 708
+    }
+  },
+  "saved_at": "2026-10-08T11:21:10.342645+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Refactor listeners dict to use defaultdict(list); snapshot listeners list before iterating in emit and once; add listener_count helper\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\nclass EventSystem:\n    def __init__(self):\n        self.listeners = {}\n\n    def on(self, event, callback):\n        if event not in self.listeners:\n            self.listeners[event] = []\n        self.listeners[event].append(callback)\n\n    def off(self, event, callback):\n        if event in self.listeners:\n            self.listeners[event] = [cb for cb in self.listeners[event] if cb != callback]\n            if not self.listeners[event]:\n                del self.listeners[event]\n\n    def emit(self, event, *args, **kwargs):\n        if event in self.listeners:\n            for callback in self.listeners[event]:\n                callback(*args, **kwargs)\n\n    def once(self, event, callback):\n        def wrapper(*args, **kwargs):\n            self.off(event, wrapper)\n            callback(*args, **kwargs)\n        self.on(event, wrapper)\n\nRefactored Code:",
+  "record_identity": "1bce0ac242940ca6dc79ac14334be159512626d8b16fac77621b46ae2293c573",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 4096,
+    "content": "",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 225076.797708,
+    "model": "nemotron-3.5-lightning:30b",
+    "prompt_tokens": 516,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "length",
+    "truncated": true,
+    "usage": {
+      "eval_count": 4096,
+      "prompt_eval_count": 516
+    }
+  },
+  "saved_at": "2026-10-08T09:13:59.187511+00:00",
+  "schema_version": "2.0"
+}

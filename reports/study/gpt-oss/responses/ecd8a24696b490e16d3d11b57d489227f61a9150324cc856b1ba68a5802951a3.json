@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import fizz_buzz\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine fizz_buzz. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Return the number of times the digit 7 appears in integers less than n which are divisible by 11 or 13.\nCode to test:\ndef fizz_buzz(n: int):\n    \"\"\"Return the number of times the digit 7 appears in integers less than n which are divisible by 11 or 13.\n    >>> fizz_buzz(50)\n    0\n    >>> fizz_buzz(78)\n    2\n    >>> fizz_buzz(79)\n    3\n    \"\"\"\n    ns = []\n    for i in range(n):\n        if i % 11 == 0 or i % 13 == 0:\n            ns.append(i)\n    s = ''.join(list(map(str, ns)))\n    ans = 0\n    for c in s:\n        ans += (c == '7')\n    return ans\n\nGenerated Tests:\n",
+  "record_identity": "ecd8a24696b490e16d3d11b57d489227f61a9150324cc856b1ba68a5802951a3",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1780,
+    "content": "import unittest\nfrom candidate import fizz_buzz\n\nclass TestFizzBuzz(unittest.TestCase):\n    def expected_count(self, n):\n        count = 0\n        for i in range(n):\n            if i % 11 == 0 or i % 13 == 0:\n                count += str(i).count('7')\n        return count\n\n    def test_zero_input(self):\n        self.assertEqual(fizz_buzz(0), 0)\n\n    def test_negative_input(self):\n        self.assertEqual(fizz_buzz(-10), 0)\n\n    def test_single_digit_no_multiples(self):\n        self.assertEqual(fizz_buzz(7), 0)\n\n    def test_just_divisible_by_11(self):\n        self.assertEqual(fizz_buzz(11), 0)\n\n    def test_just_divisible_by_13(self):\n        self.assertEqual(fizz_buzz(13), 0)\n\n    def test_multiple_multiples_no_sevens(self):\n        self.assertEqual(fizz_buzz(100), self.expected_count(100))\n\n    def test_77_case(self):\n        self.assertEqual(fizz_buzz(78), 2)\n\n    def test_78_case_excludes_78(self):\n        self.assertEqual(fizz_buzz(78), 2)\n\n    def test_79_case_includes_78(self):\n        self.assertEqual(fizz_buzz(79), 3)\n\n    def test_type_error_none(self):\n        with self.assertRaises(TypeError):\n            fizz_buzz(None)\n\n    def test_type_error_string(self):\n        with self.assertRaises(TypeError):\n            fizz_buzz('100')\n\n    def test_type_error_float(self):\n        with self.assertRaises(TypeError):\n            fizz_buzz(10.5)\n\n    def test_type_error_list(self):\n        with self.assertRaises(TypeError):\n            fizz_buzz([1, 2, 3])\n\n    def test_type_bool_true(self):\n        self.assertEqual(fizz_buzz(True), 0)\n\n    def test_type_bool_false(self):\n        self.assertEqual(fizz_buzz(False), 0)\n\n    def test_return_type(self):\n        self.assertIsInstance(fizz_buzz(50), int)\n\n    def test_large_input_performance(self):\n        self.assertEqual(fizz_buzz(10000), self.expected_count(10000))\n\nif __name__ == '__main__':\n    unittest.main()\n",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 133481.247141,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 786,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1780,
+      "prompt_eval_count": 786
+    }
+  },
+  "saved_at": "2026-10-10T19:27:03.406529+00:00",
+  "schema_version": "2.0"
+}

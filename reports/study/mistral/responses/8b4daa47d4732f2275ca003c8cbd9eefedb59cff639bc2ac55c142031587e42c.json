@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef modp(n: int, p: int):\n    \"\"\"Return 2^n modulo p (be aware of numerics).\n    >>> modp(3, 5)\n    3\n    >>> modp(1101, 101)\n    2\n    >>> modp(0, 101)\n    1\n    >>> modp(3, 11)\n    8\n    >>> modp(100, 101)\n    1\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "8b4daa47d4732f2275ca003c8cbd9eefedb59cff639bc2ac55c142031587e42c",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 370,
+    "content": " To implement the modular exponentiation function in Python, we can use the following recursive approach, known as \"Exponentiation by Squaring\" or \"square and multiply\" algorithm. This algorithm is efficient, avoiding large intermediate values, which is crucial for large exponents and small moduli.\n\n```python\nfrom typing import Iterable\n\ndef modp(n: int, p: int) -> int:\n    \"\"\"Return 2^n modulo p (be aware of numerics).\"\"\"\n\n    def power(base: int, exp: int, modulo: int) -> int:\n        result = 1\n        base = base % modulo\n        while exp:\n            if exp & 1:\n                result = (result * base) % modulo\n            base = (base * base) % modulo\n            exp >>= 1\n        return result\n\n    if n < 0:\n        return power(2, -n, p)\n    return power(2, n, p)\n```\n\nThis function takes advantage of Python's built-in `modulo` (`%`) operation and a helper function, `power`, to perform the exponentiation. Additionally, I have added a check to handle negative `n` values.\n\nThe `power` function takes `base`, `exp`, and `modulo` as arguments. It computes `2^exp` modulo `modulo` using the square-and-multiply algorithm.\n\nThe `from typing import Iterable` import is included for type hinting, which is a modern Python practice to document the expected type of variables. The actual function does not require this import to run.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 34437.990774,
+    "model": "mistral:7b",
+    "prompt_tokens": 319,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 370,
+      "prompt_eval_count": 319
+    }
+  },
+  "saved_at": "2026-10-10T23:50:27.765249+00:00",
+  "schema_version": "2.0"
+}

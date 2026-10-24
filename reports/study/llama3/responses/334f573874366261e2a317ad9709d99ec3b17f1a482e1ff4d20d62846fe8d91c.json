@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Refactor the monolithic validator into composable per-field validator functions collected in a FIELD_VALIDATORS registry\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\ndef validate_user_input(data):\n    errors = []\n    if 'name' not in data:\n        errors.append('name is required')\n    elif len(data['name']) < 2:\n        errors.append('name must be at least 2 characters')\n    elif len(data['name']) > 100:\n        errors.append('name must be at most 100 characters')\n    if 'email' not in data:\n        errors.append('email is required')\n    elif '@' not in data['email']:\n        errors.append('email must contain @')\n    elif len(data['email']) > 254:\n        errors.append('email is too long')\n    if 'age' not in data:\n        errors.append('age is required')\n    elif not isinstance(data['age'], int):\n        errors.append('age must be an integer')\n    elif data['age'] < 0 or data['age'] > 150:\n        errors.append('age must be between 0 and 150')\n    if 'role' not in data:\n        errors.append('role is required')\n    elif data['role'] not in ('admin', 'user', 'moderator'):\n        errors.append('role must be admin, user, or moderator')\n    return errors\n\nRefactored Code:",
+  "record_identity": "334f573874366261e2a317ad9709d99ec3b17f1a482e1ff4d20d62846fe8d91c",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 332,
+    "content": "FIELD_VALIDATORS = {\n    'name': [\n        lambda x: x is not None, 'name is required',\n        lambda x: len(x) >= 2, 'name must be at least 2 characters',\n        lambda x: len(x) <= 100, 'name must be at most 100 characters',\n    ],\n    'email': [\n        lambda x: x is not None, 'email is required',\n        lambda x: '@' in x, 'email must contain @',\n        lambda x: len(x) <= 254, 'email is too long',\n    ],\n    'age': [\n        lambda x: x is not None, 'age is required',\n        lambda x: isinstance(x, int), 'age must be an integer',\n        lambda x: 0 <= x <= 150, 'age must be between 0 and 150',\n    ],\n    'role': [\n        lambda x: x is not None, 'role is required',\n        lambda x: x in ('admin', 'user', 'moderator'), 'role must be admin, user, or moderator',\n    ],\n}\n\ndef validate_field(field_name, field_value):\n    errors = []\n    for validator, error_message in FIELD_VALIDATORS.get(field_name, []):\n        if not validator(field_value):\n            errors.append(error_message)\n    return errors\n\ndef validate_user_input(data):\n    errors = []\n    for field_name in FIELD_VALIDATORS:\n        if field_name in data:\n            errors.extend(validate_field(field_name, data[field_name]))\n        else:\n            errors.append(f'{field_name} is required')\n    return errors",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 270109.393746,
+    "model": "llama3:70b",
+    "prompt_tokens": 560,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 332,
+      "prompt_eval_count": 560
+    }
+  },
+  "saved_at": "2026-10-10T07:26:45.546720+00:00",
+  "schema_version": "2.0"
+}

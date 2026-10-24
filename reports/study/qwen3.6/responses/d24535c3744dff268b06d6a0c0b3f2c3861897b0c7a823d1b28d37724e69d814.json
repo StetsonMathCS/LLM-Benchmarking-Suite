@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import car_race_collision\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine car_race_collision. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Imagine a road that's a perfectly straight infinitely long line. n cars are driving left to right; simultaneously, a different set of n cars are driving right to left. The two sets of cars start out being very far from each other. All cars move in the same speed. Two cars are said to collide when a car that's moving left to right hits a car that's moving right to left. However, the cars are infinitely sturdy and strong; as a result, they continue moving in their trajectory as if they did not collide. This function outputs the number of such collisions.\nCode to test:\ndef car_race_collision(n: int):\n    \"\"\"\n    Imagine a road that's a perfectly straight infinitely long line.\n    n cars are driving left to right;  simultaneously, a different set of n cars\n    are driving right to left.   The two sets of cars start out being very far from\n    each other.  All cars move in the same speed.  Two cars are said to collide\n    when a car that's moving left to right hits a car that's moving right to left.\n    However, the cars are infinitely sturdy and strong; as a result, they continue moving\n    in their trajectory as if they did not collide.\n\n    This function outputs the number of such collisions.\n    \"\"\"\n    return n**2\n\nGenerated Tests:\n",
+  "record_identity": "d24535c3744dff268b06d6a0c0b3f2c3861897b0c7a823d1b28d37724e69d814",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 2536,
+    "content": "import pytest\nfrom candidate import car_race_collision\n\ndef test_car_race_collision_normal_n1():\n    assert car_race_collision(1) == 1\n\ndef test_car_race_collision_normal_n2():\n    assert car_race_collision(2) == 4\n\ndef test_car_race_collision_normal_n5():\n    assert car_race_collision(5) == 25\n\ndef test_car_race_collision_zero_input():\n    assert car_race_collision(0) == 0\n\ndef test_car_race_collision_negative_input():\n    assert car_race_collision(-3) == 9\n\ndef test_car_race_collision_float_input():\n    assert car_race_collision(4.0) == 16.0\n\ndef test_car_race_collision_large_n():\n    assert car_race_collision(100) == 10000\n\ndef test_car_race_collision_string_raises_type_error():\n    with pytest.raises(TypeError):\n        car_race_collision(\"5\")\n\ndef test_car_race_collision_none_raises_type_error():\n    with pytest.raises(TypeError):\n        car_race_collision(None)\n\ndef test_car_race_collision_list_raises_type_error():\n    with pytest.raises(TypeError):\n        car_race_collision([1, 2])",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 134854.212793,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 860,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 2536,
+      "prompt_eval_count": 860
+    }
+  },
+  "saved_at": "2026-10-09T22:44:56.469236+00:00",
+  "schema_version": "2.0"
+}

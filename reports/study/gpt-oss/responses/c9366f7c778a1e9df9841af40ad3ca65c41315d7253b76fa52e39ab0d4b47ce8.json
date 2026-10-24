@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef sort_even(l: list):\n    \"\"\"This function takes a list l and returns a list l' such that\n    l' is identical to l in the odd indicies, while its values at the even indicies are equal\n    to the values of the even indicies of l, but sorted.\n    >>> sort_even([1, 2, 3])\n    [1, 2, 3]\n    >>> sort_even([5, 6, 3, 4])\n    [3, 6, 5, 4]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "c9366f7c778a1e9df9841af40ad3ca65c41315d7253b76fa52e39ab0d4b47ce8",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 533,
+    "content": "```python\nfrom __future__ import annotations\nfrom typing import List\n\n\ndef sort_even(l: List[int]) -> List[int]:\n    \"\"\"Return a new list where elements at even indices are sorted,\n    while elements at odd indices remain unchanged.\n\n    The elements at even indices are taken from the original list,\n    sorted in ascending order, and then placed back at the even indices\n    of the result.\n\n    Examples:\n        >>> sort_even([1, 2, 3])\n        [1, 2, 3]\n        >>> sort_even([5, 6, 3, 4])\n        [3, 6, 5, 4]\n        >>> sort_even([9, 1, 8, 2, 7])\n        [7, 1, 8, 2, 9]\n        >>> sort_even([])\n        []\n    \"\"\"\n    if not l:\n        return []\n\n    # Extract values at even indices (0-based) and sort them\n    even_values = sorted(l[i] for i in range(0, len(l), 2))\n\n    # Build the result list\n    result: List[int] = []\n    even_iter = iter(even_values)\n    for i, val in enumerate(l):\n        if i % 2 == 0:  # even index\n            result.append(next(even_iter))\n        else:           # odd index\n            result.append(val)\n\n    return result\n\n\nif __name__ == \"__main__\":\n    import doctest\n    doctest.testmod()\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 38634.22506,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 349,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 533,
+      "prompt_eval_count": 349
+    }
+  },
+  "saved_at": "2026-10-10T15:44:31.780681+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef minPath(grid, k):\n    \"\"\"\n    Given a grid with N rows and N columns (N >= 2) and a positive integer k, \n    each cell of the grid contains a value. Every integer in the range [1, N * N]\n    inclusive appears exactly once on the cells of the grid.\n\n    You have to find the minimum path of length k in the grid. You can start\n    from any cell, and in each step you can move to any of the neighbor cells,\n    in other words, you can go to cells which share an edge with you current\n    cell.\n    Please note that a path of length k means visiting exactly k cells (not\n    necessarily distinct).\n    You CANNOT go off the grid.\n    A path A (of length k) is considered less than a path B (of length k) if\n    after making the ordered lists of the values on the cells that A and B go\n    through (let's call them lst_A and lst_B), lst_A is lexicographically less\n    than lst_B, in other words, there exist an integer index i (1 <= i <= k)\n    such that lst_A[i] < lst_B[i] and for any j (1 <= j < i) we have\n    lst_A[j] = lst_B[j].\n    It is guaranteed that the answer is unique.\n    Return an ordered list of the values on the cells that the minimum path go through.\n\n    Examples:\n\n        Input: grid = [ [1,2,3], [4,5,6], [7,8,9]], k = 3\n        Output: [1, 2, 1]\n\n        Input: grid = [ [5,9,3], [4,1,6], [7,8,2]], k = 1\n        Output: [1]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "a250bef093e1bf03ae4bd5968d8e1344362532c5f2daecc42e7d39540310cf8e",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 217,
+    "content": "from collections import deque\n\ndef minPath(grid, k):\n    N = len(grid)\n    directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]\n    queue = deque([(grid[0][0], 0, 0, [grid[0][0]])])\n    visited = {(0, 0)}\n    min_path = float('inf')\n\n    while queue:\n        path_sum, x, y, path = queue.popleft()\n        if len(path) == k:\n            if path < min_path:\n                min_path = path\n        else:\n            for dx, dy in directions:\n                nx, ny = x + dx, y + dy\n                if 0 <= nx < N and 0 <= ny < N and (nx, ny) not in visited:\n                    visited.add((nx, ny))\n                    queue.append((path_sum + grid[nx][ny], nx, ny, path + [grid[nx][ny]]))\n\n    return list(min_path)",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 198182.433977,
+    "model": "llama3:70b",
+    "prompt_tokens": 569,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 217,
+      "prompt_eval_count": 569
+    }
+  },
+  "saved_at": "2026-10-10T04:58:39.500720+00:00",
+  "schema_version": "2.0"
+}

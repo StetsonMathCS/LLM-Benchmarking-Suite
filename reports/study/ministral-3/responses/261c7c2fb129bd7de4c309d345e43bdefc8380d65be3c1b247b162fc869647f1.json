@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import monotonic\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine monotonic. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Return True is list elements are monotonically increasing or decreasing.\nCode to test:\ndef monotonic(l: list):\n    \"\"\"Return True is list elements are monotonically increasing or decreasing.\n    >>> monotonic([1, 2, 4, 20])\n    True\n    >>> monotonic([1, 20, 4, 10])\n    False\n    >>> monotonic([4, 1, 0, -10])\n    True\n    \"\"\"\n    if l == sorted(l) or l == sorted(l, reverse=True):\n        return True\n    return False\n\nGenerated Tests:\n",
+  "record_identity": "261c7c2fb129bd7de4c309d345e43bdefc8380d65be3c1b247b162fc869647f1",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 579,
+    "content": "```python\nimport unittest\nfrom candidate import monotonic\n\nclass TestMonotonic(unittest.TestCase):\n    def test_monotonic_increasing(self):\n        self.assertTrue(monotonic([1, 2, 3, 4]))\n\n    def test_monotonic_decreasing(self):\n        self.assertTrue(monotonic([5, 4, 3, 2]))\n\n    def test_monotonic_mixed_increasing(self):\n        self.assertTrue(monotonic([1, 2, 4, 20]))\n\n    def test_monotonic_mixed_decreasing(self):\n        self.assertTrue(monotonic([20, 4, 2, 1]))\n\n    def test_non_monotonic(self):\n        self.assertFalse(monotonic([1, 20, 4, 10]))\n\n    def test_empty_list(self):\n        self.assertTrue(monotonic([]))\n\n    def test_single_element(self):\n        self.assertTrue(monotonic([7]))\n\n    def test_constant_list(self):\n        self.assertTrue(monotonic([5, 5, 5, 5]))\n\n    def test_negative_numbers_increasing(self):\n        self.assertTrue(monotonic([-1, -2, -3]))\n\n    def test_negative_numbers_decreasing(self):\n        self.assertTrue(monotonic([-3, -2, -1]))\n\n    def test_mixed_positive_negative(self):\n        self.assertTrue(monotonic([-5, -3, 0, 1]))\n\n    def test_mixed_positive_negative_reversed(self):\n        self.assertTrue(monotonic([1, 0, -3, -5]))\n\n    def test_invalid_type(self):\n        with self.assertRaises(TypeError):\n            monotonic(\"not_a_list\")\n\n    def test_none_input(self):\n        with self.assertRaises(TypeError):\n            monotonic(None)\n\n    def test_list_with_non_numeric_elements(self):\n        with self.assertRaises(TypeError):\n            monotonic([1, 'a', 3])\n\n    def test_duplicate_elements(self):\n        self.assertTrue(monotonic([1, 1, 2, 2]))\n\n    def test_large_list_increasing(self):\n        self.assertTrue(monotonic(list(range(1, 1001))))\n\n    def test_large_list_decreasing(self):\n        self.assertTrue(monotonic(list(range(1000, 0, -1))))\n\n    def test_large_list_non_monotonic(self):\n        self.assertFalse(monotonic([1, 2, 3, 100, 4]))\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 33675.284545,
+    "model": "ministral-3:3b",
+    "prompt_tokens": 1250,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 579,
+      "prompt_eval_count": 1250
+    }
+  },
+  "saved_at": "2026-10-10T22:52:43.619664+00:00",
+  "schema_version": "2.0"
+}

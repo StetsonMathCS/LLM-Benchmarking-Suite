@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code review model. Your task is to analyze Python code and provide a structured review highlighting issues, potential improvements, and best practices.\n\n1.) Carefully analyze the provided Python code for correctness, readability, and maintainability.\n2.) Identify syntax issues, logical errors, potential runtime problems, and edge cases.\n3.) Detect inefficient algorithms, unnecessary complexity, or poor use of Python features.\n4.) Suggest improvements following idiomatic Python practices and common style conventions.\n5.) Highlight missing error handling, validation, or unsafe operations when relevant.\n6.) Point out maintainability concerns such as unclear variable names, deeply nested logic, or duplicated code.\n7.) Recommend improvements while preserving the original intent of the code.\n8.) Do not rewrite the entire program unless necessary to demonstrate a fix or improvement.\n9.) Present the review in a clear and structured manner.\n10.) If improvements are suggested, provide concise corrected snippets where appropriate.\n\nStart Example\n\nInput:\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n-1)\n\nOutput:\n\nIssues:\nThe function does not handle negative inputs.\nRecursive implementation may cause recursion depth issues for large values.\nSuggestions:\nAdd input validation to ensure n is non-negative.\nConsider an iterative implementation for better scalability.\n\nEnd Example\n\nYour turn now.\n\nCode to review:def cache_result(func):\n    cache = {}\n    def wrapper(*args):\n        if args in cache:\n            return cache[args]\n        result = func(*args)\n        cache[args] = result\n        return result\n    return wrapper\n\n",
+  "record_identity": "94b6749163dd08a0a4d6fec0ee3f82a63a5286a8d02794f4f5b7795cadfa0214",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 410,
+    "content": "Issues:\n- The use of `args in cache` to check for the existence of a key in the `cache` dictionary is incorrect because `args` is a tuple and not an integer. Tuples are not hashable and cannot be used as keys in the `cache` dictionary directly.\n- The function `func` is missing the definition, which means the `wrapper` function is incomplete and would cause a runtime error if called.\n- The `cache_result` decorator is missing the `@functools.wraps` decorator, which would be necessary to preserve the original function's metadata, such as its name and docstring.\n- The code snippet provided is not a complete example, as it lacks the actual function definition that should be decorated by `cache_result`.\n\nSuggestions:\n1. Correct the way of checking the cache by converting `args` to a hashable type like a tuple if not already a hashable object.\n2. Include the missing function definition that will be decorated by `cache_result`.\n3. Use `@functools.wraps` decorator to preserve the metadata of the original function when it's being decorated.\n\nImproved Code Snippet:\n\n```python\nfrom functools import wraps\n\ndef cache_result(func):\n    cache = {}\n    @wraps(func)\n    def wrapper(*args):\n        # Convert the argument tuple to a hashable type (e.g., frozenset) if necessary\n        key = frozenset(args)\n        if key in cache:\n            return cache[key]\n        result = func(*args)\n        cache[key] = result\n        return result\n    return wrapper\n\n# Example function that could be decorated\n@cache_result\ndef example_function(arg1, arg2):\n    # Some expensive computation\n    return arg1 + arg2\n```\n\nThese improvements address the issues related to the incorrect key checking in the cache and ensure that the original function's metadata is preserved when it is decorated. The inclusion of an example function demonstrates how to use the `cache_result` decorator.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 22027.51575,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 325,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 410,
+      "prompt_eval_count": 325
+    }
+  },
+  "saved_at": "2026-10-11T03:13:25.306555+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Replace type-string dispatch with a proper class hierarchy using abstract base class and subclasses\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\nclass Animal:\n    def __init__(self, name, animal_type):\n        self.name = name\n        self.animal_type = animal_type\n\n    def speak(self):\n        if self.animal_type == 'dog':\n            return f'{self.name} says Woof'\n        elif self.animal_type == 'cat':\n            return f'{self.name} says Meow'\n        elif self.animal_type == 'cow':\n            return f'{self.name} says Moo'\n        else:\n            return f'{self.name} says ...'\n\n    def move(self):\n        if self.animal_type == 'dog':\n            return f'{self.name} runs'\n        elif self.animal_type == 'cat':\n            return f'{self.name} slinks'\n        elif self.animal_type == 'cow':\n            return f'{self.name} plods'\n        else:\n            return f'{self.name} moves'\n\nRefactored Code:",
+  "record_identity": "f9773f6bbe37e6ff32f65480e7ab10a681b652227560e3a4d9d701936076fd9d",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 194,
+    "content": "from abc import ABC, abstractmethod\n\nclass Animal(ABC):\n    def __init__(self, name):\n        self.name = name\n\n    @abstractmethod\n    def speak(self):\n        pass\n\n    @abstractmethod\n    def move(self):\n        pass\n\nclass Dog(Animal):\n    def speak(self):\n        return f'{self.name} says Woof'\n\n    def move(self):\n        return f'{self.name} runs'\n\nclass Cat(Animal):\n    def speak(self):\n        return f'{self.name} says Meow'\n\n    def move(self):\n        return f'{self.name} slinks'\n\nclass Cow(Animal):\n    def speak(self):\n        return f'{self.name} says Moo'\n\n    def move(self):\n        return f'{self.name} plods'\n\nclass UnknownAnimal(Animal):\n    def speak(self):\n        return f'{self.name} says ...'\n\n    def move(self):\n        return f'{self.name} moves'",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 162286.957661,
+    "model": "llama3:70b",
+    "prompt_tokens": 488,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 194,
+      "prompt_eval_count": 488
+    }
+  },
+  "saved_at": "2026-10-10T07:19:48.547827+00:00",
+  "schema_version": "2.0"
+}

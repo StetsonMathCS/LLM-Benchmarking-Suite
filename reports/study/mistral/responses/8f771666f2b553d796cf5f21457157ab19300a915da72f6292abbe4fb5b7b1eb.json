@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef max_fill(grid, capacity):\n    import math\n    \"\"\"\n    You are given a rectangular grid of wells. Each row represents a single well,\n    and each 1 in a row represents a single unit of water.\n    Each well has a corresponding bucket that can be used to extract water from it, \n    and all buckets have the same capacity.\n    Your task is to use the buckets to empty the wells.\n    Output the number of times you need to lower the buckets.\n\n    Example 1:\n        Input: \n            grid : [[0,0,1,0], [0,1,0,0], [1,1,1,1]]\n            bucket_capacity : 1\n        Output: 6\n\n    Example 2:\n        Input: \n            grid : [[0,0,1,1], [0,0,0,0], [1,1,1,1], [0,1,1,1]]\n            bucket_capacity : 2\n        Output: 5\n    \n    Example 3:\n        Input: \n            grid : [[0,0,0], [0,0,0]]\n            bucket_capacity : 5\n        Output: 0\n\n    Constraints:\n        * all wells have the same length\n        * 1 <= grid.length <= 10^2\n        * 1 <= grid[:,1].length <= 10^2\n        * grid[i][j] -> 0 | 1\n        * 1 <= capacity <= 10\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "8f771666f2b553d796cf5f21457157ab19300a915da72f6292abbe4fb5b7b1eb",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 489,
+    "content": " Here is a Python function named `max_fill` that follows your specifications:\n\n```python\ndef max_fill(grid, capacity):\n    total_units = sum(row.count(1) for row in grid)\n    if not total_units:\n        return 0\n\n    num_trips = math.ceil(total_units / capacity)\n    rows, cols = len(grid), len(grid[0])\n    visited = [[False for _ in range(cols)] for _ in range(rows)]\n\n    def dfs(r, c, units_left):\n        if not units_left:\n            return\n\n        if units_left > capacity:\n            units_left = capacity\n\n        if visited[r][c]:\n            return\n\n        visited[r][c] = True\n        units_left -= grid[r][c]\n        grid[r][c] = 0\n\n        if not units_left:\n            return\n\n        for dr, dc in ((0, 1), (1, 0), (0, -1), (1, 0)):\n            dfs(r + dr, c + dc, units_left)\n\n    dfs(0, 0, capacity)\n    return num_trips * (num_trips - 1) // 2\n```\n\nThis function uses Depth-First Search (DFS) to fill the buckets in a greedy manner. It first calculates the total number of units of water in the grid and checks if there's any water to be emptied. If there's no water, it returns 0.\n\nThen, it calculates the number of trips needed to empty the grid based on the capacity of the buckets. It initializes a 2D visited array to keep track of already visited cells and performs a DFS starting from the top-left cell with the capacity of the bucket as the initial number of units to be emptied.\n\nFinally, it returns the calculated number of trips multiplied by (number of trips - 1) divided by 2, which gives the total number of trips. This is because each well is filled once during each trip.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 48992.815413,
+    "model": "mistral:7b",
+    "prompt_tokens": 561,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 489,
+      "prompt_eval_count": 561
+    }
+  },
+  "saved_at": "2026-10-11T00:19:56.928598+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import longest\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine longest. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Out of list of strings, return the longest one. Return the first one in case of multiple strings of the same length. Return None in case the input list is empty.\nCode to test:\nfrom typing import List, Optional\n\n\ndef longest(strings: List[str]) -> Optional[str]:\n    \"\"\" Out of list of strings, return the longest one. Return the first one in case of multiple\n    strings of the same length. Return None in case the input list is empty.\n    >>> longest([])\n\n    >>> longest(['a', 'b', 'c'])\n    'a'\n    >>> longest(['a', 'bb', 'ccc'])\n    'ccc'\n    \"\"\"\n    if not strings:\n        return None\n\n    maxlen = max(len(x) for x in strings)\n    for s in strings:\n        if len(s) == maxlen:\n            return s\n\nGenerated Tests:\n",
+  "record_identity": "a3ae4dc91a8ab3a32883795d029419cc1faf684a2ac728a34592dd45ea76d55d",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 661,
+    "content": " import unittest\nfrom unittest.mock import mock_open\nfrom candidate import longest\n\nclass TestLongestString(unittest.TestCase):\n    def setUp(self):\n        self.mock_open = mock_open(read_data='test_string')\n        self.patcher = self.patch('builtins', 'open', self.mock_open)\n        self.patcher.start()\n\n    def tearDown(self):\n        self.patcher.stop()\n\n    def test_empty_list(self):\n        self.assertEqual(longest([]), None)\n\n    def test_single_string(self):\n        self.mock_open().write('a')\n        self.assertEqual(longest(['a']), 'a')\n\n    def test_multiple_strings(self):\n        self.mock_open().write('a\\nb\\nc')\n        self.assertEqual(longest(['a', 'b', 'c']), 'c')\n\n    def test_strings_same_length(self):\n        self.mock_open().write('aaa\\nbbb\\nccc')\n        self.assertEqual(longest(['aaa', 'bbb', 'ccc']), 'ccc')\n\n    def test_strings_different_lengths(self):\n        self.mock_open().write('aaa\\nbb\\nc')\n        self.assertEqual(longest(['aaa', 'bb', 'c']), 'aaa')\n\n    def test_empty_string(self):\n        self.mock_open().write('  \\n')\n        self.assertEqual(longest(['']), None)\n\n    def test_strings_with_spaces(self):\n        self.mock_open().write('aaa bbb ccc')\n        self.assertEqual(longest(['aaa bbb ccc']), 'aaa bbb ccc')\n\n    def test_strings_with_special_characters(self):\n        self.mock_open().write('aaa@bbb_ccc!')\n        self.assertEqual(longest(['aaa@bbb_ccc!']), 'aaa@bbb_ccc!')\n\n    def test_none_input(self):\n        self.assertEqual(longest(None), None)\n\n    def test_list_with_none(self):\n        self.assertEqual(longest([None]), None)\n\n    def test_list_with_string_and_none(self):\n        self.mock_open().write('test_string')\n        self.assertEqual(longest(['test_string', None]), 'test_string')\n\n    def test_list_with_non_string(self):\n        self.assertEqual(longest([1, 2, 3]), None)\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 73669.838662,
+    "model": "mistral:7b",
+    "prompt_tokens": 903,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 661,
+      "prompt_eval_count": 903
+    }
+  },
+  "saved_at": "2026-10-11T01:22:52.672558+00:00",
+  "schema_version": "2.0"
+}

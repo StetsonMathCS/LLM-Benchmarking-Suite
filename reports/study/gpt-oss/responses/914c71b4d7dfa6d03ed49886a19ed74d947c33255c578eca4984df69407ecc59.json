@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import sum_product\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine sum_product. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: For a given list of integers, return a tuple consisting of a sum and a product of all the integers in a list. Empty sum should be equal to 0 and empty product should be equal to 1.\nCode to test:\nfrom typing import List, Tuple\n\n\ndef sum_product(numbers: List[int]) -> Tuple[int, int]:\n    \"\"\" For a given list of integers, return a tuple consisting of a sum and a product of all the integers in a list.\n    Empty sum should be equal to 0 and empty product should be equal to 1.\n    >>> sum_product([])\n    (0, 1)\n    >>> sum_product([1, 2, 3, 4])\n    (10, 24)\n    \"\"\"\n    sum_value = 0\n    prod_value = 1\n\n    for n in numbers:\n        sum_value += n\n        prod_value *= n\n    return sum_value, prod_value\n\nGenerated Tests:\n",
+  "record_identity": "914c71b4d7dfa6d03ed49886a19ed74d947c33255c578eca4984df69407ecc59",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1931,
+    "content": "import unittest\nfrom candidate import sum_product\n\n\nclass TestSumProduct(unittest.TestCase):\n    def test_normal_positive_numbers(self):\n        self.assertEqual(sum_product([1, 2, 3, 4]), (10, 24))\n\n    def test_single_negative_number(self):\n        self.assertEqual(sum_product([-5]), (-5, -5))\n\n    def test_mixed_numbers(self):\n        self.assertEqual(sum_product([-2, 0, 3]), (1, 0))\n\n    def test_list_with_zeroes(self):\n        self.assertEqual(sum_product([0, 0, 0]), (0, 0))\n\n    def test_empty_list(self):\n        self.assertEqual(sum_product([]), (0, 1))\n\n    def test_large_numbers(self):\n        large_list = list(range(1, 21))\n        expected_sum = sum(large_list)\n        expected_prod = 1\n        for n in large_list:\n            expected_prod *= n\n        self.assertEqual(sum_product(large_list), (expected_sum, expected_prod))\n\n    def test_large_input_size(self):\n        large_list = [1] * 1000\n        self.assertEqual(sum_product(large_list), (1000, 1))\n\n    def test_type_error_none_input(self):\n        with self.assertRaises(TypeError):\n            sum_product(None)\n\n    def test_type_error_non_iterable(self):\n        with self.assertRaises(TypeError):\n            sum_product(42)\n\n    def test_type_error_non_int_elements(self):\n        with self.assertRaises(TypeError):\n            sum_product([1, \"two\", 3])\n\n    def test_tuple_input(self):\n        self.assertEqual(sum_product((5, 6)), (11, 30))\n\n    def test_set_input(self):\n        self.assertEqual(sum_product({2, 3}), (5, 6))\n\n    def test_generator_input(self):\n        gen = (x for x in range(1, 4))\n        self.assertEqual(sum_product(gen), (6, 6))\n\n    def test_zero_and_negative_product(self):\n        self.assertEqual(sum_product([-1, -2, -3]), (-6, -6))\n\n    def test_many_ones_product(self):\n        self.assertEqual(sum_product([1] * 5), (5, 1))\n\n    def test_single_zero(self):\n        self.assertEqual(sum_product([0]), (0, 0))\n\n    def test_product_overflow(self):\n        big_list = [10**5, 10**5]\n        self.assertEqual(sum_product(big_list), (2 * 10**5, 10**10))\n\n\nif __name__ == \"__main__\":\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 143120.756346,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 803,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1931,
+      "prompt_eval_count": 803
+    }
+  },
+  "saved_at": "2026-10-10T18:25:07.953735+00:00",
+  "schema_version": "2.0"
+}

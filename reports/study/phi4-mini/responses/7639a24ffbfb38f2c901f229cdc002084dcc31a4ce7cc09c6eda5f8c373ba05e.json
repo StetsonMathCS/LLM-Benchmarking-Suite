@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import longest\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine longest. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Out of list of strings, return the longest one. Return the first one in case of multiple strings of the same length. Return None in case the input list is empty.\nCode to test:\nfrom typing import List, Optional\n\n\ndef longest(strings: List[str]) -> Optional[str]:\n    \"\"\" Out of list of strings, return the longest one. Return the first one in case of multiple\n    strings of the same length. Return None in case the input list is empty.\n    >>> longest([])\n\n    >>> longest(['a', 'b', 'c'])\n    'a'\n    >>> longest(['a', 'bb', 'ccc'])\n    'ccc'\n    \"\"\"\n    if not strings:\n        return None\n\n    maxlen = max(len(x) for x in strings)\n    for s in strings:\n        if len(s) == maxlen:\n            return s\n\nGenerated Tests:\n",
+  "record_identity": "7639a24ffbfb38f2c901f229cdc002084dcc31a4ce7cc09c6eda5f8c373ba05e",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 393,
+    "content": "```python\nimport pytest\nfrom candidate import longest\n\n@pytest.mark.parametrize(\"input_list, expected\", [\n    ([], None),\n    (['a'], 'a'),\n    (['bb', 'aa'], 'bb'),\n    (['ccc', 'dd', 'cc'], 'ccc'),\n    (['a', 'bb', 'cc', 'dd'], 'cc'),\n    (['a', 'bb'], 'bb'),\n    (['aa', 'a', 'aa'], 'aa'),\n])\ndef test_longest_basic_cases(input_list, expected):\n    assert longest(input_list) == expected\n\n@pytest.mark.parametrize(\"input_list, expected\", [\n    (['', 'a', ''], None),\n    (['', ''], None),\n    (['a', 'b', 'c', 'a'], 'a'),\n    (['a'*10, 'a'*9, 'a'*11], 'a'*11),\n    (['a', 'b'*5], 'b'*5),\n])\ndef test_longest_edge_cases(input_list, expected):\n    assert longest(input_list) == expected\n\n@pytest.mark.parametrize(\"input_list, expected\", [\n    (['a', 'b', 'c'], None),\n    (['', 'a', ''], 'a'),\n    (['a', 'b', 'c'], None),\n    (['a', 'b', 'c'], None),\n])\ndef test_longest_empty_and_none_cases(input_list, expected):\n    assert longest(input_list) == expected\n\n@pytest.mark.parametrize(\"input_list, expected\", [\n    (['a', 1, 'b'], None),\n    (['a', None, 'b'], None),\n    (['a', 'b', None], None),\n    (['a', 'b', 'c'], None),\n])\ndef test_longest_invalid_types(input_list, expected):\n    assert longest(input_list) == expected\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 24762.254782,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 722,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 393,
+      "prompt_eval_count": 722
+    }
+  },
+  "saved_at": "2026-10-11T03:29:04.416042+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef sorted_list_sum(lst):\n    \"\"\"Write a function that accepts a list of strings as a parameter,\n    deletes the strings that have odd lengths from it,\n    and returns the resulted list with a sorted order,\n    The list is always a list of strings and never an array of numbers,\n    and it may contain duplicates.\n    The order of the list should be ascending by length of each word, and you\n    should return the list sorted by that rule.\n    If two words have the same length, sort the list alphabetically.\n    The function should return a list of strings in sorted order.\n    You may assume that all words will have the same length.\n    For example:\n    assert list_sort([\"aa\", \"a\", \"aaa\"]) => [\"aa\"]\n    assert list_sort([\"ab\", \"a\", \"aaa\", \"cd\"]) => [\"ab\", \"cd\"]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "7a98843422686e760bda43dd558d0cd878d118398c0978b4b0156a894c349236",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 79,
+    "content": "def sorted_list_sum(lst):\n    filtered_sorted = sorted([word for word in lst if len(word) % 2 == 0])\n    return filtered_sorted\n\n# Example test cases\nassert sorted_list_sum([\"aa\", \"a\", \"aaa\"]) == [\"aa\"]\nassert sorted_list_sum([\"ab\", \"a\", \"aaa\", \"cd\"]) == [\"ab\", \"cd\"]",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 5040.744383,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 349,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 79,
+      "prompt_eval_count": 349
+    }
+  },
+  "saved_at": "2026-10-11T03:07:01.771831+00:00",
+  "schema_version": "2.0"
+}

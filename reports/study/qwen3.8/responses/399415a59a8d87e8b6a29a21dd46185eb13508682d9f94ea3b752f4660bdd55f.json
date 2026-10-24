@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef count_upper(s):\n    \"\"\"\n    Given a string s, count the number of uppercase vowels in even indices.\n    \n    For example:\n    count_upper('aBCdEf') returns 1\n    count_upper('abcdefg') returns 0\n    count_upper('dBBE') returns 0\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "399415a59a8d87e8b6a29a21dd46185eb13508682d9f94ea3b752f4660bdd55f",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 466,
+    "content": "```python\ndef count_upper(s):\n    \"\"\"\n    Given a string s, count the number of uppercase vowels in even indices.\n    \n    For example:\n    count_upper('aBCdEf') returns 1\n    count_upper('abcdefg') returns 0\n    count_upper('dBBE') returns 0\n    \"\"\"\n    return sum(1 for i in range(0, len(s), 2) if s[i] in 'AEIOU')\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 74769.368395,
+    "model": "qwen3.8:27b",
+    "prompt_tokens": 259,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 466,
+      "prompt_eval_count": 259
+    }
+  },
+  "saved_at": "2026-10-08T20:00:35.026115+00:00",
+  "schema_version": "2.0"
+}

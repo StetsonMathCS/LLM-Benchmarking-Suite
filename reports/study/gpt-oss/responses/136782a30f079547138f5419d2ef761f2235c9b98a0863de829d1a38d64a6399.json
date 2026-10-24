@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef unique_digits(x):\n    \"\"\"Given a list of positive integers x. return a sorted list of all \n    elements that hasn't any even digit.\n\n    Note: Returned list should be sorted in increasing order.\n    \n    For example:\n    >>> unique_digits([15, 33, 1422, 1])\n    [1, 15, 33]\n    >>> unique_digits([152, 323, 1422, 10])\n    []\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "136782a30f079547138f5419d2ef761f2235c9b98a0863de829d1a38d64a6399",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 494,
+    "content": "def unique_digits(x):\n    \"\"\"Given a list of positive integers x. return a sorted list of all \n    elements that hasn't any even digit.\n\n    Note: Returned list should be sorted in increasing order.\n    \n    For example:\n    >>> unique_digits([15, 33, 1422, 1])\n    [1, 15, 33]\n    >>> unique_digits([152, 323, 1422, 10])\n    []\n    \"\"\"\n    return sorted(\n        n for n in x\n        if all(int(d) % 2 == 1 for d in str(n))\n    )",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 34434.420226,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 327,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 494,
+      "prompt_eval_count": 327
+    }
+  },
+  "saved_at": "2026-10-10T16:21:30.944871+00:00",
+  "schema_version": "2.0"
+}

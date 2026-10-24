@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef sort_array(arr):\n    \"\"\"\n    In this Kata, you have to sort an array of non-negative integers according to\n    number of ones in their binary representation in ascending order.\n    For similar number of ones, sort based on decimal value.\n\n    It must be implemented like this:\n    >>> sort_array([1, 5, 2, 3, 4]) == [1, 2, 3, 4, 5]\n    >>> sort_array([-2, -3, -4, -5, -6]) == [-6, -5, -4, -3, -2]\n    >>> sort_array([1, 0, 2, 3, 4]) [0, 1, 2, 3, 4]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "06662ae6faebbb292e364eeb20650a603e9cf01a7735b128c5cccd7c188c7019",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 300,
+    "content": " To sort an array based on the number of ones in their binary representation, you can convert each number to binary, count the number of ones, and then sort the array based on this count. Here's the code that implements this functionality:\n\n```python\nimport math\nfrom functools import cmp_to_key\n\ndef sort_array(arr):\n    def binary_ones_counter(num):\n        return bin(num).count('1')\n\n    def compare(x, y):\n        count_x = binary_ones_counter(x)\n        count_y = binary_ones_counter(y)\n\n        if count_x < count_y:\n            return -1\n        elif count_x > count_y:\n            return 1\n        else:\n            return cmp(x, y)\n\n    sorted_arr = sorted(arr, key=cmp_to_key(compare))\n    return sorted_arr\n```\n\nThis implementation first defines a helper function `binary_ones_counter` that takes a number and returns the count of ones in its binary representation. Then it defines another helper function `compare` that compares two numbers based on their binary ones count, and finally, it uses the `sorted` function with a custom comparison key to sort the input array. The resulting sorted array is returned at the end.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 29251.980118,
+    "model": "mistral:7b",
+    "prompt_tokens": 386,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 300,
+      "prompt_eval_count": 386
+    }
+  },
+  "saved_at": "2026-10-11T00:20:26.491607+00:00",
+  "schema_version": "2.0"
+}

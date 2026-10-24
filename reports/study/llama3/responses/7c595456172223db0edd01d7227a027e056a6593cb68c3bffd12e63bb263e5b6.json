@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef total_match(lst1, lst2):\n    '''\n    Write a function that accepts two lists of strings and returns the list that has \n    total number of chars in the all strings of the list less than the other list.\n\n    if the two lists have the same number of chars, return the first list.\n\n    Examples\n    total_match([], []) ➞ []\n    total_match(['hi', 'admin'], ['hI', 'Hi']) ➞ ['hI', 'Hi']\n    total_match(['hi', 'admin'], ['hi', 'hi', 'admin', 'project']) ➞ ['hi', 'admin']\n    total_match(['hi', 'admin'], ['hI', 'hi', 'hi']) ➞ ['hI', 'hi', 'hi']\n    total_match(['4'], ['1', '2', '3', '4', '5']) ➞ ['4']\n    '''\n\n\nGenerated Code:",
+  "record_identity": "7c595456172223db0edd01d7227a027e056a6593cb68c3bffd12e63bb263e5b6",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 62,
+    "content": "def total_match(lst1, lst2):\n    total_chars1 = sum(len(s) for s in lst1)\n    total_chars2 = sum(len(s) for s in lst2)\n    if total_chars1 <= total_chars2:\n        return lst1\n    else:\n        return lst2",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 64346.900061,
+    "model": "llama3:70b",
+    "prompt_tokens": 366,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 62,
+      "prompt_eval_count": 366
+    }
+  },
+  "saved_at": "2026-10-10T03:57:34.226664+00:00",
+  "schema_version": "2.0"
+}

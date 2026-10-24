@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import incr_list\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine incr_list. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Return list with elements incremented by 1.\nCode to test:\ndef incr_list(l: list):\n    \"\"\"Return list with elements incremented by 1.\n    >>> incr_list([1, 2, 3])\n    [2, 3, 4]\n    >>> incr_list([5, 3, 5, 2, 3, 3, 9, 0, 123])\n    [6, 4, 6, 3, 4, 4, 10, 1, 124]\n    \"\"\"\n    return [(e + 1) for e in l]\n\nGenerated Tests:\n",
+  "record_identity": "3596730c19b92fc1b1287e7749df48464d467f6a0b147c971aff149baac3b529",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1076,
+    "content": "import unittest\nfrom candidate import incr_list\n\n\nclass TestIncrList(unittest.TestCase):\n    def test_incr_list_positive_integers(self):\n        self.assertEqual(incr_list([1, 2, 3]), [2, 3, 4])\n\n    def test_incr_list_negative_integers(self):\n        self.assertEqual(incr_list([-3, -2, -1]), [-2, -1, 0])\n\n    def test_incr_list_mixed_positive_negative(self):\n        self.assertEqual(incr_list([-5, 0, 5]), [-4, 1, 6])\n\n    def test_incr_list_single_element(self):\n        self.assertEqual(incr_list([42]), [43])\n\n    def test_incr_list_empty_list(self):\n        self.assertEqual(incr_list([]), [])\n\n    def test_incr_list_floats(self):\n        self.assertEqual(incr_list([1.5, 2.5, 3.5]), [2.5, 3.5, 4.5])\n\n    def test_incr_list_mixed_int_and_float(self):\n        self.assertEqual(incr_list([1, 2.5, 3]), [2, 3.5, 4])\n\n    def test_incr_list_large_numbers(self):\n        self.assertEqual(incr_list([10**18, 2**60]), [10**18 + 1, 2**60 + 1])\n\n    def test_incr_list_zero(self):\n        self.assertEqual(incr_list([0]), [1])\n\n    def test_incr_list_multiple_zeros(self):\n        self.assertEqual(incr_list([0, 0, 0]), [1, 1, 1])\n\n    def test_incr_list_does_not_modify_original(self):\n        original = [1, 2, 3]\n        result = incr_list(original)\n        self.assertEqual(original, [1, 2, 3])\n        self.assertIsNot(result, original)\n\n    def test_incr_list_return_type_is_list(self):\n        result = incr_list([1, 2, 3])\n        self.assertIsInstance(result, list)\n\n    def test_incr_list_with_none_element_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            incr_list([1, None, 3])\n\n    def test_incr_list_with_string_element_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            incr_list([\"a\", 2, 3])\n\n    def test_incr_list_with_none_as_input_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            incr_list(None)\n\n    def test_incr_list_with_bool_values(self):\n        self.assertEqual(incr_list([True, False]), [2, 1])\n\n    def test_incr_list_with_nested_list_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            incr_list([[1, 2], 3])\n\n    def test_incr_list_preserves_order(self):\n        self.assertEqual(incr_list([5, 1, 4, 2, 3]), [6, 2, 5, 3, 4])\n\n    def test_incr_list_duplicate_elements(self):\n        self.assertEqual(incr_list([7, 7, 7]), [8, 8, 8])\n\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 205228.738335,
+    "model": "qwen3.8:27b",
+    "prompt_tokens": 720,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1076,
+      "prompt_eval_count": 720
+    }
+  },
+  "saved_at": "2026-10-09T05:21:22.225066+00:00",
+  "schema_version": "2.0"
+}

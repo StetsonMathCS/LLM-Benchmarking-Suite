@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import modp\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine modp. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Return 2^n modulo p (be aware of numerics).\nCode to test:\ndef modp(n: int, p: int):\n    \"\"\"Return 2^n modulo p (be aware of numerics).\n    >>> modp(3, 5)\n    3\n    >>> modp(1101, 101)\n    2\n    >>> modp(0, 101)\n    1\n    >>> modp(3, 11)\n    8\n    >>> modp(100, 101)\n    1\n    \"\"\"\n    ret = 1\n    for i in range(n):\n        ret = (2 * ret) % p\n    return ret\n\nGenerated Tests:\n",
+  "record_identity": "f5d1ac8b4aa1fd473b06cff38d6fd0643d78e58f425c35892b3f018a20836e31",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 275,
+    "content": "import unittest\nfrom candidate import modp\n\nclass TestModp(unittest.TestCase):\n    def test_modp_positive_numbers(self):\n        self.assertEqual(modp(3, 5), 3)\n    \n    def test_modp_large_number(self):\n        self.assertEqual(modp(1101, 101), 2)\n    \n    def test_modp_zero(self):\n        self.assertEqual(modp(0, 101), 1)\n    \n    def test_modp_small_number(self):\n        self.assertEqual(modp(3, 11), 8)\n    \n    def test_modp_large_large_number(self):\n        self.assertEqual(modp(100, 101), 1)\n    \n    def test_modp_negative_numbers(self):\n        self.assertRaises(TypeError, modp, -3, 5)\n    \n    def test_modp_non_positive_p(self):\n        self.assertRaises(TypeError, modp, 3, -5)\n    \n    def test_modp_negative_numbers(self):\n        self.assertRaises(TypeError, modp, -3, -5)\n    \n    def test_modp_non_integer(self):\n        self.assertRaises(TypeError, modp, '3', 5)\n    \n    def test_modp_non_integer_p(self):\n        self.assertRaises(TypeError, modp, 3, '5')",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 18716.088449,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 694,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 275,
+      "prompt_eval_count": 694
+    }
+  },
+  "saved_at": "2026-10-11T04:00:25.427878+00:00",
+  "schema_version": "2.0"
+}

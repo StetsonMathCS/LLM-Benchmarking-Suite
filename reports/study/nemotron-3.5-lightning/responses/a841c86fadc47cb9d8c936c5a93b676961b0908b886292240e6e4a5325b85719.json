@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef search(lst):\n    '''\n    You are given a non-empty list of positive integers. Return the greatest integer that is greater than \n    zero, and has a frequency greater than or equal to the value of the integer itself. \n    The frequency of an integer is the number of times it appears in the list.\n    If no such a value exist, return -1.\n    Examples:\n        search([4, 1, 2, 2, 3, 1]) == 2\n        search([1, 2, 2, 3, 3, 3, 4, 4, 4]) == 3\n        search([5, 5, 4, 4, 4]) == -1\n    '''\n\n\nGenerated Code:",
+  "record_identity": "a841c86fadc47cb9d8c936c5a93b676961b0908b886292240e6e4a5325b85719",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1599,
+    "content": "from collections import Counter\n\ndef search(lst):\n    counts = Counter(lst)\n    return max((num for num, freq in counts.items() if freq >= num), default=-1)",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 85196.898989,
+    "model": "nemotron-3.5-lightning:30b",
+    "prompt_tokens": 349,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1599,
+      "prompt_eval_count": 349
+    }
+  },
+  "saved_at": "2026-10-08T05:06:31.531634+00:00",
+  "schema_version": "2.0"
+}

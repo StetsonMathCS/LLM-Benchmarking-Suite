@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code review model. Your task is to analyze Python code and provide a structured review highlighting issues, potential improvements, and best practices.\n\n1.) Carefully analyze the provided Python code for correctness, readability, and maintainability.\n2.) Identify syntax issues, logical errors, potential runtime problems, and edge cases.\n3.) Detect inefficient algorithms, unnecessary complexity, or poor use of Python features.\n4.) Suggest improvements following idiomatic Python practices and common style conventions.\n5.) Highlight missing error handling, validation, or unsafe operations when relevant.\n6.) Point out maintainability concerns such as unclear variable names, deeply nested logic, or duplicated code.\n7.) Recommend improvements while preserving the original intent of the code.\n8.) Do not rewrite the entire program unless necessary to demonstrate a fix or improvement.\n9.) Present the review in a clear and structured manner.\n10.) If improvements are suggested, provide concise corrected snippets where appropriate.\n\nStart Example\n\nInput:\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n-1)\n\nOutput:\n\nIssues:\nThe function does not handle negative inputs.\nRecursive implementation may cause recursion depth issues for large values.\nSuggestions:\nAdd input validation to ensure n is non-negative.\nConsider an iterative implementation for better scalability.\n\nEnd Example\n\nYour turn now.\n\nCode to review:def send_email(to, subject, body, cc=None, bcc=None):\n    recipients = [to]\n    if cc:\n        recipients.append(cc)\n    if bcc:\n        recipients.append(bcc)\n    for recipient in recipients:\n        _send(recipient, subject, body)\n\n",
+  "record_identity": "07d86fe1a8f7da15fa34b796a971fbb5f704ce6e59d2eca9c8ac8bd90d671841",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 4096,
+    "content": "### Issues:\n- **Logical Flaw with BCC Handling:** The function appends `bcc` to the same `recipients` list and iterates over it identically to `to` and `cc`. In standard email protocols (RFC 5321/5322), BCC addresses are transmitted via the SMTP envelope but **must not appear in the message headers** (`To:`/`Cc:`). This implementation likely exposes all addresses to every recipient, defeating privacy and triggering spam filters.\n- **Missing Input Validation:** No checks for empty or `None` values on required parameters. Passing `\"\"` or `None` to `to` will proceed silently and likely cause `_send()` to fail downstream.\n- **No Error Handling:** If `_send()` raises an exception (e.g., network timeout, invalid address format), the entire function crashes without logging or isolating the failure. Partial delivery context is lost.\n- **Lack of Type Hints & Documentation:** Missing type annotations and a docstring reduce IDE support, auto-complete accuracy, and onboarding readability.\n\n### Suggestions:\n- **Decouple BCC from Headers:** Pass `bcc` as a distinct argument to `_send()` so the helper function can handle SMTP envelope vs. MIME header separation correctly.\n- **Validate Required Inputs:** Raise early if `to` is empty or falsy. Optionally support both single strings and iterables (lists/tuples) for flexibility.\n- **Isolate Per-Recipient Failures:** Wrap `_send()` in a `try/except` block to log failures, continue processing remaining addresses, and return a status",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 213409.042544,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 374,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "length",
+    "truncated": true,
+    "usage": {
+      "eval_count": 4096,
+      "prompt_eval_count": 374
+    }
+  },
+  "saved_at": "2026-10-09T19:06:31.349009+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import digitSum\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine digitSum. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Task Write a function that takes a string as input and returns the sum of the upper characters only' ASCII codes.\nCode to test:\ndef digitSum(s):\n    \"\"\"Task\n    Write a function that takes a string as input and returns the sum of the upper characters only'\n    ASCII codes.\n\n    Examples:\n        digitSum(\"\") => 0\n        digitSum(\"abAB\") => 131\n        digitSum(\"abcCd\") => 67\n        digitSum(\"helloE\") => 69\n        digitSum(\"woArBld\") => 131\n        digitSum(\"aAaaaXa\") => 153\n    \"\"\"\n    if s == \"\": return 0\n    return sum(ord(char) if char.isupper() else 0 for char in s)\n\nGenerated Tests:\n",
+  "record_identity": "c3e369b2cb35606ec33b39c6f5da3e350d9147c113ffa1b308a7aa7c6501e698",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 4096,
+    "content": "import pytest\nfrom candidate import digitSum\n\ndef test_empty_string_returns_zero():\n    assert digitSum(\"\") == 0\n\ndef test_mixed_case_abab_returns_131():\n    assert digitSum(\"abAB\") == 131\n\ndef test_lowercase_with_one_uppercase_returns_correct_ascii():\n    assert digitSum(\"abcCd\") == 67\n\ndef test_uppercase_at_end_returns_correct_ascii():\n    assert digitSum(\"helloE\") == 69\n\ndef test_multiple_uppercases_spaced_out_returns_correct_sum():\n    assert digitSum(\"woArBld\") == 131\n\ndef test_spread_uppercases_returns_correct_sum():\n    assert digitSum(\"aAaaaXa\") == 153\n\ndef test_no_uppercase_characters_returns_zero():\n    assert digitSum(\"hello\") == 0\n\ndef test_all_uppercase_string_returns_full_ascii_sum():\n    assert digitSum(\"ABC\") == 198\n\ndef test_single_uppercase_character_returns_its_ascii():\n    assert digitSum(\"Z\") == 90\n\ndef test_single_lowercase_character_returns_zero():\n    assert digitSum(\"z\") == 0\n\ndef test_string_with_spaces",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 216278.251476,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 755,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "length",
+    "truncated": true,
+    "usage": {
+      "eval_count": 4096,
+      "prompt_eval_count": 755
+    }
+  },
+  "saved_at": "2026-10-10T00:11:13.207889+00:00",
+  "schema_version": "2.0"
+}

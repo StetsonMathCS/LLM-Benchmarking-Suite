@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import is_simple_power\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine is_simple_power. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Your task is to write a function that returns true if a number x is a simple power of n and false in other cases. x is a simple power of n if n**int=x For example: is_simple_power(1, 4) => true is_simple_power(2, 2) => true is_simple_power(8, 2) => true is_simple_power(3, 2) => false is_simple_power(3, 1) => false is_simple_power(5, 3) => false\nCode to test:\ndef is_simple_power(x, n):\n    \"\"\"Your task is to write a function that returns true if a number x is a simple\n    power of n and false in other cases.\n    x is a simple power of n if n**int=x\n    For example:\n    is_simple_power(1, 4) => true\n    is_simple_power(2, 2) => true\n    is_simple_power(8, 2) => true\n    is_simple_power(3, 2) => false\n    is_simple_power(3, 1) => false\n    is_simple_power(5, 3) => false\n    \"\"\"\n    if (n == 1): \n        return (x == 1) \n    power = 1\n    while (power < x): \n        power = power * n \n    return (power == x)\n\nGenerated Tests:\n",
+  "record_identity": "26c7dd68a0dc2d90609c1ee2e1ce30e9e82710033cc29c504907cf4c0fd6f76b",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 377,
+    "content": " import unittest\nfrom candidate import is_simple_power\n\nclass TestIsSimplePower(unittest.TestCase):\n    def test_simple_power_normalcase(self):\n        self.assertTrue(is_simple_power(1, 4))\n\n    def test_simple_power_positive(self):\n        self.assertTrue(is_simple_power(2, 2))\n\n    def test_simple_power_large(self):\n        self.assertTrue(is_simple_power(8, 2))\n\n    def test_simple_power_negative(self):\n        self.assertTrue(is_simple_power(-8, 2))\n\n    def test_simple_power_non_power(self):\n        self.assertFalse(is_simple_power(3, 2))\n\n    def test_simple_power_one(self):\n        self.assertTrue(is_simple_power(1, 1))\n\n    def test_simple_power_zero(self):\n        self.assertFalse(is_simple_power(0, any))\n\n    def test_simple_power_non_number(self):\n        self.assertRaises(TypeError, is_simple_power, \"3\", 2)\n\n    def test_simple_power_negative_n(self):\n        self.assertFalse(is_simple_power(8, -2))\n\n    def test_simple_power_fractional_n(self):\n        self.assertFalse(is_simple_power(2, 0.5))\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 47692.653541,
+    "model": "mistral:7b",
+    "prompt_tokens": 1042,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 377,
+      "prompt_eval_count": 1042
+    }
+  },
+  "saved_at": "2026-10-11T02:36:00.421166+00:00",
+  "schema_version": "2.0"
+}

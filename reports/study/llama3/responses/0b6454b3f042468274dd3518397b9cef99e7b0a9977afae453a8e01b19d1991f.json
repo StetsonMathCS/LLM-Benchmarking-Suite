@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef hex_key(num):\n    \"\"\"You have been tasked to write a function that receives \n    a hexadecimal number as a string and counts the number of hexadecimal \n    digits that are primes (prime number, or a prime, is a natural number \n    greater than 1 that is not a product of two smaller natural numbers).\n    Hexadecimal digits are 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F.\n    Prime numbers are 2, 3, 5, 7, 11, 13, 17,...\n    So you have to determine a number of the following digits: 2, 3, 5, 7, \n    B (=decimal 11), D (=decimal 13).\n    Note: you may assume the input is always correct or empty string, \n    and symbols A,B,C,D,E,F are always uppercase.\n    Examples:\n    For num = \"AB\" the output should be 1.\n    For num = \"1077E\" the output should be 2.\n    For num = \"ABED1A33\" the output should be 4.\n    For num = \"123456789ABCDEF0\" the output should be 6.\n    For num = \"2020\" the output should be 2.\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "0b6454b3f042468274dd3518397b9cef99e7b0a9977afae453a8e01b19d1991f",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 133,
+    "content": "def hex_key(num):\n    def is_prime(n):\n        if n < 2:\n            return False\n        for i in range(2, int(n ** 0.5) + 1):\n            if n % i == 0:\n                return False\n        return True\n\n    count = 0\n    hex_primes = {\"2\", \"3\", \"5\", \"7\", \"B\", \"D\"}\n    for digit in num:\n        if digit in hex_primes and is_prime(int(digit, 16) if digit.isdigit() else int(digit, 16)):\n            count += 1\n    return count",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 126423.410147,
+    "model": "llama3:70b",
+    "prompt_tokens": 472,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 133,
+      "prompt_eval_count": 472
+    }
+  },
+  "saved_at": "2026-10-10T04:02:48.581838+00:00",
+  "schema_version": "2.0"
+}

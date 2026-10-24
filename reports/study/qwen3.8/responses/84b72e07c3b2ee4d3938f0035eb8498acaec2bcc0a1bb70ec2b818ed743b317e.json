@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef triples_sum_to_zero(l: list):\n    \"\"\"\n    triples_sum_to_zero takes a list of integers as an input.\n    it returns True if there are three distinct elements in the list that\n    sum to zero, and False otherwise.\n\n    >>> triples_sum_to_zero([1, 3, 5, 0])\n    False\n    >>> triples_sum_to_zero([1, 3, -2, 1])\n    True\n    >>> triples_sum_to_zero([1, 2, 3, 7])\n    False\n    >>> triples_sum_to_zero([2, 4, -5, 3, 9, 7])\n    True\n    >>> triples_sum_to_zero([1])\n    False\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "84b72e07c3b2ee4d3938f0035eb8498acaec2bcc0a1bb70ec2b818ed743b317e",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1197,
+    "content": "```python\ndef triples_sum_to_zero(l: list):\n    \"\"\"\n    triples_sum_to_zero takes a list of integers as an input.\n    it returns True if there are three distinct elements in the list that\n    sum to zero, and False otherwise.\n\n    >>> triples_sum_to_zero([1, 3, 5, 0])\n    False\n    >>> triples_sum_to_zero([1, 3, -2, 1])\n    True\n    >>> triples_sum_to_zero([1, 2, 3, 7])\n    False\n    >>> triples_sum_to_zero([2, 4, -5, 3, 9, 7])\n    True\n    >>> triples_sum_to_zero([1])\n    False\n    \"\"\"\n    if len(l) < 3:\n        return False\n    sorted_l = sorted(l)\n    n = len(sorted_l)\n    for i in range(n - 2):\n        left = i + 1\n        right = n - 1\n        while left < right:\n            s = sorted_l[i] + sorted_l[left] + sorted_l[right]\n            if s == 0:\n                return True\n            elif s < 0:\n                left += 1\n            else:\n                right -= 1\n    return False\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 206420.772312,
+    "model": "qwen3.8:27b",
+    "prompt_tokens": 351,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1197,
+      "prompt_eval_count": 351
+    }
+  },
+  "saved_at": "2026-10-08T18:21:35.541785+00:00",
+  "schema_version": "2.0"
+}

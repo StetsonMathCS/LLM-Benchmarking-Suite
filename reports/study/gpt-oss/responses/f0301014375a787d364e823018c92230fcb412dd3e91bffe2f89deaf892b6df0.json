@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef check_dict_case(dict):\n    \"\"\"\n    Given a dictionary, return True if all keys are strings in lower \n    case or all keys are strings in upper case, else return False.\n    The function should return False is the given dictionary is empty.\n    Examples:\n    check_dict_case({\"a\":\"apple\", \"b\":\"banana\"}) should return True.\n    check_dict_case({\"a\":\"apple\", \"A\":\"banana\", \"B\":\"banana\"}) should return False.\n    check_dict_case({\"a\":\"apple\", 8:\"banana\", \"a\":\"apple\"}) should return False.\n    check_dict_case({\"Name\":\"John\", \"Age\":\"36\", \"City\":\"Houston\"}) should return False.\n    check_dict_case({\"STATE\":\"NC\", \"ZIP\":\"12345\" }) should return True.\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "f0301014375a787d364e823018c92230fcb412dd3e91bffe2f89deaf892b6df0",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 341,
+    "content": "```python\ndef check_dict_case(d):\n    \"\"\"\n    Return True if all keys of the dictionary are strings and are either all\n    lower‑case or all upper‑case.  Return False if the dictionary is empty,\n    contains a non‑string key, or has mixed case keys.\n    \"\"\"\n    if not d:                      # empty dictionary\n        return False\n\n    keys = d.keys()\n    for k in keys:\n        if not isinstance(k, str):  # non‑string key\n            return False\n\n    lower = all(k.islower() for k in keys)\n    upper = all(k.isupper() for k in keys)\n\n    return lower or upper\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 25032.565456,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 395,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 341,
+      "prompt_eval_count": 395
+    }
+  },
+  "saved_at": "2026-10-10T16:16:04.018137+00:00",
+  "schema_version": "2.0"
+}

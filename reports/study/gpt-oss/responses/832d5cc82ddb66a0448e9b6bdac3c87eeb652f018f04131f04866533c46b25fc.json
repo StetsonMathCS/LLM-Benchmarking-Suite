@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef fib(n: int):\n    \"\"\"Return n-th Fibonacci number.\n    >>> fib(10)\n    55\n    >>> fib(1)\n    1\n    >>> fib(8)\n    21\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "832d5cc82ddb66a0448e9b6bdac3c87eeb652f018f04131f04866533c46b25fc",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 351,
+    "content": "```python\ndef fib(n: int) -> int:\n    \"\"\"Return n-th Fibonacci number.\n\n    The sequence is defined as:\n        F(1) = 1, F(2) = 1, and F(k) = F(k-1) + F(k-2) for k > 2.\n\n    Parameters\n    ----------\n    n : int\n        The position in the Fibonacci sequence (must be a positive integer).\n\n    Returns\n    -------\n    int\n        The n-th Fibonacci number.\n\n    Examples\n    --------\n    >>> fib(10)\n    55\n    >>> fib(1)\n    1\n    >>> fib(8)\n    21\n    \"\"\"\n    if n <= 0:\n        raise ValueError(\"n must be a positive integer\")\n    if n <= 2:\n        return 1\n    a, b = 1, 1\n    for _ in range(3, n + 1):\n        a, b = b, a + b\n    return b\n\n\nif __name__ == \"__main__\":\n    import doctest\n    doctest.testmod()\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 24777.727705,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 278,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 351,
+      "prompt_eval_count": 278
+    }
+  },
+  "saved_at": "2026-10-10T15:53:57.641416+00:00",
+  "schema_version": "2.0"
+}

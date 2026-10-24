@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import filter_integers\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine filter_integers. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Filter given list of any python values only for integers\nCode to test:\nfrom typing import List, Any\n\n\ndef filter_integers(values: List[Any]) -> List[int]:\n    \"\"\" Filter given list of any python values only for integers\n    >>> filter_integers(['a', 3.14, 5])\n    [5]\n    >>> filter_integers([1, 2, 3, 'abc', {}, []])\n    [1, 2, 3]\n    \"\"\"\n    return [x for x in values if isinstance(x, int)]\n\nGenerated Tests:\n",
+  "record_identity": "6c702dcb5e9909bee0f286d9efc118d59c3ed10ca4cd32162c1e26402b459590",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 434,
+    "content": " import unittest\nfrom candidate import filter_integers\n\nclass TestFilterIntegers(unittest.TestCase):\n    def test_filter_empty_list(self):\n        self.assertListEqual(filter_integers([]), [])\n\n    def test_filter_only_integers(self):\n        self.assertListEqual(filter_integers([1, 2, 3, 4]), [1, 2, 3, 4])\n\n    def test_filter_mixed_list(self):\n        self.assertListEqual(filter_integers(['a', 3, 4]), [3, 4])\n\n    def test_filter_list_with_float(self):\n        self.assertListEqual(filter_integers([3.14, 5]), [5])\n\n    def test_filter_list_with_bool(self):\n        self.assertListEqual(filter_integers([True, False, 5]), [5])\n\n    def test_filter_list_with_str(self):\n        self.assertListEqual(filter_integers(['a', '3']), ['3'])\n\n    def test_filter_list_with_list(self):\n        self.assertListEqual(filter_integers([[1, 2, 3], ['a', 4]]), [1, 2, 3, 4])\n\n    def test_filter_list_with_dict(self):\n        self.assertListEqual(filter_integers({'a': 1, 'b': 2, 'c': 3}), [1, 2, 3])\n\n    def test_filter_list_with_none(self):\n        self.assertListEqual(filter_integers([None, 5]), [5])\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 49604.689717,
+    "model": "mistral:7b",
+    "prompt_tokens": 841,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 434,
+      "prompt_eval_count": 841
+    }
+  },
+  "saved_at": "2026-10-11T01:32:33.791966+00:00",
+  "schema_version": "2.0"
+}

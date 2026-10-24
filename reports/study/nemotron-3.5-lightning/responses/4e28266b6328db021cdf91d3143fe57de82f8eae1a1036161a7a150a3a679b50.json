@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef starts_one_ends(n):\n    \"\"\"\n    Given a positive integer n, return the count of the numbers of n-digit\n    positive integers that start or end with 1.\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "4e28266b6328db021cdf91d3143fe57de82f8eae1a1036161a7a150a3a679b50",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1783,
+    "content": "```python\ndef starts_one_ends(n):\n    \"\"\"\n    Given a positive integer n, return the count of n-digit positive integers\n    that start or end with 1.\n    \"\"\"\n    if n == 1:\n        return 1\n    return 18 * (10 ** (n - 2))\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 90536.560202,
+    "model": "nemotron-3.5-lightning:30b",
+    "prompt_tokens": 226,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1783,
+      "prompt_eval_count": 226
+    }
+  },
+  "saved_at": "2026-10-08T05:30:59.483443+00:00",
+  "schema_version": "2.0"
+}

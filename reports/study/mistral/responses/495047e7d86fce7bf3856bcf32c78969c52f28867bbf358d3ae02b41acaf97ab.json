@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef sort_even(l: list):\n    \"\"\"This function takes a list l and returns a list l' such that\n    l' is identical to l in the odd indicies, while its values at the even indicies are equal\n    to the values of the even indicies of l, but sorted.\n    >>> sort_even([1, 2, 3])\n    [1, 2, 3]\n    >>> sort_even([5, 6, 3, 4])\n    [3, 6, 5, 4]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "495047e7d86fce7bf3856bcf32c78969c52f28867bbf358d3ae02b41acaf97ab",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 199,
+    "content": " Here is the Python code that fulfills the requested functionality:\n\n```python\ndef sort_even(l: list) -> list:\n    sorted_even = []\n    for index, value in enumerate(l):\n        if index % 2 == 0 and value:\n            sorted_even.append(sorted(l)[index])\n        else:\n            sorted_even.append(l[index])\n    return sorted_even\n```\n\nThis function takes a list `l` as input, iterates through its elements, checks if the index is even and the value is not None (since the function's behavior is undefined for empty list elements), and if so, replaces the original value with the sorted value at the same index in the sorted list. For odd indices, it simply keeps the original value. The function returns a new list `sorted_even` with the modified values.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 19325.586401,
+    "model": "mistral:7b",
+    "prompt_tokens": 331,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 199,
+      "prompt_eval_count": 331
+    }
+  },
+  "saved_at": "2026-10-10T23:45:25.606108+00:00",
+  "schema_version": "2.0"
+}

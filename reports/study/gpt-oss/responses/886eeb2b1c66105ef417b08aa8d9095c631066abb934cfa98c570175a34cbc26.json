@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef count_up_to(n):\n    \"\"\"Implement a function that takes an non-negative integer and returns an array of the first n\n    integers that are prime numbers and less than n.\n    for example:\n    count_up_to(5) => [2,3]\n    count_up_to(11) => [2,3,5,7]\n    count_up_to(0) => []\n    count_up_to(20) => [2,3,5,7,11,13,17,19]\n    count_up_to(1) => []\n    count_up_to(18) => [2,3,5,7,11,13,17]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "886eeb2b1c66105ef417b08aa8d9095c631066abb934cfa98c570175a34cbc26",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 645,
+    "content": "```python\ndef count_up_to(n: int) -> list[int]:\n    \"\"\"\n    Return a list of all prime numbers less than ``n``.\n    \n    Parameters\n    ----------\n    n : int\n        Non‑negative integer upper bound.  The function returns an empty\n        list for ``n`` <= 1.\n    \n    Returns\n    -------\n    list[int]\n        Sorted list of primes strictly less than ``n``.\n    \"\"\"\n    if n <= 2:\n        return []\n\n    # Sieve of Eratosthenes up to n - 1\n    sieve = [True] * n\n    sieve[0:2] = [False, False]  # 0 and 1 are not prime\n\n    limit = int(n**0.5) + 1\n    for p in range(2, limit):\n        if sieve[p]:\n            step = p\n            start = p * p\n            sieve[start:n:step] = [False] * ((n - start - 1) // step + 1)\n\n    return [i for i, is_prime in enumerate(sieve) if is_prime]\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 45741.609204,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 371,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 645,
+      "prompt_eval_count": 371
+    }
+  },
+  "saved_at": "2026-10-10T16:16:50.074736+00:00",
+  "schema_version": "2.0"
+}

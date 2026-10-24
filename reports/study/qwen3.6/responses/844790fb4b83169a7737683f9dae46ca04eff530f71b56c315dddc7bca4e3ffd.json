@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import get_positive\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine get_positive. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Return only positive numbers in the list.\nCode to test:\ndef get_positive(l: list):\n    \"\"\"Return only positive numbers in the list.\n    >>> get_positive([-1, 2, -4, 5, 6])\n    [2, 5, 6]\n    >>> get_positive([5, 3, -5, 2, -3, 3, 9, 0, 123, 1, -10])\n    [5, 3, 2, 3, 9, 123, 1]\n    \"\"\"\n    return [e for e in l if e > 0]\n\nGenerated Tests:\n",
+  "record_identity": "844790fb4b83169a7737683f9dae46ca04eff530f71b56c315dddc7bca4e3ffd",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 4036,
+    "content": "import unittest\nfrom candidate import get_positive\n\nclass TestGetPositive(unittest.TestCase):\n    def test_normal_case_mixed_values(self):\n        self.assertEqual(get_positive([-1, 2, -4, 5, 6]), [2, 5, 6])\n\n    def test_all_positives(self):\n        self.assertEqual(get_positive([1, 2, 3, 4]), [1, 2, 3, 4])\n\n    def test_all_negatives(self):\n        self.assertEqual(get_positive([-1, -2, -3]), [])\n\n    def test_contains_zero(self):\n        self.assertEqual(get_positive([0, -5, 5]), [5])\n\n    def test_empty_list_input(self):\n        self.assertEqual(get_positive([]), [])\n\n    def test_single_positive_element(self):\n        self.assertEqual(get_positive([42]), [42])\n\n    def test_single_negative_element(self):\n        self.assertEqual(get_positive([-10]), [])\n\n    def test_single_zero_element(self):\n        self.assertEqual(get_positive([0]), [])\n\n    def test_large_list_with_many_elements(self):\n        input_list = list(range(-5, 6))\n        expected = [x for x in range(-5, 6) if x > 0]\n        self.assertEqual(get_positive(input_list), expected)\n\n    def test_none_input_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            get_positive(None)\n\n    def test_string_input_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            get_positive(\"abc\")\n\n    def test_float_values_filtered_correctly(self):\n        self.assertEqual(get_positive([-1.5, 2.0, 0.5, -3.2]), [2.0, 0.5])\n\n    def test_duplicates_preserved(self):\n        self.assertEqual(get_positive([1, 2, 2, 3, -1]), [1, 2, 2, 3])",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 212903.253201,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 725,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 4036,
+      "prompt_eval_count": 725
+    }
+  },
+  "saved_at": "2026-10-09T22:06:23.916116+00:00",
+  "schema_version": "2.0"
+}

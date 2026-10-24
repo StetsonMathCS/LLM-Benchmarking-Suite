@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef get_positive(l: list):\n    \"\"\"Return only positive numbers in the list.\n    >>> get_positive([-1, 2, -4, 5, 6])\n    [2, 5, 6]\n    >>> get_positive([5, 3, -5, 2, -3, 3, 9, 0, 123, 1, -10])\n    [5, 3, 2, 3, 9, 123, 1]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "531d2e8eb4ffea9c20b403bbc39e9d5ca1507ee8cafb9648699e7cc0c75dff0e",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 25,
+    "content": "def get_positive(l: list) -> list:\n    return [num for num in l if num > 0]",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 29462.221273,
+    "model": "llama3:70b",
+    "prompt_tokens": 286,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 25,
+      "prompt_eval_count": 286
+    }
+  },
+  "saved_at": "2026-10-10T03:17:11.862996+00:00",
+  "schema_version": "2.0"
+}

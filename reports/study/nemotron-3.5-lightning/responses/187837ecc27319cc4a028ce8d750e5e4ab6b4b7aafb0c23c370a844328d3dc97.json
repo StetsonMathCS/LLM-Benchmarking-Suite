@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code debugger and bug-fixing model. Your task is to take incorrect or broken Python code and return a corrected version that runs and behaves as intended.\n\n1.) Identify and fix all syntax errors, logical errors, type issues, and potential runtime problems.\n2.) Ensure the corrected code runs under standard Python (prefer clear, idiomatic Python where appropriate).\n3.) Preserve the original program structure, intent, and logic whenever possible.\n4.) Do not rewrite the entire program unless necessary to fix correctness or runtime issues.\n5.) Respect existing imports, variables, classes, and function definitions unless they are inconsistent, incorrect or missing.\n6.) Fix incorrect conditions, loops, indentation issues, type mismatches, and undefined behavior if present.\n7.) Add missing imports, return statements, or definitions only if required for the code to run.\n8.) Maintain consistent and clean formatting and indentation following Python conventions.\n9.) Ensure the final code runs without syntax errors or obvious runtime failures.\n10.) Make sure output is ONLY an executeable and parseable chunk of code.\nStart Example\n\nInput:\ndef factorial(n):\n    if n = 0:\n        return 1\n    else\n        return n * factorial(n - 1)\n\nprint(factorial(5)\n\nOutput:\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n - 1)\n\nprint(factorial(5))\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the corrected Python code.\n\nCode to fix:\n\ndef next_permutation(perm):\n    for i in range(len(perm) - 2, -1, -1):\n        if perm[i] < perm[i + 1]:\n            for j in range(len(perm) - 1, i, -1):\n                if perm[j] < perm[i]:\n                    next_perm = list(perm)\n                    next_perm[i], next_perm[j] = perm[j], perm[i]\n                    next_perm[i + 1:] = reversed(next_perm[i + 1:])\n                    return next_perm\n\nprint(next_permutation([3, 2, 4, 1]))\nprint(next_permutation([3, 5, 6, 2, 1]))\nprint(next_permutation([3, 5, 6, 2]))\n\nCorrected Code:",
+  "record_identity": "187837ecc27319cc4a028ce8d750e5e4ab6b4b7aafb0c23c370a844328d3dc97",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 4096,
+    "content": "",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 223232.398758,
+    "model": "nemotron-3.5-lightning:30b",
+    "prompt_tokens": 507,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "length",
+    "truncated": true,
+    "usage": {
+      "eval_count": 4096,
+      "prompt_eval_count": 507
+    }
+  },
+  "saved_at": "2026-10-08T02:35:40.768398+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef valid_date(date):\n    \"\"\"You have to write a function which validates a given date string and\n    returns True if the date is valid otherwise False.\n    The date is valid if all of the following rules are satisfied:\n    1. The date string is not empty.\n    2. The number of days is not less than 1 or higher than 31 days for months 1,3,5,7,8,10,12. And the number of days is not less than 1 or higher than 30 days for months 4,6,9,11. And, the number of days is not less than 1 or higher than 29 for the month 2.\n    3. The months should not be less than 1 or higher than 12.\n    4. The date should be in the format: mm-dd-yyyy\n\n    for example: \n    valid_date('03-11-2000') => True\n\n    valid_date('15-01-2012') => False\n\n    valid_date('04-0-2040') => False\n\n    valid_date('06-04-2020') => True\n\n    valid_date('06/04/2020') => False\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "8cf5bb77953bac69180ce51169b30ac04e8521c164ee374efe8f97612f4cacbd",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 172,
+    "content": "```\nfrom datetime import datetime\n\ndef valid_date(date):\n    if not date:\n        return False\n    try:\n        datetime.strptime(date, '%m-%d-%Y')\n        day, month, year = map(int, date.split('-'))\n        if month in [1, 3, 5, 7, 8, 10, 12]:\n            if not 1 <= day <= 31:\n                return False\n        elif month in [4, 6, 9, 11]:\n            if not 1 <= day <= 30:\n                return False\n        elif month == 2:\n            if not 1 <= day <= 29:\n                return False\n        if not 1 <= month <= 12:\n            return False\n        return True\n    except ValueError:\n        return False\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 151285.80916,
+    "model": "llama3:70b",
+    "prompt_tokens": 436,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 172,
+      "prompt_eval_count": 436
+    }
+  },
+  "saved_at": "2026-10-10T04:50:04.760041+00:00",
+  "schema_version": "2.0"
+}

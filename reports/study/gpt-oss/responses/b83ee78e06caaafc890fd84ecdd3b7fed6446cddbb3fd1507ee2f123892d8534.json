@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef add(x: int, y: int):\n    \"\"\"Add two numbers x and y\n    >>> add(2, 3)\n    5\n    >>> add(5, 7)\n    12\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "b83ee78e06caaafc890fd84ecdd3b7fed6446cddbb3fd1507ee2f123892d8534",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 290,
+    "content": "def add(x: int, y: int) -> int:\n    \"\"\"Add two numbers x and y\n    >>> add(2, 3)\n    5\n    >>> add(5, 7)\n    12\n    \"\"\"\n    return x + y",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 20085.63713,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 279,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 290,
+      "prompt_eval_count": 279
+    }
+  },
+  "saved_at": "2026-10-10T15:53:01.126790+00:00",
+  "schema_version": "2.0"
+}

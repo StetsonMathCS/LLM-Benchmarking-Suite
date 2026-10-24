@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Refactor TaskRunner to use a TaskResult dataclass; eliminate the running flag and parallel error/result lists; expose a summary property\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\nclass TaskRunner:\n    def __init__(self):\n        self.tasks = []\n        self.results = []\n        self.errors = []\n        self.running = False\n\n    def add_task(self, func, *args, **kwargs):\n        self.tasks.append((func, args, kwargs))\n\n    def run(self):\n        self.running = True\n        self.results = []\n        self.errors = []\n        for func, args, kwargs in self.tasks:\n            try:\n                result = func(*args, **kwargs)\n                self.results.append({'status': 'ok', 'result': result})\n            except Exception as e:\n                self.errors.append({'status': 'error', 'error': str(e), 'func': func.__name__})\n                self.results.append({'status': 'error', 'error': str(e)})\n        self.running = False\n        return self.results\n\n    def get_errors(self):\n        return self.errors\n\n    def get_successes(self):\n        return [r for r in self.results if r['status'] == 'ok']\n\nRefactored Code:",
+  "record_identity": "34dff295bee774db88a88b7093b9e67efd4491c395ce7fbd05e65dbd2c5c565f",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 3513,
+    "content": "from dataclasses import dataclass\nfrom typing import Any, Callable, List\n\n\n@dataclass\nclass TaskResult:\n    status: str\n    result: Any = None\n    error: str = None\n    func_name: str = None\n\n\nclass TaskRunner:\n    def __init__(self) -> None:\n        self._tasks: List[tuple] = []\n        self._results: List[TaskResult] = []\n\n    def add_task(self, func: Callable, *args, **kwargs) -> None:\n        self._tasks.append((func, args, kwargs))\n\n    def run(self) -> List[TaskResult]:\n        self._results = []\n        for func, args, kwargs in self._tasks:\n            try:\n                result = func(*args, **kwargs)\n                self._results.append(\n                    TaskResult(status=\"ok\", result=result, func_name=func.__name__)\n                )\n            except Exception as e:\n                self._results.append(\n                    TaskResult(status=\"error\", error=str(e), func_name=func.__name__)\n                )\n        return self._results\n\n    def get_errors(self) -> List[TaskResult]:\n        return [r for r in self._results if r.status == \"error\"]\n\n    def get_successes(self) -> List[TaskResult]:\n        return [r for r in self._results if r.status == \"ok\"]\n\n    @property\n    def summary(self) -> dict:\n        total = len(self._results)\n        successes = len(self.get_successes())\n        errors = len(self.get_errors())\n        return {\n            \"total\": total,\n            \"successes\": successes,\n            \"errors\": errors,\n            \"success_rate\": successes / total if total else 0.0,\n        }",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 190927.612477,
+    "model": "nemotron-3.5-lightning:30b",
+    "prompt_tokens": 542,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 3513,
+      "prompt_eval_count": 542
+    }
+  },
+  "saved_at": "2026-10-08T09:22:36.898028+00:00",
+  "schema_version": "2.0"
+}

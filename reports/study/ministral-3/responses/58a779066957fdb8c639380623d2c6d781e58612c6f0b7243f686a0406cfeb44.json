@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef is_multiply_prime(a):\n    \"\"\"Write a function that returns true if the given number is the multiplication of 3 prime numbers\n    and false otherwise.\n    Knowing that (a) is less then 100. \n    Example:\n    is_multiply_prime(30) == True\n    30 = 2 * 3 * 5\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "58a779066957fdb8c639380623d2c6d781e58612c6f0b7243f686a0406cfeb44",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 314,
+    "content": "```python\ndef is_multiply_prime(a):\n    def is_prime(n):\n        if n <= 1:\n            return False\n        if n == 2:\n            return True\n        if n % 2 == 0:\n            return False\n        for i in range(3, int(n**0.5) + 1, 2):\n            if n % i == 0:\n                return False\n        return True\n\n    if a < 2:\n        return False\n\n    primes = []\n    temp = a\n    for i in range(2, int(a**0.5) + 1):\n        if temp % i == 0 and is_prime(i):\n            other_factor = a // i\n            if other_factor != i and is_prime(other_factor):\n                primes.append(i)\n                primes.append(other_factor)\n                break\n        if temp == 1:\n            break\n\n    if len(primes) == 2 and primes[0] * primes[1] == a:\n        return True\n\n    # Check for cases where a is product of three primes (e.g., 30 = 2 * 3 * 5)\n    if a > 2:\n        for i in range(2, int(a**0.5) + 1):\n            if is_prime(i) and a % i == 0:\n                remaining = a // i\n                if is_prime(remaining):\n                    return True\n\n    return False\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 15542.610796,
+    "model": "ministral-3:3b",
+    "prompt_tokens": 808,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 314,
+      "prompt_eval_count": 808
+    }
+  },
+  "saved_at": "2026-10-10T21:36:08.124119+00:00",
+  "schema_version": "2.0"
+}

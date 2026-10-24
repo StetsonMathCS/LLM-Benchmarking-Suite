@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import string_sequence\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine string_sequence. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Return a string containing space-delimited numbers starting from 0 upto n inclusive.\nCode to test:\ndef string_sequence(n: int) -> str:\n    \"\"\" Return a string containing space-delimited numbers starting from 0 upto n inclusive.\n    >>> string_sequence(0)\n    '0'\n    >>> string_sequence(5)\n    '0 1 2 3 4 5'\n    \"\"\"\n    return ' '.join([str(x) for x in range(n + 1)])\n\nGenerated Tests:\n",
+  "record_identity": "b755c09aa6264277cf750a3a6a9dbff11502c8a1b53f76ddb23890456d67aedb",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 357,
+    "content": " import unittest\nfrom candidate import string_sequence\n\nclass TestStringSequence(unittest.TestCase):\n    def test_string_sequence_zero(self):\n        self.assertEqual(string_sequence(0), '0')\n\n    def test_string_sequence_one(self):\n        self.assertEqual(string_sequence(1), '0')\n\n    def test_string_sequence_positive(self):\n        self.assertEqual(string_sequence(5), '0 1 2 3 4 5')\n\n    def test_string_sequence_negative(self):\n        self.assertEqual(string_sequence(-5), '-5 -4 -3 -2 -1 0')\n\n    def test_string_sequence_zero_padding(self):\n        self.assertEqual(string_sequence(0), '0')\n        self.assertEqual(string_sequence(1), '0')\n        self.assertEqual(string_sequence(2), '0 1')\n        self.assertEqual(string_sequence(3), '0 1 2')\n        self.assertEqual(string_sequence(4), '0 1 2 3')\n        self.assertEqual(string_sequence(5), '0 1 2 3 4')\n\n    def test_string_sequence_empty_input(self):\n        self.assertIsInstance(string_sequence(-1), TypeError)\n        self.assertIsInstance(string_sequence(float('inf')), TypeError)\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 42373.16097,
+    "model": "mistral:7b",
+    "prompt_tokens": 828,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 357,
+      "prompt_eval_count": 828
+    }
+  },
+  "saved_at": "2026-10-11T01:25:28.697113+00:00",
+  "schema_version": "2.0"
+}

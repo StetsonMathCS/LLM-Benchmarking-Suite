@@ -1,0 +1,23 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import pairs_sum_to_zero\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine pairs_sum_to_zero. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: pairs_sum_to_zero takes a list of integers as an input. it returns True if there are two distinct elements in the list that sum to zero, and False otherwise.\nCode to test:\ndef pairs_sum_to_zero(l):\n    \"\"\"\n    pairs_sum_to_zero takes a list of integers as an input.\n    it returns True if there are two distinct elements in the list that\n    sum to zero, and False otherwise.\n    >>> pairs_sum_to_zero([1, 3, 5, 0])\n    False\n    >>> pairs_sum_to_zero([1, 3, -2, 1])\n    False\n    >>> pairs_sum_to_zero([1, 2, 3, 7])\n    False\n    >>> pairs_sum_to_zero([2, 4, -5, 3, 5, 7])\n    True\n    >>> pairs_sum_to_zero([1])\n    False\n    \"\"\"\n    for i, l1 in enumerate(l):\n        for j in range(i + 1, len(l)):\n            if l1 + l[j] == 0:\n                return True\n    return False\n\nGenerated Tests:\n",
+  "record_identity": "57a6c80bf152e68a8e4095cbf19a0701af37ade4a1ff2f178f57f17648616e9b",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 0,
+    "content": "",
+    "effective_settings": {},
+    "error": "model 'deepseek-r1:32b' not found (status code: 404)",
+    "latency_ms": 0.0,
+    "model": "deepseek-r1:32b",
+    "prompt_tokens": 0,
+    "provider": "ollama",
+    "requested_settings": {},
+    "status": "completed",
+    "stop_reason": null,
+    "truncated": false,
+    "usage": {}
+  },
+  "saved_at": "2026-10-09T09:38:54.326994+00:00",
+  "schema_version": "2.0"
+}

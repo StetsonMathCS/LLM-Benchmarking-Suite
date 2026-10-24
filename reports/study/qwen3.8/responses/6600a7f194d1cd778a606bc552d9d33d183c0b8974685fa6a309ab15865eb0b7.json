@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import flip_case\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine flip_case. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: For a given string, flip lowercase characters to uppercase and uppercase to lowercase.\nCode to test:\ndef flip_case(string: str) -> str:\n    \"\"\" For a given string, flip lowercase characters to uppercase and uppercase to lowercase.\n    >>> flip_case('Hello')\n    'hELLO'\n    \"\"\"\n    return string.swapcase()\n\nGenerated Tests:\n",
+  "record_identity": "6600a7f194d1cd778a606bc552d9d33d183c0b8974685fa6a309ab15865eb0b7",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1142,
+    "content": "import pytest\nfrom candidate import flip_case\n\n\ndef test_flip_case_mixed_case_string():\n    assert flip_case('Hello') == 'hELLO'\n\n\ndef test_flip_case_all_lowercase():\n    assert flip_case('hello') == 'HELLO'\n\n\ndef test_flip_case_all_uppercase():\n    assert flip_case('HELLO') == 'hello'\n\n\ndef test_flip_case_empty_string():\n    assert flip_case('') == ''\n\n\ndef test_flip_case_single_lowercase_char():\n    assert flip_case('a') == 'A'\n\n\ndef test_flip_case_single_uppercase_char():\n    assert flip_case('A') == 'a'\n\n\ndef test_flip_case_single_z_lowercase():\n    assert flip_case('z') == 'Z'\n\n\ndef test_flip_case_single_z_uppercase():\n    assert flip_case('Z') == 'z'\n\n\ndef test_flip_case_special_characters_unchanged():\n    assert flip_case('123!@#$%^&*()') == '123!@#$%^&*()'\n\n\ndef test_flip_case_numbers_unchanged():\n    assert flip_case('12345') == '12345'\n\n\ndef test_flip_case_mixed_alphanumeric():\n    assert flip_case('aB1cD2') == 'Ab1Cd2'\n\n\ndef test_flip_case_whitespace_only():\n    assert flip_case('   ') == '   '\n\n\ndef test_flip_case_tabs_and_newlines():\n    assert flip_case('\\t\\n') == '\\t\\n'\n\n\ndef test_flip_case_unicode_lowercase():\n    assert flip_case('héllo') == 'HÉLLO'\n\n\ndef test_flip_case_unicode_uppercase():\n    assert flip_case('HÉLLO') == 'héllo'\n\n\ndef test_flip_case_emoji_and_letters():\n    assert flip_case('h🐱i') == 'H🐱I'\n\n\ndef test_flip_case_long_string():\n    s = 'a' * 1000\n    assert flip_case(s) == 'A' * 1000\n\n\ndef test_flip_case_none_input_raises_type_error():\n    with pytest.raises(TypeError):\n        flip_case(None)\n\n\ndef test_flip_case_integer_input_raises_type_error():\n    with pytest.raises(TypeError):\n        flip_case(123)\n\n\ndef test_flip_case_list_input_raises_type_error():\n    with pytest.raises(TypeError):\n        flip_case(['a', 'b'])\n\n\ndef test_flip_case_float_input_raises_type_error():\n    with pytest.raises(TypeError):\n        flip_case(3.14)\n\n\ndef test_flip_case_boolean_input_raises_type_error():\n    with pytest.raises(TypeError):\n        flip_case(True)\n\n\ndef test_flip_case_dict_input_raises_type_error():\n    with pytest.raises(TypeError):\n        flip_case({'a': 1})\n\n\ndef test_flip_case_return_type_is_string():\n    result = flip_case('Hello')\n    assert isinstance(result, str)\n\n\ndef test_flip_case_idempotent_on_numbers_only():\n    assert flip_case('999') == '999'\n\n\ndef test_flip_case_idempotent_on_special_chars_only():\n    assert flip_case('!!@@##') == '!!@@##'",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 213998.897293,
+    "model": "qwen3.8:27b",
+    "prompt_tokens": 651,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1142,
+      "prompt_eval_count": 651
+    }
+  },
+  "saved_at": "2026-10-09T03:45:44.794571+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef tri(n):\n    \"\"\"Everyone knows Fibonacci sequence, it was studied deeply by mathematicians in \n    the last couple centuries. However, what people don't know is Tribonacci sequence.\n    Tribonacci sequence is defined by the recurrence:\n    tri(1) = 3\n    tri(n) = 1 + n / 2, if n is even.\n    tri(n) =  tri(n - 1) + tri(n - 2) + tri(n + 1), if n is odd.\n    For example:\n    tri(2) = 1 + (2 / 2) = 2\n    tri(4) = 3\n    tri(3) = tri(2) + tri(1) + tri(4)\n           = 2 + 3 + 3 = 8 \n    You are given a non-negative integer number n, you have to a return a list of the \n    first n + 1 numbers of the Tribonacci sequence.\n    Examples:\n    tri(3) = [1, 3, 2, 8]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "9c7b90bc393d13aef15b71f06351fd340606af2e9f14f9fd5c4f7c56ca0777b7",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1664,
+    "content": "```python\ndef tri(n: int) -> list[int]:\n    \"\"\"\n    Return the first n + 1 numbers of the Tribonacci sequence.\n\n    The sequence is defined as:\n        tri(0) = 1\n        tri(1) = 3\n        tri(n) = 1 + n // 2          if n is even\n        tri(n) = tri(n-1) + tri(n-2) + tri(n+1)  if n is odd\n\n    Parameters\n    ----------\n    n : int\n        Non‑negative integer indicating how many numbers (plus one) to return.\n\n    Returns\n    -------\n    list[int]\n        A list of length n + 1 containing the Tribonacci values.\n    \"\"\"\n    if n < 0:\n        raise ValueError(\"n must be a non‑negative integer\")\n\n    result = [0] * (n + 1)\n\n    for i in range(n + 1):\n        if i % 2 == 0:                     # even index\n            result[i] = 1 + i // 2\n        else:                               # odd index\n            if i == 1:                     # base case\n                result[i] = 3\n            else:\n                # tri(i+1) is even, so use the direct formula\n                result[i] = result[i - 1] + result[i - 2] + (1 + (i + 1) // 2)\n\n    return result\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 123185.853792,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 460,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1664,
+      "prompt_eval_count": 460
+    }
+  },
+  "saved_at": "2026-10-10T16:42:44.075041+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code debugger and bug-fixing model. Your task is to take incorrect or broken Python code and return a corrected version that runs and behaves as intended.\n\n1.) Identify and fix all syntax errors, logical errors, type issues, and potential runtime problems.\n2.) Ensure the corrected code runs under standard Python (prefer clear, idiomatic Python where appropriate).\n3.) Preserve the original program structure, intent, and logic whenever possible.\n4.) Do not rewrite the entire program unless necessary to fix correctness or runtime issues.\n5.) Respect existing imports, variables, classes, and function definitions unless they are inconsistent, incorrect or missing.\n6.) Fix incorrect conditions, loops, indentation issues, type mismatches, and undefined behavior if present.\n7.) Add missing imports, return statements, or definitions only if required for the code to run.\n8.) Maintain consistent and clean formatting and indentation following Python conventions.\n9.) Ensure the final code runs without syntax errors or obvious runtime failures.\n10.) Make sure output is ONLY an executeable and parseable chunk of code.\nStart Example\n\nInput:\ndef factorial(n):\n    if n = 0:\n        return 1\n    else\n        return n * factorial(n - 1)\n\nprint(factorial(5)\n\nOutput:\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n - 1)\n\nprint(factorial(5))\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the corrected Python code.\n\nCode to fix:\ndef bucketsort(arr, k):\n    counts = [0] * k\n    for x in arr:\n        counts[x] += 1\n\n    sorted_arr = []\n    for i, count in enumerate(arr):\n        sorted_arr.extend([i] * count)\n\n    return sorted_arr\n\nprint(bucketsort([], 14))\nprint(bucketsort([3, 11, 2, 9, 1, 5], 12))\nprint(bucketsort([3, 2, 4, 2, 3, 5], 6))\n\nCorrected Code:",
+  "record_identity": "6483657cf75261c65d52bdb8af5464db98c14febbe6ee57d02ad1d62f67215e9",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 126,
+    "content": "def bucketsort(arr, k):\n    counts = [0] * k\n    for x in arr:\n        if 0 <= x < k:\n            counts[x] += 1\n\n    sorted_arr = []\n    for i in range(k):\n        sorted_arr.extend([i] * counts[i])\n\n    return sorted_arr\n\nprint(bucketsort([], 14))\nprint(bucketsort([3, 11, 2, 9, 1, 5], 12))\nprint(bucketsort([3, 2, 4, 2, 3, 5], 6))",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 102886.953169,
+    "model": "llama3:70b",
+    "prompt_tokens": 440,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 126,
+      "prompt_eval_count": 440
+    }
+  },
+  "saved_at": "2026-10-10T01:44:39.256920+00:00",
+  "schema_version": "2.0"
+}

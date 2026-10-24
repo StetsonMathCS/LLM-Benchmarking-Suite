@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import below_zero\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine below_zero. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: You're given a list of deposit and withdrawal operations on a bank account that starts with zero balance. Your task is to detect if at any point the balance of account fallls below zero, and at that point function should return True. Otherwise it should return False.\nCode to test:\nfrom typing import List\n\n\ndef below_zero(operations: List[int]) -> bool:\n    \"\"\" You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    \"\"\"\n    balance = 0\n\n    for op in operations:\n        balance += op\n        if balance < 0:\n            return True\n\n    return False\n\nGenerated Tests:\n",
+  "record_identity": "a5699837b15919f416f2bd3bbef2fb8b7f0e6f61d1aeca7db613aea4f0e336a8",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 3813,
+    "content": "import unittest\nfrom candidate import below_zero\n\nclass TestBelowZero(unittest.TestCase):\n    def test_all_positive_operations(self):\n        self.assertEqual(below_zero([1, 2, 3]), False)\n\n    def test_balance_drops_below_zero(self):\n        self.assertEqual(below_zero([1, 2, -4, 5]), True)\n\n    def test_empty_list_returns_false(self):\n        self.assertEqual(below_zero([]), False)\n\n    def test_single_negative_operation(self):\n        self.assertEqual(below_zero([-1]), True)\n\n    def test_single_positive_operation(self):\n        self.assertEqual(below_zero([100]), False)\n\n    def test_balance_exactly_zero_at_boundary(self):\n        self.assertEqual(below_zero([10, -10, 5]), False)\n\n    def test_balance_touches_zero_multiple_times(self):\n        self.assertEqual(below_zero([5, -5, 5, -5, 2]), False)\n\n    def test_alternating_large_values(self):\n        self.assertEqual(below_zero([1000000, -2000000, 1500000]), True)\n\n    def test_all_negative_operations(self):\n        self.assertEqual(below_zero([-1, -2, -3]), True)\n\n    def test_none_input_raises_error(self):\n        with self.assertRaises(TypeError):\n            below_zero(None)\n\n    def test_non_list_input_raises_error(self):\n        with self.assertRaises(TypeError):\n            below_zero(123)\n\n    def test_list_with_string_element_raises_error(self):\n        with self.assertRaises(TypeError):\n            below_zero([1, \"2\", -3])\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 202046.069643,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 788,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 3813,
+      "prompt_eval_count": 788
+    }
+  },
+  "saved_at": "2026-10-09T20:30:16.435008+00:00",
+  "schema_version": "2.0"
+}

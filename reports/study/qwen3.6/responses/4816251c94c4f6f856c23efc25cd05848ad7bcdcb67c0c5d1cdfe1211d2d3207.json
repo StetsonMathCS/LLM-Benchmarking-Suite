@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef monotonic(l: list):\n    \"\"\"Return True is list elements are monotonically increasing or decreasing.\n    >>> monotonic([1, 2, 4, 20])\n    True\n    >>> monotonic([1, 20, 4, 10])\n    False\n    >>> monotonic([4, 1, 0, -10])\n    True\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "4816251c94c4f6f856c23efc25cd05848ad7bcdcb67c0c5d1cdfe1211d2d3207",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 4096,
+    "content": "",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 212516.215061,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 279,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "length",
+    "truncated": true,
+    "usage": {
+      "eval_count": 4096,
+      "prompt_eval_count": 279
+    }
+  },
+  "saved_at": "2026-10-09T13:30:33.734172+00:00",
+  "schema_version": "2.0"
+}

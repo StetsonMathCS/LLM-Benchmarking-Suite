@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import concatenate\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine concatenate. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Concatenate list of strings into a single string\nCode to test:\nfrom typing import List\n\n\ndef concatenate(strings: List[str]) -> str:\n    \"\"\" Concatenate list of strings into a single string\n    >>> concatenate([])\n    ''\n    >>> concatenate(['a', 'b', 'c'])\n    'abc'\n    \"\"\"\n    return ''.join(strings)\n\nGenerated Tests:\n",
+  "record_identity": "fd462d60a081c06698457d0c7875372752fd266e254ffa405925cf008853a29e",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 2212,
+    "content": "import unittest\nfrom candidate import concatenate\n\nclass TestConcatenate(unittest.TestCase):\n    def test_concatenate_normal_case_expected_behavior(self):\n        self.assertEqual(concatenate(['a', 'b', 'c']), 'abc')\n    \n    def test_concatenate_empty_list_return_empty_string(self):\n        self.assertEqual(concatenate([]), '')\n    \n    def test_concatenate_single_element(self):\n        self.assertEqual(concatenate(['x']), 'x')\n    \n    def test_concatenate_none_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            concatenate(None)\n    \n    def test_concatenate_list_with_non_strings_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            concatenate([1, 2])\n    \n    def test_concatenate_with_special_characters(self):\n        self.assertEqual(concatenate(['!', '@', '#']), '!@#')\n    \n    def test_concatenate_with_unicode(self):\n        self.assertEqual(concatenate(['α', 'β']), 'αβ')\n    \n    def test_concatenate_with_spaces(self):\n        self.assertEqual(concatenate(['a ', ' b']), 'a b')",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 114213.021302,
+    "model": "nemotron-3.5-lightning:30b",
+    "prompt_tokens": 666,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 2212,
+      "prompt_eval_count": 666
+    }
+  },
+  "saved_at": "2026-10-08T11:17:28.314070+00:00",
+  "schema_version": "2.0"
+}

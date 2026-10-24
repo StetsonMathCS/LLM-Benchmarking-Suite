@@ -1,0 +1,119 @@
+{
+  "applicable_task_weights": {
+    "bug_fixing": 0.15,
+    "code_generation": 0.27,
+    "code_review": 0.15,
+    "refactoring": 0.15,
+    "test_generation": 0.12,
+    "translation": 0.16
+  },
+  "category_scores": {
+    "analysis": 0.0,
+    "generation": 0.0,
+    "transformation": 0.0
+  },
+  "complete": false,
+  "dimension_scores": {},
+  "final_score": null,
+  "grade": "INCOMPLETE",
+  "overall_pass_rate": 0.0,
+  "scoring_profile": "revised-v1",
+  "task_scores": {
+    "bug_fixing": {
+      "error_count": 31,
+      "max_score": 0.0,
+      "mean_score": 0.0,
+      "min_score": 0.0,
+      "pass_rate": 0.0,
+      "record_count": 31,
+      "scored_count": 0,
+      "std_score": 0.0,
+      "task_name": "bug_fixing"
+    },
+    "code_generation": {
+      "error_count": 164,
+      "max_score": 0.0,
+      "mean_score": 0.0,
+      "min_score": 0.0,
+      "pass_rate": 0.0,
+      "record_count": 164,
+      "scored_count": 0,
+      "std_score": 0.0,
+      "task_name": "code_generation"
+    },
+    "code_review": {
+      "error_count": 20,
+      "max_score": 0.0,
+      "mean_score": 0.0,
+      "min_score": 0.0,
+      "pass_rate": 0.0,
+      "record_count": 20,
+      "scored_count": 0,
+      "std_score": 0.0,
+      "task_name": "code_review"
+    },
+    "refactoring": {
+      "error_count": 20,
+      "max_score": 0.0,
+      "mean_score": 0.0,
+      "min_score": 0.0,
+      "pass_rate": 0.0,
+      "record_count": 20,
+      "scored_count": 0,
+      "std_score": 0.0,
+      "task_name": "refactoring"
+    },
+    "test_generation": {
+      "error_count": 80,
+      "max_score": 0.0,
+      "mean_score": 0.0,
+      "min_score": 0.0,
+      "pass_rate": 0.0,
+      "record_count": 80,
+      "scored_count": 0,
+      "std_score": 0.0,
+      "task_name": "test_generation"
+    },
+    "translation": {
+      "error_count": 30,
+      "max_score": 0.0,
+      "mean_score": 0.0,
+      "min_score": 0.0,
+      "pass_rate": 0.0,
+      "record_count": 30,
+      "scored_count": 0,
+      "std_score": 0.0,
+      "task_name": "translation"
+    }
+  },
+  "token_usage": {
+    "counted_input_tokens": 0,
+    "counted_output_tokens": 0,
+    "counted_total_tokens": 0,
+    "detail": "usage/summary.json",
+    "embedding": {
+      "counted_input_tokens": 0,
+      "counted_output_tokens": 0,
+      "counted_total_tokens": 0,
+      "requests_total": 0,
+      "requests_with_unknown_usage": 0
+    },
+    "generation": {
+      "counted_input_tokens": 0,
+      "counted_output_tokens": 0,
+      "counted_total_tokens": 0,
+      "requests_total": 345,
+      "requests_with_unknown_usage": 345
+    },
+    "inherited_requests": 0,
+    "known_coverage": 0.0,
+    "requests_total": 345,
+    "requests_with_known_usage": 0,
+    "requests_with_unknown_usage": 345,
+    "totals_are_exact": false
+  },
+  "total_errors": 345,
+  "total_passed": 0,
+  "total_records": 345,
+  "total_scored": 0
+}

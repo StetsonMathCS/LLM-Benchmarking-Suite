@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import decode_shift\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine decode_shift. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: returns encoded string by shifting every character by 5 in the alphabet.\nCode to test:\ndef encode_shift(s: str):\n    \"\"\"\n    returns encoded string by shifting every character by 5 in the alphabet.\n    \"\"\"\n    return \"\".join([chr(((ord(ch) + 5 - ord(\"a\")) % 26) + ord(\"a\")) for ch in s])\n\n\ndef decode_shift(s: str):\n    \"\"\"\n    takes as input string encoded with encode_shift function. Returns decoded string.\n    \"\"\"\n    return \"\".join([chr(((ord(ch) - 5 - ord(\"a\")) % 26) + ord(\"a\")) for ch in s])\n\nGenerated Tests:\n",
+  "record_identity": "385a1dcd515c7d7189ad5c049fb310c12b5ee9c5f906c1677f4c650e236f0109",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 3423,
+    "content": "import pytest\nfrom candidate import decode_shift\n\ndef test_decode_shift_empty_string_returns_empty():\n    assert decode_shift(\"\") == \"\"\n\n@pytest.mark.parametrize(\n    \"input_char,expected_output\",\n    [\n        (\"a\", \"v\"),\n        (\"b\", \"w\"),\n        (\"c\", \"x\"),\n        (\"d\", \"y\"),\n        (\"e\", \"z\"),\n        (\"f\", \"a\"),\n        (\"g\", \"b\"),\n        (\"h\", \"c\"),\n        (\"i\", \"d\"),\n        (\"j\", \"e\"),\n        (\"k\", \"f\"),\n        (\"l\", \"g\"),\n        (\"m\", \"h\"),\n        (\"n\", \"i\"),\n        (\"o\", \"j\"),\n        (\"p\", \"k\"),\n        (\"q\", \"l\"),\n        (\"r\", \"m\"),\n        (\"s\", \"n\"),\n        (\"t\", \"o\"),\n        (\"u\", \"p\"),\n        (\"v\", \"q\"),\n        (\"w\", \"r\"),\n        (\"x\", \"s\"),\n        (\"y\", \"t\"),\n        (\"z\", \"u\"),\n    ],\n)\ndef test_decode_shift_single_characters(input_char, expected_output):\n    assert decode_shift(input_char) == expected_output\n\ndef test_decode_shift_abcde_to_vwxyz():\n    assert decode_shift(\"abcde\") == \"vwxyz\"\n\ndef test_decode_shift_fghij_to_abcde():\n    assert decode_shift(\"fghij\") == \"abcde\"\n\ndef test_decode_shift_alphabet_to_shifted_alphabet():\n    assert decode_shift(\"abcdefghijklmnopqrstuvwxyz\") == \"vwxyzabcdefghijklmnopqrstuv\"\n\ndef test_decode_shift_space_to_i():\n    assert decode_shift(\" \") == \"i\"\n\ndef test_decode_shift_period_to_w():\n    assert decode_shift(\".\") == \"w\"\n\ndef test_decode_shift_none_raises_type_error():\n    with pytest.raises(TypeError):\n        decode_shift(None)\n\ndef test_decode_shift_integer_raises_type_error():\n    with pytest.raises(TypeError):\n        decode_shift(123)\n\ndef test_decode_shift_list_raises_type_error():\n    with pytest.raises(TypeError):\n        decode_shift([1, 2, 3])\n\ndef test_decode_shift_bytes_raises_type_error():\n    with pytest.raises(TypeError):\n        decode_shift(b\"abc\")\n\ndef test_decode_shift_set_raises_type_error():\n    with pytest.raises(TypeError):\n        decode_shift({\"a\", \"b\"})\n\ndef test_decode_shift_long_string_returns_expected():\n    long_input = \"thequickbrownfoxjumpsoverthelazydog\"\n    expected_output = \"\".join(\n        chr(((ord(ch) - 5 - ord(\"a\")) % 26) + ord(\"a\")) for ch in long_input\n    )\n    assert decode_shift(long_input) == expected_output\n",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 260371.917318,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 746,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 3423,
+      "prompt_eval_count": 746
+    }
+  },
+  "saved_at": "2026-10-10T20:03:29.714944+00:00",
+  "schema_version": "2.0"
+}

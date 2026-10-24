@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import fibfib\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine fibfib. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: The FibFib number sequence is a sequence similar to the Fibbonacci sequnece that's defined as follows: fibfib(0) == 0 fibfib(1) == 0 fibfib(2) == 1 fibfib(n) == fibfib(n-1) + fibfib(n-2) + fibfib(n-3). Please write a function to efficiently compute the n-th element of the fibfib number sequence.\nCode to test:\ndef fibfib(n: int):\n    \"\"\"The FibFib number sequence is a sequence similar to the Fibbonacci sequnece that's defined as follows:\n    fibfib(0) == 0\n    fibfib(1) == 0\n    fibfib(2) == 1\n    fibfib(n) == fibfib(n-1) + fibfib(n-2) + fibfib(n-3).\n    Please write a function to efficiently compute the n-th element of the fibfib number sequence.\n    >>> fibfib(1)\n    0\n    >>> fibfib(5)\n    4\n    >>> fibfib(8)\n    24\n    \"\"\"\n    if n == 0:\n        return 0\n    if n == 1:\n        return 0\n    if n == 2:\n        return 1\n    return fibfib(n - 1) + fibfib(n - 2) + fibfib(n - 3)\n\nGenerated Tests:\n",
+  "record_identity": "0408f07047070e27f39f49436b8f858878858e9895a1e1e54255f30cd87de8a9",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 511,
+    "content": "from candidate import fibfib\nimport pytest\nfrom unittest.mock import patch\n\n@pytest.mark.parametrize(\"n, expected\", [\n    (1, 0), (5, 4), (8, 24), (10, 89), (15, 274), (20, 1770), (25, 10609)\n])\ndef test_fibfib_normalcases(n, expected):\n    assert fibfib(n) == expected\n\n@pytest.mark.parametrize(\"n\", [\n    -1, -2, -3, -100, 1000, float('inf')\n])\ndef test_fibfib_edgecases(n):\n    with pytest.raises(ValueError):\n        fibfib(n)\n\n@pytest.mark.parametrize(\"n\", [None])\ndef test_fibfib_none_input(n):\n    with pytest.raises(TypeError):\n        fibfib(n)\n\n@pytest.mark.parametrize(\"n\", [0, 1, 2])\ndef test_fibfib_boundary_conditions(n):\n    assert fibfib(n) == [0, 0, 1][n]\n\n@pytest.mark.parametrize(\"n\", [\n    (3,), (4,), (5,)\n])\ndef test_fibfib_nonsequential_inputs(n):\n    assert fibfib(n) == [1, 1, 2, 4, 9][n]\n\n@pytest.mark.parametrize(\"n\", [\n    (10,), (15,), (20,), (25,)\n])\ndef test_fibfib_large_values(n):\n    assert fibfib(n) < 10000\n\n@pytest.mark.parametrize(\"n\", [\n    (3,), (4,), (5,)\n])\ndef test_fibfib_caching(n):\n    with patch('builtins.input', side_effect=['4']):\n        assert fibfib(4) == 9\n\ndef test_fibfib_multiplication():\n    assert fibfib(4) * 2 == 18\n    assert fibfib(4) * 0 == 0\n    assert fibfib(4) * -1 == -18\n    assert fibfib(4) == fibfib(4) * 1\n\ndef test_fibfib_mixed_inputs():\n    assert fibfib(1) == 0\n    assert fibfib(1.5) == 0\n    assert fibfib(1 + 1.5) == 0\n    assert fibfib(\"1\") == 0\n    assert fibfib([1]) == 0\n    assert fibfib({'n': 1}) == 0\n",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 32318.457834,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 843,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 511,
+      "prompt_eval_count": 843
+    }
+  },
+  "saved_at": "2026-10-11T04:07:51.970854+00:00",
+  "schema_version": "2.0"
+}

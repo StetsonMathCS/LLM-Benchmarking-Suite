@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef histogram(test):\n    \"\"\"Given a string representing a space separated lowercase letters, return a dictionary\n    of the letter with the most repetition and containing the corresponding count.\n    If several letters have the same occurrence, return all of them.\n    \n    Example:\n    histogram('a b c') == {'a': 1, 'b': 1, 'c': 1}\n    histogram('a b b a') == {'a': 2, 'b': 2}\n    histogram('a b c a b') == {'a': 2, 'b': 2}\n    histogram('b b b b a') == {'b': 4}\n    histogram('') == {}\n\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "7470f0b36fbfa3ed51c744ed216734bd1e29a1bf892f9d4bf1d79b7b7947e75e",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 426,
+    "content": "```python\nfrom collections import Counter\nfrom typing import Dict\n\ndef histogram(test: str) -> Dict[str, int]:\n    \"\"\"\n    Given a string representing a space separated lowercase letters, return a dictionary\n    of the letter with the most repetition and containing the corresponding count.\n    If several letters have the same occurrence, return all of them.\n    \n    Example:\n    histogram('a b c') == {'a': 1, 'b': 1, 'c': 1}\n    histogram('a b b a') == {'a': 2, 'b': 2}\n    histogram('a b c a b') == {'a': 2, 'b': 2}\n    histogram('b b b b a') == {'b': 4}\n    histogram('') == {}\n    \"\"\"\n    if not test.strip():\n        return {}\n\n    # Split by whitespace and count occurrences\n    letters = test.split()\n    counts = Counter(letters)\n\n    # Determine the maximum count\n    max_count = max(counts.values())\n\n    # Build result dictionary with all letters that have the maximum count\n    return {letter: max_count for letter, count in counts.items() if count == max_count}\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 30734.438131,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 377,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 426,
+      "prompt_eval_count": 377
+    }
+  },
+  "saved_at": "2026-10-10T16:26:44.662993+00:00",
+  "schema_version": "2.0"
+}

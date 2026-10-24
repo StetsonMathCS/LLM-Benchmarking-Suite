@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import add\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine add. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Add two numbers x and y\nCode to test:\ndef add(x: int, y: int):\n    \"\"\"Add two numbers x and y\n    >>> add(2, 3)\n    5\n    >>> add(5, 7)\n    12\n    \"\"\"\n    return x + y\n\nGenerated Tests:\n",
+  "record_identity": "82e84a476e4fca40b85a083878bff9d637ec632e9a7e0f9c49c1eebd99fdd740",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 402,
+    "content": " import unittest\nfrom candidate import add\n\nclass TestAdd(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n        self.assertEqual(add(5, 7), 12)\n\n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n        self.assertEqual(add(-5, -7), -12)\n\n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n        self.assertEqual(add(-5, 7), 2)\n\n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n        self.assertEqual(add(5, 0), 5)\n\n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n        self.assertAlmostEqual(add(-2.5, 3.5), 1.0)\n\n    def test_add_empty_inputs(self):\n        self.assertEqual(add(None, None), None)\n        self.assertEqual(add(0, None), None)\n        self.assertEqual(add(None, 0), None)\n\n    def test_add_type_errors(self):\n        self.assertRaises(TypeError, add, 2, 'string')\n        self.assertRaises(TypeError, add, 'string', 2)\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 45579.721291,
+    "model": "mistral:7b",
+    "prompt_tokens": 770,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 402,
+      "prompt_eval_count": 770
+    }
+  },
+  "saved_at": "2026-10-11T02:10:27.937326+00:00",
+  "schema_version": "2.0"
+}

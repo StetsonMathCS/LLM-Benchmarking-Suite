@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: from typing import List\n\n\ndef parse_nested_parens(paren_string: str) -> List[int]:\n    \"\"\" Input to this function is a string represented multiple groups for nested parentheses separated by spaces.\n    For each of the group, output the deepest level of nesting of parentheses.\n    E.g. (()()) has maximum two levels of nesting while ((())) has three.\n\n    >>> parse_nested_parens('(()()) ((())) () ((())()())')\n    [2, 3, 1, 3]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "07234ef5c69696e1018d3478f77ad914f2edd8ad8147bb27b5aa7fba8bf31171",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 100,
+    "content": "```\nfrom typing import List\n\ndef parse_nested_parens(paren_string: str) -> List[int]:\n    groups = paren_string.split()\n    result = []\n    for group in groups:\n        stack = []\n        max_level = 0\n        for char in group:\n            if char == '(':\n                stack.append(char)\n                max_level = max(max_level, len(stack))\n            elif char == ')':\n                stack.pop()\n        result.append(max_level)\n    return result\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 82629.250305,
+    "model": "llama3:70b",
+    "prompt_tokens": 284,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 100,
+      "prompt_eval_count": 284
+    }
+  },
+  "saved_at": "2026-10-10T02:59:31.844464+00:00",
+  "schema_version": "2.0"
+}

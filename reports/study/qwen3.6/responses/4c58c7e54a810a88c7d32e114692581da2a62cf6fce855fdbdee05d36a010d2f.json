@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Replace the two manual accumulator loops with built-in sum() and a generator expression for variance\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\ndef compute_stats(numbers):\n    if not numbers:\n        return {'count': 0, 'mean': 0.0, 'variance': 0.0, 'min': None, 'max': None}\n    count = len(numbers)\n    total = 0\n    for n in numbers:\n        total += n\n    mean = total / count\n    sq_diff_total = 0\n    for n in numbers:\n        sq_diff_total += (n - mean) ** 2\n    variance = sq_diff_total / count\n    return {\n        'count': count,\n        'mean': mean,\n        'variance': variance,\n        'min': min(numbers),\n        'max': max(numbers),\n    }\n\nRefactored Code:",
+  "record_identity": "4c58c7e54a810a88c7d32e114692581da2a62cf6fce855fdbdee05d36a010d2f",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1249,
+    "content": "def compute_stats(numbers):\n    if not numbers:\n        return {'count': 0, 'mean': 0.0, 'variance': 0.0, 'min': None, 'max': None}\n    count = len(numbers)\n    mean = sum(numbers) / count\n    variance = sum((n - mean) ** 2 for n in numbers) / count\n    return {\n        'count': count,\n        'mean': mean,\n        'variance': variance,\n        'min': min(numbers),\n        'max': max(numbers),\n    }",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 65681.326179,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 485,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1249,
+      "prompt_eval_count": 485
+    }
+  },
+  "saved_at": "2026-10-09T20:07:47.863061+00:00",
+  "schema_version": "2.0"
+}

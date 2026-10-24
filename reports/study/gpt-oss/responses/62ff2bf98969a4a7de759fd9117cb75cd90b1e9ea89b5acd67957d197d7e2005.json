@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef can_arrange(arr):\n    \"\"\"Create a function which returns the largest index of an element which\n    is not greater than or equal to the element immediately preceding it. If\n    no such element exists then return -1. The given array will not contain\n    duplicate values.\n\n    Examples:\n    can_arrange([1,2,4,3,5]) = 3\n    can_arrange([1,2,3]) = -1\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "62ff2bf98969a4a7de759fd9117cb75cd90b1e9ea89b5acd67957d197d7e2005",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 409,
+    "content": "def can_arrange(arr):\n    \"\"\"\n    Return the largest index i such that arr[i] < arr[i-1].\n    If no such index exists, return -1.\n    \"\"\"\n    last_index = -1\n    for i in range(1, len(arr)):\n        if arr[i] < arr[i - 1]:\n            last_index = i\n    return last_index\n\n# Example usage\nif __name__ == \"__main__\":\n    print(can_arrange([1, 2, 4, 3, 5]))  # 3\n    print(can_arrange([1, 2, 3]))        # -1\n    print(can_arrange([]))               # -1\n    print(can_arrange([5]))              # -1\n    print(can_arrange([3, 1, 2, 4]))     # 1\n",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 29003.147748,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 329,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 409,
+      "prompt_eval_count": 329
+    }
+  },
+  "saved_at": "2026-10-10T16:46:49.074770+00:00",
+  "schema_version": "2.0"
+}

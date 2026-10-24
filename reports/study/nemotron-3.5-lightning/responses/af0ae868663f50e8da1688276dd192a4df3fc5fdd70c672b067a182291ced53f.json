@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import fruit_distribution\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine fruit_distribution. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: In this task, you will be given a string that represents a number of apples and oranges that are distributed in a basket of fruit this basket contains apples, oranges, and mango fruits. Given the string that represents the total number of the oranges and apples and an integer that represent the total number of the fruits in the basket return the number of the mango fruits in the basket. for examble: fruit_distribution(\"5 apples and 6 oranges\", 19) ->19 - 5 - 6 = 8 fruit_distribution(\"0 apples and 1 oranges\",3) -> 3 - 0 - 1 = 2 fruit_distribution(\"2 apples and 3 oranges\", 100) -> 100 - 2 - 3 = 95 fruit_distribution(\"100 apples and 1 oranges\",120) -> 120 - 100 - 1 = 19\nCode to test:\ndef fruit_distribution(s,n):\n    \"\"\"\n    In this task, you will be given a string that represents a number of apples and oranges \n    that are distributed in a basket of fruit this basket contains \n    apples, oranges, and mango fruits. Given the string that represents the total number of \n    the oranges and apples and an integer that represent the total number of the fruits \n    in the basket return the number of the mango fruits in the basket.\n    for examble:\n    fruit_distribution(\"5 apples and 6 oranges\", 19) ->19 - 5 - 6 = 8\n    fruit_distribution(\"0 apples and 1 oranges\",3) -> 3 - 0 - 1 = 2\n    fruit_distribution(\"2 apples and 3 oranges\", 100) -> 100 - 2 - 3 = 95\n    fruit_distribution(\"100 apples and 1 oranges\",120) -> 120 - 100 - 1 = 19\n    \"\"\"\n    lis = list()\n    for i in s.split(' '):\n        if i.isdigit():\n            lis.append(int(i))\n    return n - sum(lis)\n\nGenerated Tests:\n",
+  "record_identity": "af0ae868663f50e8da1688276dd192a4df3fc5fdd70c672b067a182291ced53f",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 4096,
+    "content": "",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 220651.35922,
+    "model": "nemotron-3.5-lightning:30b",
+    "prompt_tokens": 1073,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "length",
+    "truncated": true,
+    "usage": {
+      "eval_count": 4096,
+      "prompt_eval_count": 1073
+    }
+  },
+  "saved_at": "2026-10-08T13:34:36.742714+00:00",
+  "schema_version": "2.0"
+}

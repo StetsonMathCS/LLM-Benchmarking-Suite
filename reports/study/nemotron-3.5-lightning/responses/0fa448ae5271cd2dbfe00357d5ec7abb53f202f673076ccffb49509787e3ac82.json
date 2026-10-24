@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef prod_signs(arr):\n    \"\"\"\n    You are given an array arr of integers and you need to return\n    sum of magnitudes of integers multiplied by product of all signs\n    of each number in the array, represented by 1, -1 or 0.\n    Note: return None for empty arr.\n\n    Example:\n    >>> prod_signs([1, 2, 2, -4]) == -9\n    >>> prod_signs([0, 1]) == 0\n    >>> prod_signs([]) == None\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "0fa448ae5271cd2dbfe00357d5ec7abb53f202f673076ccffb49509787e3ac82",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1695,
+    "content": "```python\ndef prod_signs(arr):\n    if not arr:\n        return None\n    total = sum(abs(x) for x in arr)\n    neg_count = sum(1 for x in arr if x < 0)\n    has_zero = any(x == 0 for x in arr)\n    sign = 0 if has_zero else (1 if neg_count % 2 == 0 else -1)\n    return total * sign\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 85664.588964,
+    "model": "nemotron-3.5-lightning:30b",
+    "prompt_tokens": 302,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1695,
+      "prompt_eval_count": 302
+    }
+  },
+  "saved_at": "2026-10-08T06:53:43.162161+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef make_a_pile(n):\n    \"\"\"\n    Given a positive integer n, you have to make a pile of n levels of stones.\n    The first level has n stones.\n    The number of stones in the next level is:\n        - the next odd number if n is odd.\n        - the next even number if n is even.\n    Return the number of stones in each level in a list, where element at index\n    i represents the number of stones in the level (i+1).\n\n    Examples:\n    >>> make_a_pile(3)\n    [3, 5, 7]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "58372e3c1a89e76395360effc5d1107ebfa15124ab16a19138465e9f0a09927e",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 739,
+    "content": "```python\ndef make_a_pile(n: int) -> list[int]:\n    \"\"\"\n    Return the number of stones in each level of a pile with `n` levels.\n    The first level has `n` stones. Every subsequent level has the next\n    odd or even number, depending on the parity of the previous level.\n    Since adding 2 preserves parity, the sequence is simply `n, n+2, n+4, ...`.\n\n    Parameters\n    ----------\n    n : int\n        Positive integer representing the number of levels.\n\n    Returns\n    -------\n    list[int]\n        A list of length `n` containing the stone counts per level.\n\n    Examples\n    --------\n    >>> make_a_pile(3)\n    [3, 5, 7]\n    >>> make_a_pile(4)\n    [4, 6, 8, 10]\n    \"\"\"\n    if n <= 0:\n        raise ValueError(\"n must be a positive integer\")\n    return [n + 2 * i for i in range(n)]\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 52118.429831,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 358,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 739,
+      "prompt_eval_count": 358
+    }
+  },
+  "saved_at": "2026-10-10T16:19:12.600479+00:00",
+  "schema_version": "2.0"
+}

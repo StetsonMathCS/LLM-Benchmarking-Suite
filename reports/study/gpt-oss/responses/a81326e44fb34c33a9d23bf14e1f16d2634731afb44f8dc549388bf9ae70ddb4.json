@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef sorted_list_sum(lst):\n    \"\"\"Write a function that accepts a list of strings as a parameter,\n    deletes the strings that have odd lengths from it,\n    and returns the resulted list with a sorted order,\n    The list is always a list of strings and never an array of numbers,\n    and it may contain duplicates.\n    The order of the list should be ascending by length of each word, and you\n    should return the list sorted by that rule.\n    If two words have the same length, sort the list alphabetically.\n    The function should return a list of strings in sorted order.\n    You may assume that all words will have the same length.\n    For example:\n    assert list_sort([\"aa\", \"a\", \"aaa\"]) => [\"aa\"]\n    assert list_sort([\"ab\", \"a\", \"aaa\", \"cd\"]) => [\"ab\", \"cd\"]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "a81326e44fb34c33a9d23bf14e1f16d2634731afb44f8dc549388bf9ae70ddb4",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 466,
+    "content": "from typing import List\n\ndef list_sort(words: List[str]) -> List[str]:\n    \"\"\"\n    Removes strings with odd lengths and returns the remaining strings\n    sorted first by length (ascending) and then alphabetically for ties.\n    \"\"\"\n    filtered = [w for w in words if len(w) % 2 == 0]\n    return sorted(filtered, key=lambda w: (len(w), w))\n\n# Alias to match the original function name requested\nsorted_list_sum = list_sort\n\n# Example usage\nif __name__ == \"__main__\":\n    assert list_sort([\"aa\", \"a\", \"aaa\"]) == [\"aa\"]\n    assert list_sort([\"ab\", \"a\", \"aaa\", \"cd\"]) == [\"ab\", \"cd\"]\n    assert sorted_list_sum([\"hello\", \"world\", \"foo\", \"bar\", \"baz\"]) == [\"bar\", \"baz\", \"foo\"]  # \"hello\" and \"world\" removed (odd lengths) and sorted alphabetically\n\n    print(\"All tests passed.\")",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 33366.805665,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 413,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 466,
+      "prompt_eval_count": 413
+    }
+  },
+  "saved_at": "2026-10-10T16:58:33.023084+00:00",
+  "schema_version": "2.0"
+}

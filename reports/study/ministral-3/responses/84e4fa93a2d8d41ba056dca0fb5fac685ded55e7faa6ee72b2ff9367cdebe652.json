@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import sort_numbers\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine sort_numbers. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Input is a space-delimited string of numberals from 'zero' to 'nine'. Valid choices are 'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight' and 'nine'. Return the string with numbers sorted from smallest to largest\nCode to test:\nfrom typing import List\n\n\ndef sort_numbers(numbers: str) -> str:\n    \"\"\" Input is a space-delimited string of numberals from 'zero' to 'nine'.\n    Valid choices are 'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight' and 'nine'.\n    Return the string with numbers sorted from smallest to largest\n    >>> sort_numbers('three one five')\n    'one three five'\n    \"\"\"\n    value_map = {\n        'zero': 0,\n        'one': 1,\n        'two': 2,\n        'three': 3,\n        'four': 4,\n        'five': 5,\n        'six': 6,\n        'seven': 7,\n        'eight': 8,\n        'nine': 9\n    }\n    return ' '.join(sorted([x for x in numbers.split(' ') if x], key=lambda x: value_map[x]))\n\nGenerated Tests:\n",
+  "record_identity": "84e4fa93a2d8d41ba056dca0fb5fac685ded55e7faa6ee72b2ff9367cdebe652",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 438,
+    "content": "```python\nimport unittest\nfrom candidate import sort_numbers\n\nclass TestSortNumbers(unittest.TestCase):\n    def test_normal_case_single_number(self):\n        self.assertEqual(sort_numbers('zero'), 'zero')\n\n    def test_normal_case_multiple_numbers(self):\n        self.assertEqual(sort_numbers('three one five'), 'one three five')\n\n    def test_normal_case_mixed_numbers(self):\n        self.assertEqual(sort_numbers('nine two zero eight'), 'zero two eight nine')\n\n    def test_normal_case_with_duplicates(self):\n        self.assertEqual(sort_numbers('five five two'), 'two five five')\n\n    def test_empty_string(self):\n        with self.assertRaises(ValueError):\n            sort_numbers('')\n\n    def test_none_input(self):\n        with self.assertRaises(TypeError):\n            sort_numbers(None)\n\n    def test_invalid_word_zero(self):\n        with self.assertRaises(ValueError):\n            sort_numbers('zero invalid')\n\n    def test_invalid_word_one(self):\n        with self.assertRaises(ValueError):\n            sort_numbers('one invalid')\n\n    def test_invalid_word_nine(self):\n        with self.assertRaises(ValueError):\n            sort_numbers('nine invalid')\n\n    def test_invalid_word_unknown(self):\n        with self.assertRaises(ValueError):\n            sort_numbers('ten')\n\n    def test_boundary_case_single_letter(self):\n        self.assertEqual(sort_numbers('one'), 'one')\n\n    def test_boundary_case_all_same(self):\n        self.assertEqual(sort_numbers('zero zero zero'), 'zero zero zero')\n\n    def test_boundary_case_all_nine(self):\n        self.assertEqual(sort_numbers('nine nine nine'), 'nine nine nine')\n\n    def test_case_sensitivity(self):\n        with self.assertRaises(ValueError):\n            sort_numbers('ONE')\n\n    def test_whitespace_preservation(self):\n        self.assertEqual(sort_numbers('  one   three  '), 'one three')\n\n    def test_mixed_whitespace(self):\n        self.assertEqual(sort_numbers('one\\tfive\\nthree'), 'one three five')\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 26921.689201,
+    "model": "ministral-3:3b",
+    "prompt_tokens": 1410,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 438,
+      "prompt_eval_count": 1410
+    }
+  },
+  "saved_at": "2026-10-10T22:21:47.248908+00:00",
+  "schema_version": "2.0"
+}

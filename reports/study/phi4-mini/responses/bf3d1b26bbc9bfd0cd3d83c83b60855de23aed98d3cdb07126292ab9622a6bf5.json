@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code review model. Your task is to analyze Python code and provide a structured review highlighting issues, potential improvements, and best practices.\n\n1.) Carefully analyze the provided Python code for correctness, readability, and maintainability.\n2.) Identify syntax issues, logical errors, potential runtime problems, and edge cases.\n3.) Detect inefficient algorithms, unnecessary complexity, or poor use of Python features.\n4.) Suggest improvements following idiomatic Python practices and common style conventions.\n5.) Highlight missing error handling, validation, or unsafe operations when relevant.\n6.) Point out maintainability concerns such as unclear variable names, deeply nested logic, or duplicated code.\n7.) Recommend improvements while preserving the original intent of the code.\n8.) Do not rewrite the entire program unless necessary to demonstrate a fix or improvement.\n9.) Present the review in a clear and structured manner.\n10.) If improvements are suggested, provide concise corrected snippets where appropriate.\n\nStart Example\n\nInput:\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n-1)\n\nOutput:\n\nIssues:\nThe function does not handle negative inputs.\nRecursive implementation may cause recursion depth issues for large values.\nSuggestions:\nAdd input validation to ensure n is non-negative.\nConsider an iterative implementation for better scalability.\n\nEnd Example\n\nYour turn now.\n\nCode to review:def retry(func, retries=3):\n    for i in range(retries):\n        try:\n            return func()\n        except Exception:\n            if i == retries - 1:\n                raise\n            time.sleep(1)\n\n",
+  "record_identity": "bf3d1b26bbc9bfd0cd3d83c83b60855de23aed98d3cdb07126292ab9622a6bf5",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 510,
+    "content": "Issues:\n- The function name `retry` is a built-in Python function name, which is not recommended because it can lead to unexpected behavior if a user tries to import the built-in `retry` from the standard library.\n- The code does not handle specific exceptions, which means it might catch and suppress exceptions that it shouldn't, potentially hiding bugs.\n- The `time.sleep(1)` call may not be appropriate for all use cases, as it introduces a fixed delay regardless of the nature of the exception.\n- The function does not provide any means of specifying a delay between retries or a backoff strategy.\n- The variable `retries` is not initialized with a default value, which may cause a `TypeError` if the function is called without specifying the number of retries.\n\nSuggestions:\n- Rename the function to avoid overshadowing the built-in `retry` function.\n- Add type annotations for better readability and to provide information about the expected types of arguments.\n- Allow the caller to specify the type of exception to catch.\n- Introduce parameters for delay and backoff strategy for better control over the retry behavior.\n- Initialize `retries` with a default value of 0 or make it mandatory to specify it.\n- Add error handling for the case when the `func` argument is not callable.\n\nCorrected Code Snippet:\n```python\nimport time\nfrom typing import Callable, TypeVar, Optional\n\nT = TypeVar('T')\n\ndef retry_with_backoff(func: Callable[[], T], retries: int = 3, delay: float = 1.0, catch_exception: Optional[Type[Exception]] = Exception):\n    for i in range(retries):\n        try:\n            return func()\n        except catch_exception as e:\n            if i == retries - 1:\n                raise\n            time.sleep(delay)\n```\n\nIn this corrected snippet:\n- I've renamed the function to `retry_with_backoff` to avoid overshadowing the built-in `retry` function.\n- I've added type annotations for better readability and to provide information about the expected types of arguments.\n- I've introduced an additional parameter `catch_exception` to specify the type of exception to catch.\n- I've added a `delay` parameter to allow the caller to specify the delay between retries.\n- I've initialized `retries` with a default value of 3.\n- I've added a catch-all exception as the default for the `catch_exception` parameter, but this could be improved by allowing the caller to specify which exceptions should trigger a retry.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 27581.306404,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 320,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 510,
+      "prompt_eval_count": 320
+    }
+  },
+  "saved_at": "2026-10-11T03:11:13.165127+00:00",
+  "schema_version": "2.0"
+}

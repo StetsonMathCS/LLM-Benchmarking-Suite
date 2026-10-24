@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Extract each format branch into its own renderer class implementing a common Renderer protocol, registered in a FORMAT_REGISTRY dict\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\nclass ReportGenerator:\n    def generate(self, data, format):\n        if format == 'csv':\n            lines = []\n            header = ','.join(data[0].keys())\n            lines.append(header)\n            for row in data:\n                lines.append(','.join(str(v) for v in row.values()))\n            return '\\n'.join(lines)\n        elif format == 'json':\n            import json\n            return json.dumps(data, indent=2)\n        elif format == 'html':\n            rows_html = ''\n            for row in data:\n                cells = ''.join(f'<td>{v}</td>' for v in row.values())\n                rows_html += f'<tr>{cells}</tr>'\n            headers = ''.join(f'<th>{k}</th>' for k in data[0].keys())\n            return f'<table><thead><tr>{headers}</tr></thead><tbody>{rows_html}</tbody></table>'\n        else:\n            raise ValueError(f'Unknown format: {format}')\n\nRefactored Code:",
+  "record_identity": "5fdd85f19561ab4235297f0ec36df298a5d3efc25b5b2867ee3d11d3e9d4546b",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 954,
+    "content": "from typing import Protocol, runtime_checkable\n\n\n@runtime_checkable\nclass Renderer(Protocol):\n    def render(self, data: list[dict]) -> str:\n        ...\n\n\nclass CSVRenderer:\n    def render(self, data: list[dict]) -> str:\n        lines = [','.join(data[0].keys())]\n        lines.extend(','.join(str(v) for v in row.values()) for row in data)\n        return '\\n'.join(lines)\n\n\nclass JSONRenderer:\n    def render(self, data: list[dict]) -> str:\n        import json\n        return json.dumps(data, indent=2)\n\n\nclass HTMLRenderer:\n    def render(self, data: list[dict]) -> str:\n        headers = ''.join(f'<th>{k}</th>' for k in data[0].keys())\n        rows = ''.join(\n            '<tr>' + ''.join(f'<td>{v}</td>' for v in row.values()) + '</tr>'\n            for row in data\n        )\n        return (\n            f'<table><thead><tr>{headers}</tr></thead>'\n            f'<tbody>{rows}</tbody></table>'\n        )\n\n\nFORMAT_REGISTRY: dict[str, Renderer] = {\n    'csv': CSVRenderer(),\n    'json': JSONRenderer(),\n    'html': HTMLRenderer(),\n}\n\n\nclass ReportGenerator:\n    def generate(self, data: list[dict], format: str) -> str:\n        if format not in FORMAT_REGISTRY:\n            raise ValueError(f'Unknown format: {format}')\n        return FORMAT_REGISTRY[format].render(data)",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 166939.408328,
+    "model": "qwen3.8:27b",
+    "prompt_tokens": 546,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 954,
+      "prompt_eval_count": 546
+    }
+  },
+  "saved_at": "2026-10-09T00:40:30.433353+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef by_length(arr):\n    \"\"\"\n    Given an array of integers, sort the integers that are between 1 and 9 inclusive,\n    reverse the resulting array, and then replace each digit by its corresponding name from\n    \"One\", \"Two\", \"Three\", \"Four\", \"Five\", \"Six\", \"Seven\", \"Eight\", \"Nine\".\n\n    For example:\n      arr = [2, 1, 1, 4, 5, 8, 2, 3]   \n            -> sort arr -> [1, 1, 2, 2, 3, 4, 5, 8] \n            -> reverse arr -> [8, 5, 4, 3, 2, 2, 1, 1]\n      return [\"Eight\", \"Five\", \"Four\", \"Three\", \"Two\", \"Two\", \"One\", \"One\"]\n    \n      If the array is empty, return an empty array:\n      arr = []\n      return []\n    \n      If the array has any strange number ignore it:\n      arr = [1, -1 , 55] \n            -> sort arr -> [-1, 1, 55]\n            -> reverse arr -> [55, 1, -1]\n      return = ['One']\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "83a59eb11bb12b4672f7f5e073a0676c1cadcbbbfeb23a7acccf7bd613c8d29c",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1766,
+    "content": "```python\ndef by_length(arr):\n    mapping = {1: \"One\", 2: \"Two\", 3: \"Three\", 4: \"Four\", 5: \"Five\", \n               6: \"Six\", 7: \"Seven\", 8: \"Eight\", 9: \"Nine\"}\n    valid_nums = sorted([x for x in arr if 1 <= x <= 9])\n    return [mapping[x] for x in reversed(valid_nums)]\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 91718.902491,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 476,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1766,
+      "prompt_eval_count": 476
+    }
+  },
+  "saved_at": "2026-10-09T15:39:02.739127+00:00",
+  "schema_version": "2.0"
+}

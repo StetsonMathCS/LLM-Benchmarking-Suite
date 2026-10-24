@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef sort_even(l: list):\n    \"\"\"This function takes a list l and returns a list l' such that\n    l' is identical to l in the odd indicies, while its values at the even indicies are equal\n    to the values of the even indicies of l, but sorted.\n    >>> sort_even([1, 2, 3])\n    [1, 2, 3]\n    >>> sort_even([5, 6, 3, 4])\n    [3, 6, 5, 4]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "78ce4fb0ef058c288ea74b5cfc3a6087acd4f0576d3f2aef6de154b1217f8129",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 82,
+    "content": "def sort_even(l: list) -> list:\n    even_indices = [i for i in range(len(l)) if i % 2 == 0]\n    even_values = [l[i] for i in even_indices]\n    even_values.sort()\n    result = l.copy()\n    for i, val in zip(even_indices, even_values):\n        result[i] = val\n    return result",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 71807.996325,
+    "model": "llama3:70b",
+    "prompt_tokens": 296,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 82,
+      "prompt_eval_count": 296
+    }
+  },
+  "saved_at": "2026-10-10T03:24:51.026592+00:00",
+  "schema_version": "2.0"
+}

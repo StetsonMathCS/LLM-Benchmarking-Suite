@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import smallest_change\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine smallest_change. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Given an array arr of integers, find the minimum number of elements that need to be changed to make the array palindromic. A palindromic array is an array that is read the same backwards and forwards. In one change, you can change one element to any other element. For example: smallest_change([1,2,3,5,4,7,9,6]) == 4 smallest_change([1, 2, 3, 4, 3, 2, 2]) == 1 smallest_change([1, 2, 3, 2, 1]) == 0\nCode to test:\ndef smallest_change(arr):\n    \"\"\"\n    Given an array arr of integers, find the minimum number of elements that\n    need to be changed to make the array palindromic. A palindromic array is an array that\n    is read the same backwards and forwards. In one change, you can change one element to any other element.\n\n    For example:\n    smallest_change([1,2,3,5,4,7,9,6]) == 4\n    smallest_change([1, 2, 3, 4, 3, 2, 2]) == 1\n    smallest_change([1, 2, 3, 2, 1]) == 0\n    \"\"\"\n    ans = 0\n    for i in range(len(arr) // 2):\n        if arr[i] != arr[len(arr) - i - 1]:\n            ans += 1\n    return ans\n\nGenerated Tests:\n",
+  "record_identity": "5461331fb86af970f66548f21ecc3acd2ed129c3f66e41bab81ab12a1135cd1b",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 560,
+    "content": "```python\nimport unittest\nfrom candidate import smallest_change\n\nclass TestSmallestChange(unittest.TestCase):\n    def test_normal_case_even_length(self):\n        self.assertEqual(smallest_change([1, 2, 3, 5, 4, 7, 9, 6]), 4)\n\n    def test_normal_case_odd_length(self):\n        self.assertEqual(smallest_change([1, 2, 3, 4, 3, 2, 2]), 1)\n\n    def test_already_palindrome(self):\n        self.assertEqual(smallest_change([1, 2, 3, 2, 1]), 0)\n\n    def test_empty_array(self):\n        self.assertEqual(smallest_change([]), 0)\n\n    def test_single_element(self):\n        self.assertEqual(smallest_change([5]), 0)\n\n    def test_all_elements_same(self):\n        self.assertEqual(smallest_change([7, 7, 7, 7]), 0)\n\n    def test_mismatched_pairs(self):\n        self.assertEqual(smallest_change([1, 2, 3, 4, 5]), 3)\n\n    def test_odd_mismatches(self):\n        self.assertEqual(smallest_change([1, 2, 3, 2, 4]), 2)\n\n    def test_negative_numbers(self):\n        self.assertEqual(smallest_change([-1, -2, -3, -2, -1]), 0)\n        self.assertEqual(smallest_change([-1, -2, -3, -4, -1]), 2)\n\n    def test_mixed_numbers(self):\n        self.assertEqual(smallest_change([1, -2, 3, -4, 5]), 3)\n\n    def test_duplicate_mismatches(self):\n        self.assertEqual(smallest_change([1, 1, 2, 2, 3, 3, 1]), 1)\n\n    def test_type_error_invalid_input(self):\n        with self.assertRaises(TypeError):\n            smallest_change(\"not_an_array\")\n\n    def test_none_input(self):\n        with self.assertRaises(TypeError):\n            smallest_change(None)\n\n    def test_non_integer_elements(self):\n        with self.assertRaises(TypeError):\n            smallest_change([1, 2, \"three\", 4])\n\n    def test_large_array(self):\n        arr = [1] * 1000 + [2] * 1000\n        self.assertEqual(smallest_change(arr), 1000)\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 35119.898234,
+    "model": "ministral-3:3b",
+    "prompt_tokens": 1456,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 560,
+      "prompt_eval_count": 1456
+    }
+  },
+  "saved_at": "2026-10-10T23:04:21.729772+00:00",
+  "schema_version": "2.0"
+}

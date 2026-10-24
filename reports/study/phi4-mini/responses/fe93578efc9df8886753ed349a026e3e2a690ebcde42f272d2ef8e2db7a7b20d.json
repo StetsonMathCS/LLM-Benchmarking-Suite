@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef prime_fib(n: int):\n    \"\"\"\n    prime_fib returns n-th number that is a Fibonacci number and it's also prime.\n    >>> prime_fib(1)\n    2\n    >>> prime_fib(2)\n    3\n    >>> prime_fib(3)\n    5\n    >>> prime_fib(4)\n    13\n    >>> prime_fib(5)\n    89\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "fe93578efc9df8886753ed349a026e3e2a690ebcde42f272d2ef8e2db7a7b20d",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 243,
+    "content": "def is_prime(num):\n    \"\"\"Check if a number is prime.\"\"\"\n    if num < 2:\n        return False\n    for i in range(2, int(num**0.5) + 1):\n        if num % i == 0:\n            return False\n    return True\n\ndef fibonacci():\n    \"\"\"Generator for Fibonacci numbers.\"\"\"\n    a, b = 0, 1\n    while True:\n        yield b\n        a, b = b, a + b\n\ndef prime_fib(n: int) -> int:\n    \"\"\"Return the n-th Fibonacci number that is also a prime.\"\"\"\n    fib_gen = fibonacci()\n    for _ in range(n):\n        fib_number = next(fib_gen)\n        if is_prime(fib_number):\n            return fib_number\n\n# Testing\nif __name__ == \"__main__\":\n    print(prime_fib(1))  # 2\n    print(prime_fib(2))  # 3\n    print(prime_fib(3))  # 5\n    print(prime_fib(4))  # 13\n    print(prime_fib(5))  # 89\n",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 13087.896431,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 258,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 243,
+      "prompt_eval_count": 258
+    }
+  },
+  "saved_at": "2026-10-11T02:56:13.027942+00:00",
+  "schema_version": "2.0"
+}

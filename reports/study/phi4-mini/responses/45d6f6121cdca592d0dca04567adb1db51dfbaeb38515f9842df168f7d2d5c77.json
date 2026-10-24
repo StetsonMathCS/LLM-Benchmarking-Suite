@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef intersection(interval1, interval2):\n    \"\"\"You are given two intervals,\n    where each interval is a pair of integers. For example, interval = (start, end) = (1, 2).\n    The given intervals are closed which means that the interval (start, end)\n    includes both start and end.\n    For each given interval, it is assumed that its start is less or equal its end.\n    Your task is to determine whether the length of intersection of these two \n    intervals is a prime number.\n    Example, the intersection of the intervals (1, 3), (2, 4) is (2, 3)\n    which its length is 1, which not a prime number.\n    If the length of the intersection is a prime number, return \"YES\",\n    otherwise, return \"NO\".\n    If the two intervals don't intersect, return \"NO\".\n\n\n    [input/output] samples:\n    intersection((1, 2), (2, 3)) ==> \"NO\"\n    intersection((-1, 1), (0, 4)) ==> \"NO\"\n    intersection((-3, -1), (-5, 5)) ==> \"YES\"\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "45d6f6121cdca592d0dca04567adb1db51dfbaeb38515f9842df168f7d2d5c77",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 193,
+    "content": "def is_prime(n):\n    if n < 2:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n\ndef intersection(interval1, interval2):\n    start = max(interval1[0], interval2[0])\n    end = min(interval1[1], interval2[1])\n    if start >= end:\n        return \"NO\"\n    length = end - start\n    if is_prime(length):\n        return \"YES\"\n    else:\n        return \"NO\"\n\n# Test cases:\nprint(intersection((1, 2), (2, 3)))  # ==> \"NO\"\nprint(intersection((-1, 1), (0, 4)))  # ==> \"NO\"\nprint(intersection((-3, -1), (-5, 5)))  # ==> \"YES\"",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 11388.95889,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 415,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 193,
+      "prompt_eval_count": 415
+    }
+  },
+  "saved_at": "2026-10-11T03:04:33.946139+00:00",
+  "schema_version": "2.0"
+}

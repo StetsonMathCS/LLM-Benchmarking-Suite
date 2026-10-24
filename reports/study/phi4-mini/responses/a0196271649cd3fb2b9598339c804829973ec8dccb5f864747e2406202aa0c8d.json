@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import is_palindrome\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine is_palindrome. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Checks if given string is a palindrome\nCode to test:\ndef is_palindrome(text: str):\n    \"\"\"\n    Checks if given string is a palindrome\n    >>> is_palindrome('')\n    True\n    >>> is_palindrome('aba')\n    True\n    >>> is_palindrome('aaaaa')\n    True\n    >>> is_palindrome('zbcd')\n    False\n    \"\"\"\n    for i in range(len(text)):\n        if text[i] != text[len(text) - 1 - i]:\n            return False\n    return True\n\nGenerated Tests:\n",
+  "record_identity": "a0196271649cd3fb2b9598339c804829973ec8dccb5f864747e2406202aa0c8d",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 562,
+    "content": "from candidate import is_palindrome\nimport pytest\nfrom unittest.mock import patch\n\n@pytest.mark.parametrize(\"text, expected\", [\n    (\"\", True),\n    (\"aba\", True),\n    (\"aaaaa\", True),\n    (\"zbcd\", False),\n])\ndef test_is_palindrome_normal_cases(text, expected):\n    assert is_palindrome(text) == expected\n\ndef test_is_palindrome_with_special_characters(text):\n    assert is_palindrome(\"a.b.c.a\") == True\n    assert is_palindrome(\"a,b,c\") == False\n\ndef test_is_palindrome_with_mixed_case(text):\n    assert is_palindrome(\"Abacaba\") == True\n    assert is_palindrome(\"Abcba\") == True\n    assert is_palindrome(\"abc\") == False\n\ndef test_is_palindrome_with_non_alpha_numbers(text):\n    assert is_palindrome(\"A man, a plan, a canal: Panama\") == True\n    assert is_palindrome(\"Not a palindrome\") == False\n\ndef test_is_palindrome_with_mixed_case_and_symbols(text):\n    assert is_palindrome(\"!dlroW ,olleH\") == True\n    assert is_palindrome(\"Hello, World!\") == False\n\n@pytest.mark.parametrize(\"text\", [\n    (\" \", \" \"),  # Palindrome edge case with only spaces\n    (\"a\", \"a\"),  # Single character edge case\n    (\"ab\", \"ab\"),  # Non-palindrome edge case with two characters\n])\ndef test_is_palindrome_single_and_two_characters(text):\n    assert is_palindrome(text) is True if text == text[::-1] else is_palindrome(text) is False\n\ndef test_is_palindrome_with_larger_strings(text):\n    assert is_palindrome(\"A\" * 1000) == True\n    assert is_palindrome(\"A\" * 999 + \"b\") == False\n\n@pytest.mark.parametrize(\"text\", [\n    (\"\", None),\n    (\"\", False),\n])\ndef test_is_palindrome_none_and_false_inputs(text):\n    with pytest.raises(TypeError):\n        is_palindrome(text)\n\ndef test_is_palindrome_with_empty_string(text):\n    assert is_palindrome(\"\") == True\n\n@pytest.mark.parametrize(\"text\", [\n    (\"\", \"a\"),\n    (\"ab\", \"a\"),\n])\ndef test_is_palindrome_with_none_too_short(text):\n    with pytest.raises(ValueError):\n        is_palindrome(text)\n\ndef test_is_palindrome_with_mixed_types(text):\n    with pytest.raises(TypeError):\n        is_palindrome(None)\n    with pytest.raises(TypeError):\n        is_palindrome(False)\n    with pytest.raises(TypeError):\n        is_palindrome(123)\n    with pytest.raises(TypeError):\n        is_palindrome([1, 2, 3])",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 34447.265053,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 659,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 562,
+      "prompt_eval_count": 659
+    }
+  },
+  "saved_at": "2026-10-11T04:00:02.787405+00:00",
+  "schema_version": "2.0"
+}

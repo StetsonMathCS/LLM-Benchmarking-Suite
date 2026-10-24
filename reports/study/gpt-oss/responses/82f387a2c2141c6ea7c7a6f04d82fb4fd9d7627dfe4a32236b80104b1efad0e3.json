@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Replace nested None-guard if-returns with early validation using a dedicated validator function and a dataclass result type\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\ndef process_order(order):\n    if order is None:\n        return None\n    if order['status'] != 'pending':\n        return None\n    if order['items'] is None or len(order['items']) == 0:\n        return None\n    if order['user_id'] is None:\n        return None\n    total = 0\n    for item in order['items']:\n        if item['price'] is None:\n            return None\n        if item['quantity'] is None:\n            return None\n        total += item['price'] * item['quantity']\n    return {'order_id': order['id'], 'total': total, 'user_id': order['user_id']}\n\nRefactored Code:",
+  "record_identity": "82f387a2c2141c6ea7c7a6f04d82fb4fd9d7627dfe4a32236b80104b1efad0e3",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 737,
+    "content": "from dataclasses import dataclass\nfrom typing import Any, Dict, Optional\n\n\n@dataclass\nclass OrderResult:\n    order_id: Any\n    total: float\n    user_id: Any\n\n\ndef _validate_order(order: Optional[Dict[str, Any]]) -> bool:\n    if order is None:\n        return False\n    if order.get(\"status\") != \"pending\":\n        return False\n    items = order.get(\"items\")\n    if not items:\n        return False\n    if order.get(\"user_id\") is None:\n        return False\n    for item in items:\n        if item.get(\"price\") is None or item.get(\"quantity\") is None:\n            return False\n    return True\n\n\ndef process_order(order: Optional[Dict[str, Any]]) -> Optional[OrderResult]:\n    if not _validate_order(order):\n        return None\n    total = sum(item[\"price\"] * item[\"quantity\"] for item in order[\"items\"])\n    return OrderResult(order_id=order[\"id\"], total=total, user_id=order[\"user_id\"])",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 56502.828724,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 509,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 737,
+      "prompt_eval_count": 509
+    }
+  },
+  "saved_at": "2026-10-10T17:49:49.144118+00:00",
+  "schema_version": "2.0"
+}

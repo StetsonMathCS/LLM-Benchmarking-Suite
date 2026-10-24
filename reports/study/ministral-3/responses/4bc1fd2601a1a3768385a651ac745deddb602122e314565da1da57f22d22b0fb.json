@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code debugger and bug-fixing model. Your task is to take incorrect or broken Python code and return a corrected version that runs and behaves as intended.\n\n1.) Identify and fix all syntax errors, logical errors, type issues, and potential runtime problems.\n2.) Ensure the corrected code runs under standard Python (prefer clear, idiomatic Python where appropriate).\n3.) Preserve the original program structure, intent, and logic whenever possible.\n4.) Do not rewrite the entire program unless necessary to fix correctness or runtime issues.\n5.) Respect existing imports, variables, classes, and function definitions unless they are inconsistent, incorrect or missing.\n6.) Fix incorrect conditions, loops, indentation issues, type mismatches, and undefined behavior if present.\n7.) Add missing imports, return statements, or definitions only if required for the code to run.\n8.) Maintain consistent and clean formatting and indentation following Python conventions.\n9.) Ensure the final code runs without syntax errors or obvious runtime failures.\n10.) Make sure output is ONLY an executeable and parseable chunk of code.\nStart Example\n\nInput:\ndef factorial(n):\n    if n = 0:\n        return 1\n    else\n        return n * factorial(n - 1)\n\nprint(factorial(5)\n\nOutput:\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n - 1)\n\nprint(factorial(5))\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the corrected Python code.\n\nCode to fix:\n\ndef bitcount(n):\n    count = 0\n    while n:\n        n ^= n - 1\n        count += 1\n    return count\n\nprint(bitcount(127))\nprint(bitcount(128))\nprint(bitcount(3005))\n\nCorrected Code:",
+  "record_identity": "4bc1fd2601a1a3768385a651ac745deddb602122e314565da1da57f22d22b0fb",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 97,
+    "content": "```python\ndef bitcount(n):\n    count = 0\n    while n:\n        n &= ~(n & 1)  # More efficient bitwise operation\n        count += 1\n    return count\n\nprint(bitcount(127))  # Should output 7\nprint(bitcount(128))  # Should output 1\nprint(bitcount(3005)) # Should output 10\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 23114.584257,
+    "model": "ministral-3:3b",
+    "prompt_tokens": 937,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 97,
+      "prompt_eval_count": 937
+    }
+  },
+  "saved_at": "2026-10-10T21:20:31.858402+00:00",
+  "schema_version": "2.0"
+}

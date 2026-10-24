@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import same_chars\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine same_chars. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Check if two words have the same characters.\nCode to test:\ndef same_chars(s0: str, s1: str):\n    \"\"\"\n    Check if two words have the same characters.\n    >>> same_chars('eabcdzzzz', 'dddzzzzzzzddeddabc')\n    True\n    >>> same_chars('abcd', 'dddddddabc')\n    True\n    >>> same_chars('dddddddabc', 'abcd')\n    True\n    >>> same_chars('eabcd', 'dddddddabc')\n    False\n    >>> same_chars('abcd', 'dddddddabce')\n    False\n    >>> same_chars('eabcdzzzz', 'dddzzzzzzzddddabc')\n    False\n    \"\"\"\n    return set(s0) == set(s1)\n\nGenerated Tests:\n",
+  "record_identity": "51430f5afe361f8c19893c686a004527ed292ffecfe5dd36716164e1f78b046a",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1220,
+    "content": "import pytest\nfrom candidate import same_chars\n\ndef test_same_chars_basic():\n    assert same_chars('abcd', 'abcd')\n    assert same_chars('abcd', 'dcba')\n    assert same_chars('aabb', 'bbaa')\n    assert not same_chars('abcd', 'abc')\n    assert not same_chars('abcd', 'abcde')\n\ndef test_same_chars_example_cases():\n    assert same_chars('eabcdzzzz', 'dddzzzzzzzddeddabc')\n    assert same_chars('abcd', 'dddddddabc')\n    assert same_chars('dddddddabc', 'abcd')\n    assert not same_chars('eabcd', 'dddddddabc')\n    assert not same_chars('abcd', 'dddddddabce')\n    assert not same_chars('eabcdzzzz', 'dddzzzzzzzddddabc')\n\ndef test_same_chars_empty_strings():\n    assert same_chars('', '')\n    assert not same_chars('', 'a')\n    assert not same_chars('a', '')\n\ndef test_same_chars_none_input():\n    with pytest.raises(TypeError):\n        same_chars(None, 'abc')\n    with pytest.raises(TypeError):\n        same_chars('abc', None)\n    with pytest.raises(TypeError):\n        same_chars(None, None)\n\ndef test_same_chars_non_string_iterable():\n    assert same_chars(['a', 'b', 'c'], ['c', 'b', 'a'])\n    assert not same_chars(['a', 'b', 'c'], ['a', 'b'])\n    with pytest.raises(TypeError):\n        same_chars([1, 2, 3], ['a', 'b', 'c'])\n\ndef test_same_chars_non_iterable():\n    with pytest.raises(TypeError):\n        same_chars(123, 'abc')\n    with pytest.raises(TypeError):\n        same_chars('abc', 456)\n\ndef test_same_chars_case_sensitive():\n    assert not same_chars('abc', 'ABC')\n    assert same_chars('aA', 'Aa')\n    assert not same_chars('abc', 'abC')\n\ndef test_same_chars_duplicate_characters():\n    assert same_chars('aabbcc', 'abc')\n    assert same_chars('aaabbb', 'ab')\n    assert not same_chars('aabbcc', 'abcd')\n\ndef test_same_chars_order_irrelevant():\n    for s1, s2 in [('abc', 'cba'), ('ab', 'ba'), ('a', 'a')]:\n        assert same_chars(s1, s2)\n        assert same_chars(s2, s1)\n\ndef test_same_chars_symmetry_property():\n    a = 'abcdxyz'\n    b = 'zyxabc'\n    assert same_chars(a, b) == same_chars(b, a)\n    assert same_chars(a, b) is True\n    assert same_chars(a, 'abc') is False\n    assert same_chars('abc', a) is False\n\ndef test_same_chars_large_input():\n    large = 'a' * 10000 + 'b' * 10000 + 'c' * 10000\n    same = 'c' * 5000 + 'b' * 15000 + 'a' * 10000\n    assert same_chars(large, same)\n    different = 'a' * 10000 + 'b' * 10000 + 'd' * 10000\n    assert not same_chars(large, different)",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 92777.284958,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 768,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1220,
+      "prompt_eval_count": 768
+    }
+  },
+  "saved_at": "2026-10-10T20:11:44.224174+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import sum_product\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine sum_product. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: For a given list of integers, return a tuple consisting of a sum and a product of all the integers in a list. Empty sum should be equal to 0 and empty product should be equal to 1.\nCode to test:\nfrom typing import List, Tuple\n\n\ndef sum_product(numbers: List[int]) -> Tuple[int, int]:\n    \"\"\" For a given list of integers, return a tuple consisting of a sum and a product of all the integers in a list.\n    Empty sum should be equal to 0 and empty product should be equal to 1.\n    >>> sum_product([])\n    (0, 1)\n    >>> sum_product([1, 2, 3, 4])\n    (10, 24)\n    \"\"\"\n    sum_value = 0\n    prod_value = 1\n\n    for n in numbers:\n        sum_value += n\n        prod_value *= n\n    return sum_value, prod_value\n\nGenerated Tests:\n",
+  "record_identity": "85ab13f3e6c484249e00ca33b9319f6489e72122d8bc71beac36c3935c16c66f",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 4096,
+    "content": "import pytest\nfrom candidate import sum_product\n\n\ndef test_sum_product_normal_case_returns_correct_tuple():\n    assert sum_product([1, 2, 3, 4]) == (10, 24)\n\n\ndef test_sum_product_empty_list_returns_zero_and_one():\n    assert sum_product([]) == (0, 1)\n\n\ndef test_sum_product_single_element_returns_element_twice():\n    assert sum_product([5]) == (5, 5)\n\n\ndef test_sum_product_negative_numbers_returns_correct_sum_and_product():\n    assert sum_product([-1, -2]) == (-3, 2)\n\n\ndef test_sum_product_zeros_in_list_returns_zero_product():\n    assert sum_product([0, 5]) == (5, 0)\n\n\ndef test_sum_product_all_zeros_returns_zero_tuple():\n    assert sum_product([0, 0, 0]) == (0, 0)\n\n\ndef test_sum_product_mixed_signs_returns_correct_values():\n    assert sum_product([-1, 2, -3]) == (-2, 6)\n\n\ndef test_sum_product_large_numbers_handles_big_integers():\n    assert sum_product([1000000, 2000000]) == (3000000, 2000000000000)\n\n\ndef test_sum_product_none_input_raises_type_error():\n    with pytest.raises(TypeError):\n        sum",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 216848.948874,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 782,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "length",
+    "truncated": true,
+    "usage": {
+      "eval_count": 4096,
+      "prompt_eval_count": 782
+    }
+  },
+  "saved_at": "2026-10-09T20:48:24.812401+00:00",
+  "schema_version": "2.0"
+}

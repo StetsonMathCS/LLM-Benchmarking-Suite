@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import is_prime\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine is_prime. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Return true if a given number is prime, and false otherwise.\nCode to test:\ndef is_prime(n):\n    \"\"\"Return true if a given number is prime, and false otherwise.\n    >>> is_prime(6)\n    False\n    >>> is_prime(101)\n    True\n    >>> is_prime(11)\n    True\n    >>> is_prime(13441)\n    True\n    >>> is_prime(61)\n    True\n    >>> is_prime(4)\n    False\n    >>> is_prime(1)\n    False\n    \"\"\"\n    if n < 2:\n        return False\n    for k in range(2, n - 1):\n        if n % k == 0:\n            return False\n    return True\n\nGenerated Tests:\n",
+  "record_identity": "3f85f1393739479f0c825afdb9c2b3647f43b9f5acd48defd84611fdb8ab75b0",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 261,
+    "content": "import unittest\nfrom candidate import is_prime\n\nclass TestIsPrimeFunction(unittest.TestCase):\n    def test_is_prime_number(self):\n        self.assertTrue(is_prime(101))\n    \n    def test_is_prime_number_with_small_prime_factors(self):\n        self.assertFalse(is_prime(6))\n    \n    def test_is_prime_number_with_large_prime_factors(self):\n        self.assertTrue(is_prime(13441))\n    \n    def test_is_prime_small_prime_number(self):\n        self.assertTrue(is_prime(11))\n    \n    def test_is_prime_small_non_prime_number(self):\n        self.assertFalse(is_prime(4))\n    \n    def test_is_prime_number_at_boundary(self):\n        self.assertFalse(is_prime(1))\n    \n    def test_is_prime_number_with_negative_input(self):\n        with self.assertRaises(TypeError):\n            is_prime(-10)\n    \n    def test_is_prime_number_with_non_integer_input(self):\n        with self.assertRaises(TypeError):\n            is_prime(10.5)\n    \n    def test_is_prime_number_with_none_input(self):\n        with self.assertRaises(TypeError):\n            is_prime(None)\n    \n    def test_is_prime_number_with_zero_input(self):\n        self.assertFalse(is_prime(0))\n    \n    def test_is_prime_number_with_one_input(self):\n        self.assertFalse(is_prime(1))\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 252362.953252,
+    "model": "llama3:70b",
+    "prompt_tokens": 687,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 261,
+      "prompt_eval_count": 687
+    }
+  },
+  "saved_at": "2026-10-10T10:35:52.036207+00:00",
+  "schema_version": "2.0"
+}

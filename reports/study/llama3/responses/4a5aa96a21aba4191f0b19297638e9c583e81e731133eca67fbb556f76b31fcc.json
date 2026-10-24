@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import median\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine median. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Return median of elements in the list l.\nCode to test:\ndef median(l: list):\n    \"\"\"Return median of elements in the list l.\n    >>> median([3, 1, 2, 4, 5])\n    3\n    >>> median([-10, 4, 6, 1000, 10, 20])\n    15.0\n    \"\"\"\n    l = sorted(l)\n    if len(l) % 2 == 1:\n        return l[len(l) // 2]\n    else:\n        return (l[len(l) // 2 - 1] + l[len(l) // 2]) / 2.0\n\nGenerated Tests:\n",
+  "record_identity": "4a5aa96a21aba4191f0b19297638e9c583e81e731133eca67fbb556f76b31fcc",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 323,
+    "content": "import unittest\nfrom candidate import median\n\nclass TestMedianFunction(unittest.TestCase):\n    def test_median_of_positive_numbers(self):\n        self.assertEqual(median([3, 1, 2, 4, 5]), 3)\n    \n    def test_median_of_mixed_numbers(self):\n        self.assertEqual(median([-10, 4, 6, 1000, 10, 20]), 15.0)\n    \n    def test_median_of_single_element_list(self):\n        self.assertEqual(median([5]), 5)\n    \n    def test_median_of_two_element_list(self):\n        self.assertEqual(median([3, 4]), 3.5)\n    \n    def test_median_of_empty_list(self):\n        with self.assertRaises(IndexError):\n            median([])\n    \n    def test_median_of_list_with_none(self):\n        with self.assertRaises(TypeError):\n            median([1, 2, None, 4, 5])\n    \n    def test_median_of_list_with_non_numeric(self):\n        with self.assertRaises(TypeError):\n            median([1, 2, 'a', 4, 5])\n    \n    def test_median_of_list_with_floats(self):\n        self.assertEqual(median([1.5, 2.5, 3.5, 4.5]), 3.5)\n    \n    def test_median_of_list_with_negative_and_floats(self):\n        self.assertEqual(median([-1.5, 2.5, 3.5, 4.5]), 3.0)\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 294258.84263,
+    "model": "llama3:70b",
+    "prompt_tokens": 676,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 323,
+      "prompt_eval_count": 676
+    }
+  },
+  "saved_at": "2026-10-10T12:00:12.009551+00:00",
+  "schema_version": "2.0"
+}

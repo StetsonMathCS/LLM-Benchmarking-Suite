@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef prod_signs(arr):\n    \"\"\"\n    You are given an array arr of integers and you need to return\n    sum of magnitudes of integers multiplied by product of all signs\n    of each number in the array, represented by 1, -1 or 0.\n    Note: return None for empty arr.\n\n    Example:\n    >>> prod_signs([1, 2, 2, -4]) == -9\n    >>> prod_signs([0, 1]) == 0\n    >>> prod_signs([]) == None\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "b6ac0eb54baa8831f7c0831295381a200df8eadfae1bc497877f2b7b6867b9a8",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 80,
+    "content": "def prod_signs(arr):\n    if not arr:\n        return None\n    product_of_signs = 1\n    sum_of_magnitudes = 0\n    for num in arr:\n        product_of_signs *= 1 if num >= 0 else -1\n        sum_of_magnitudes += abs(num)\n    return product_of_signs * sum_of_magnitudes",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 69752.667947,
+    "model": "llama3:70b",
+    "prompt_tokens": 295,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 80,
+      "prompt_eval_count": 295
+    }
+  },
+  "saved_at": "2026-10-10T04:55:20.992492+00:00",
+  "schema_version": "2.0"
+}

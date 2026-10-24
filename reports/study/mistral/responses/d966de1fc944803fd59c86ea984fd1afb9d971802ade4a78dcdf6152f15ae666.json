@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef largest_divisor(n: int) -> int:\n    \"\"\" For a given number n, find the largest number that divides n evenly, smaller than n\n    >>> largest_divisor(15)\n    5\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "d966de1fc944803fd59c86ea984fd1afb9d971802ade4a78dcdf6152f15ae666",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 217,
+    "content": " Here is the Python function `largest_divisor` as per your request:\n\n```python\nfrom math import sqrt\n\ndef largest_divisor(n: int) -> int:\n    \"\"\" For a given number n, find the largest number that divides n evenly, smaller than n\n    >>> largest_divisor(15)\n    5\n    \"\"\"\n    if n < 1:\n        raise ValueError(\"Number must be greater than 0\")\n\n    for i in range(1, int(sqrt(n)) + 1):\n        if n % i == 0:\n            return i\n    return n\n```\n\nThis function checks for divisibility using the modulus operator `%` and iterates up to the square root of the input number to improve efficiency. It also includes a check for the input to be greater than 0 to avoid potential errors. The function returns the divisor or the number itself if it is a prime number.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 19988.241709,
+    "model": "mistral:7b",
+    "prompt_tokens": 259,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 217,
+      "prompt_eval_count": 259
+    }
+  },
+  "saved_at": "2026-10-10T23:40:29.590882+00:00",
+  "schema_version": "2.0"
+}

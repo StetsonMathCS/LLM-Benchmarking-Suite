@@ -1,0 +1,213 @@
+{
+  "applicable_task_weights": {
+    "bug_fixing": 0.15,
+    "code_generation": 0.27,
+    "code_review": 0.15,
+    "refactoring": 0.15,
+    "test_generation": 0.12,
+    "translation": 0.16
+  },
+  "category_scores": {
+    "analysis": 0.7604,
+    "generation": 0.7188,
+    "transformation": 0.7168
+  },
+  "complete": true,
+  "dimension_scores": {
+    "code_consistency": {
+      "mean_score": 0.8820512820512821,
+      "record_count": 325,
+      "statuses": {
+        "ok": 325
+      }
+    },
+    "functional_correctness": {
+      "mean_score": 0.6049382716049383,
+      "record_count": 81,
+      "statuses": {
+        "candidate_failure": 32,
+        "ok": 49
+      }
+    },
+    "generated_test_effectiveness": {
+      "mean_score": 0.6637999636214655,
+      "record_count": 80,
+      "statuses": {
+        "candidate_failure": 7,
+        "ok": 73
+      }
+    },
+    "linting": {
+      "mean_score": 0.9382716049382716,
+      "record_count": 81,
+      "statuses": {
+        "ok": 81
+      }
+    },
+    "reference_review_similarity": {
+      "mean_score": 0.7604431301355362,
+      "record_count": 20,
+      "statuses": {
+        "ok": 20
+      }
+    },
+    "reference_test_success": {
+      "mean_score": 0.6585365853658537,
+      "record_count": 164,
+      "statuses": {
+        "candidate_failure": 56,
+        "ok": 108
+      }
+    },
+    "runtime_analysis": {
+      "mean_score": 0.5759000856943816,
+      "record_count": 20,
+      "statuses": {
+        "candidate_failure": 8,
+        "ok": 12
+      }
+    },
+    "structural_similarity": {
+      "mean_score": 0.9021571670419674,
+      "record_count": 31,
+      "statuses": {
+        "ok": 31
+      }
+    },
+    "vulnerabilities": {
+      "mean_score": 1.0,
+      "record_count": 81,
+      "statuses": {
+        "ok": 81
+      }
+    }
+  },
+  "final_score": 0.7352,
+  "grade": "B+",
+  "overall_pass_rate": 0.7333,
+  "pass_at_k": {
+    "bug_fixing": {
+      "1": 0.5806
+    },
+    "code_generation": {
+      "1": 0.6585
+    },
+    "refactoring": {
+      "1": 0.6
+    },
+    "translation": {
+      "1": 0.6333
+    }
+  },
+  "scoring_profile": "revised-v1",
+  "task_scores": {
+    "bug_fixing": {
+      "error_count": 0,
+      "max_score": 0.9998,
+      "mean_score": 0.7005,
+      "min_score": 0.2828,
+      "pass_at_k": {
+        "1": 0.5806
+      },
+      "pass_rate": 0.5806,
+      "record_count": 31,
+      "scored_count": 31,
+      "std_score": 0.3506,
+      "task_name": "bug_fixing"
+    },
+    "code_generation": {
+      "error_count": 0,
+      "max_score": 1.0,
+      "mean_score": 0.7878,
+      "min_score": 0.2667,
+      "pass_at_k": {
+        "1": 0.6585
+      },
+      "pass_rate": 0.6585,
+      "record_count": 164,
+      "scored_count": 164,
+      "std_score": 0.2937,
+      "task_name": "code_generation"
+    },
+    "code_review": {
+      "error_count": 0,
+      "max_score": 0.8804,
+      "mean_score": 0.7604,
+      "min_score": 0.6616,
+      "pass_rate": 1.0,
+      "record_count": 20,
+      "scored_count": 20,
+      "std_score": 0.0494,
+      "task_name": "code_review"
+    },
+    "refactoring": {
+      "error_count": 0,
+      "max_score": 1.0,
+      "mean_score": 0.6632,
+      "min_score": 0.15,
+      "pass_at_k": {
+        "1": 0.6
+      },
+      "pass_rate": 0.6,
+      "record_count": 20,
+      "scored_count": 20,
+      "std_score": 0.3904,
+      "task_name": "refactoring"
+    },
+    "test_generation": {
+      "error_count": 0,
+      "max_score": 0.9167,
+      "mean_score": 0.6499,
+      "min_score": 0.0833,
+      "pass_rate": 0.8375,
+      "record_count": 80,
+      "scored_count": 80,
+      "std_score": 0.2132,
+      "task_name": "test_generation"
+    },
+    "translation": {
+      "error_count": 0,
+      "max_score": 1.0,
+      "mean_score": 0.7867,
+      "min_score": 0.425,
+      "pass_at_k": {
+        "1": 0.6333
+      },
+      "pass_rate": 0.9333,
+      "record_count": 30,
+      "scored_count": 30,
+      "std_score": 0.235,
+      "task_name": "translation"
+    }
+  },
+  "token_usage": {
+    "counted_input_tokens": 346565,
+    "counted_output_tokens": 97666,
+    "counted_total_tokens": 444231,
+    "detail": "usage/summary.json",
+    "embedding": {
+      "counted_input_tokens": 4533,
+      "counted_output_tokens": 0,
+      "counted_total_tokens": 4533,
+      "requests_total": 20,
+      "requests_with_unknown_usage": 0
+    },
+    "generation": {
+      "counted_input_tokens": 342032,
+      "counted_output_tokens": 97666,
+      "counted_total_tokens": 439698,
+      "requests_total": 345,
+      "requests_with_unknown_usage": 0
+    },
+    "inherited_requests": 0,
+    "known_coverage": 1.0,
+    "requests_total": 365,
+    "requests_with_known_usage": 365,
+    "requests_with_unknown_usage": 0,
+    "totals_are_exact": true
+  },
+  "total_errors": 0,
+  "total_passed": 253,
+  "total_records": 345,
+  "total_scored": 345
+}

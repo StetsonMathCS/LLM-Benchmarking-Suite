@@ -1,0 +1,23 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Refactor TaskRunner to use a TaskResult dataclass; eliminate the running flag and parallel error/result lists; expose a summary property\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\nclass TaskRunner:\n    def __init__(self):\n        self.tasks = []\n        self.results = []\n        self.errors = []\n        self.running = False\n\n    def add_task(self, func, *args, **kwargs):\n        self.tasks.append((func, args, kwargs))\n\n    def run(self):\n        self.running = True\n        self.results = []\n        self.errors = []\n        for func, args, kwargs in self.tasks:\n            try:\n                result = func(*args, **kwargs)\n                self.results.append({'status': 'ok', 'result': result})\n            except Exception as e:\n                self.errors.append({'status': 'error', 'error': str(e), 'func': func.__name__})\n                self.results.append({'status': 'error', 'error': str(e)})\n        self.running = False\n        return self.results\n\n    def get_errors(self):\n        return self.errors\n\n    def get_successes(self):\n        return [r for r in self.results if r['status'] == 'ok']\n\nRefactored Code:",
+  "record_identity": "92f3119d8f14c5f24a359de84cf128ff642d748077985b94c6ea89b39e195725",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 0,
+    "content": "",
+    "effective_settings": {},
+    "error": "model 'deepseek-r1:32b' not found (status code: 404)",
+    "latency_ms": 0.0,
+    "model": "deepseek-r1:32b",
+    "prompt_tokens": 0,
+    "provider": "ollama",
+    "requested_settings": {},
+    "status": "completed",
+    "stop_reason": null,
+    "truncated": false,
+    "usage": {}
+  },
+  "saved_at": "2026-10-09T09:38:52.850295+00:00",
+  "schema_version": "2.0"
+}

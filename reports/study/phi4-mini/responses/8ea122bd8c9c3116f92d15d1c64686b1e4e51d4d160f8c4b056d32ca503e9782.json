@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef digits(n):\n    \"\"\"Given a positive integer n, return the product of the odd digits.\n    Return 0 if all digits are even.\n    For example:\n    digits(1)  == 1\n    digits(4)  == 0\n    digits(235) == 15\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "8ea122bd8c9c3116f92d15d1c64686b1e4e51d4d160f8c4b056d32ca503e9782",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 62,
+    "content": "def digits(n):\n    product = 1\n    has_odd = False\n    for digit in str(n):\n        if int(digit) % 2 != 0:\n            product *= int(digit)\n            has_odd = True\n    return product if has_odd else 0",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 3598.565017,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 233,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 62,
+      "prompt_eval_count": 233
+    }
+  },
+  "saved_at": "2026-10-11T03:05:17.725223+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import digitSum\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine digitSum. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Task Write a function that takes a string as input and returns the sum of the upper characters only' ASCII codes.\nCode to test:\ndef digitSum(s):\n    \"\"\"Task\n    Write a function that takes a string as input and returns the sum of the upper characters only'\n    ASCII codes.\n\n    Examples:\n        digitSum(\"\") => 0\n        digitSum(\"abAB\") => 131\n        digitSum(\"abcCd\") => 67\n        digitSum(\"helloE\") => 69\n        digitSum(\"woArBld\") => 131\n        digitSum(\"aAaaaXa\") => 153\n    \"\"\"\n    if s == \"\": return 0\n    return sum(ord(char) if char.isupper() else 0 for char in s)\n\nGenerated Tests:\n",
+  "record_identity": "9cb61935d61cc1611dd36a8b223be4a048577e18ab02194eefe2c67774f288a4",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1897,
+    "content": "import unittest\nfrom candidate import digitSum\n\nclass TestDigitSum(unittest.TestCase):\n    def test_empty_string_returns_zero(self):\n        self.assertEqual(digitSum(\"\"), 0)\n\n    def test_no_uppercase_returns_zero(self):\n        self.assertEqual(digitSum(\"abcxyz\"), 0)\n\n    def test_all_uppercase_sums_correctly(self):\n        self.assertEqual(digitSum(\"ABC\"), 198)\n        self.assertEqual(digitSum(\"XYZ\"), 240+88+90)\n\n    def test_mixed_characters_sums_only_uppercase(self):\n        self.assertEqual(digitSum(\"abAB\"), 131)\n        self.assertEqual(digitSum(\"abcCd\"), 67)\n        self.assertEqual(digitSum(\"helloE\"), 69)\n        self.assertEqual(digitSum(\"woArBld\"), 131)\n        self.assertEqual(digitSum(\"aAaaaXa\"), 153)\n\n    def test_numeric_and_punctuation_ignored(self):\n        self.assertEqual(digitSum(\"A1B!\"), 131)\n        self.assertEqual(digitSum(\"A,B.C\"), 131)\n\n    def test_unicode_uppercase_letters_sum(self):\n        self.assertEqual(digitSum(\"ÄÖÜ\"), 196 + 214 + 220)\n\n    def test_string_with_newlines_and_tabs_ignored(self):\n        self.assertEqual(digitSum(\"A\\nB\\tC\"), 65 + 66 + 67)\n\n    def test_long_string_uppercase_sum(self):\n        long_a = \"A\" * 1000\n        self.assertEqual(digitSum(long_a), 65 * 1000)\n\n    def test_non_string_input_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            digitSum(123)\n        with self.assertRaises(TypeError):\n            digitSum(None)\n        with self.assertRaises(TypeError):\n            digitSum(12.34)\n\n    def test_bytes_input_raises_attribute_error(self):\n        with self.assertRaises(AttributeError):\n            digitSum(b\"ABC\")\n\n    def test_consistency_same_input_same_output(self):\n        s = \"TestCaseABC\"\n        first = digitSum(s)\n        second = digitSum(s)\n        self.assertEqual(first, second)\n\n    def test_single_uppercase_character(self):\n        self.assertEqual(digitSum(\"Z\"), 90)\n\n    def test_single_lowercase_character(self):\n        self.assertEqual(digitSum(\"z\"), 0)\n\n    def test_string_with_only_punctuation(self):\n        self.assertEqual(digitSum(\"!@#\"), 0)\n\n    def test_string_with_mixed_unicode(self):\n        self.assertEqual(digitSum(\"aΩAΩ\"), ord('A') + ord('Ω'))\n\nif __name__ == \"__main__\":\n    unittest.main()\n",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 139852.471213,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 773,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1897,
+      "prompt_eval_count": 773
+    }
+  },
+  "saved_at": "2026-10-10T20:36:11.832893+00:00",
+  "schema_version": "2.0"
+}

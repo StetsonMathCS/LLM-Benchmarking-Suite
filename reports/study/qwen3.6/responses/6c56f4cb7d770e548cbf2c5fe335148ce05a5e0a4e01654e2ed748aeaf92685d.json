@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code review model. Your task is to analyze Python code and provide a structured review highlighting issues, potential improvements, and best practices.\n\n1.) Carefully analyze the provided Python code for correctness, readability, and maintainability.\n2.) Identify syntax issues, logical errors, potential runtime problems, and edge cases.\n3.) Detect inefficient algorithms, unnecessary complexity, or poor use of Python features.\n4.) Suggest improvements following idiomatic Python practices and common style conventions.\n5.) Highlight missing error handling, validation, or unsafe operations when relevant.\n6.) Point out maintainability concerns such as unclear variable names, deeply nested logic, or duplicated code.\n7.) Recommend improvements while preserving the original intent of the code.\n8.) Do not rewrite the entire program unless necessary to demonstrate a fix or improvement.\n9.) Present the review in a clear and structured manner.\n10.) If improvements are suggested, provide concise corrected snippets where appropriate.\n\nStart Example\n\nInput:\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n-1)\n\nOutput:\n\nIssues:\nThe function does not handle negative inputs.\nRecursive implementation may cause recursion depth issues for large values.\nSuggestions:\nAdd input validation to ensure n is non-negative.\nConsider an iterative implementation for better scalability.\n\nEnd Example\n\nYour turn now.\n\nCode to review:@app.route('/upload', methods=['POST'])\ndef upload_file():\n    file = request.files['file']\n    filename = file.filename\n    file.save(os.path.join('/var/uploads', filename))\n    return 'Uploaded'\n\n",
+  "record_identity": "6c56f4cb7d770e548cbf2c5fe335148ce05a5e0a4e01654e2ed748aeaf92685d",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 3002,
+    "content": "**Issues:**\n- **Path Traversal Vulnerability:** Using `file.filename` directly allows malicious inputs like `../../etc/passwd` to escape the intended directory.\n- **Missing Input Validation:** No check for the `'file'` key in `request.files` (raises `KeyError` if missing). No validation for empty filenames, file size limits, or allowed file types.\n- **Unsafe Path & Directory Handling:** Hardcoded `/var/uploads` will crash if the directory doesn't exist. Relative/absolute path mixing can cause permission or portability issues.\n- **Non-Standard HTTP Response:** Returning a plain string `'Uploaded'` lacks proper status codes and structured data, making API consumption unreliable.\n- **Missing Error Handling:** No `try/except` for disk-full scenarios, permission denied, or I/O errors during save.\n\n**Suggestions:**\n- Use `werkzeug.utils.secure_filename` to sanitize filenames and strip dangerous characters/path separators.\n- Validate file presence with `request.files.get()` and check for empty/malicious filenames after sanitization.\n- Whitelist allowed file extensions (or MIME types) to prevent executable uploads.\n- Ensure the upload directory exists using `os.makedirs(..., exist_ok=True)` before saving.\n- Return structured JSON responses with appropriate HTTP status codes (`201` for success, `400`/`500` for errors).\n- Log exceptions instead of exposing raw errors to clients.\n\n**Corrected Snippet:**\n```python\nimport os\nfrom flask import request, jsonify\nfrom werkzeug.utils import secure_filename\n\nUPLOAD_FOLDER = '/var/uploads'\nALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg'}\n\ndef allowed_file(filename):\n    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS\n\n@app.route('/upload', methods=['POST'])\ndef upload_file():\n    file = request.files.get('file')\n    if not file or file.filename == '' or not allowed_file(file.filename):\n        return jsonify({'error': 'Invalid or missing file'}), 400\n\n    filename = secure_filename(file.filename)\n    if not filename:\n        return jsonify({'error': 'Filename is empty after sanitization'}), 400\n\n    os.makedirs(UPLOAD_FOLDER, exist_ok=True)\n    filepath = os.path.join(UPLOAD_FOLDER, filename)\n    try:\n        file.save(filepath)\n        return jsonify({'message': 'File uploaded successfully'}), 201\n    except Exception as e:\n        app.logger.error(f'Upload failed: {e}')\n        return jsonify({'error': 'Upload processing failed'}), 500\n```\n\n**Additional Notes:**\n- In production, consider adding `app.config['MAX_CONTENT_LENGTH']` to enforce file size limits.\n- Ensure the web server process has write permissions to `/var/uploads`.\n- For high-security environments, validate actual file contents (magic bytes/MIME type) rather than relying solely on extensions.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 155070.103529,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 358,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 3002,
+      "prompt_eval_count": 358
+    }
+  },
+  "saved_at": "2026-10-09T18:53:54.183937+00:00",
+  "schema_version": "2.0"
+}

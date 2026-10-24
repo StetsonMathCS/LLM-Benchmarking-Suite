@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import search\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine search. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: You are given a non-empty list of positive integers. Return the greatest integer that is greater than zero, and has a frequency greater than or equal to the value of the integer itself. The frequency of an integer is the number of times it appears in the list. If no such a value exist, return -1.\nCode to test:\ndef search(lst):\n    '''\n    You are given a non-empty list of positive integers. Return the greatest integer that is greater than \n    zero, and has a frequency greater than or equal to the value of the integer itself. \n    The frequency of an integer is the number of times it appears in the list.\n    If no such a value exist, return -1.\n    Examples:\n        search([4, 1, 2, 2, 3, 1]) == 2\n        search([1, 2, 2, 3, 3, 3, 4, 4, 4]) == 3\n        search([5, 5, 4, 4, 4]) == -1\n    '''\n    frq = [0] * (max(lst) + 1)\n    for i in lst:\n        frq[i] += 1;\n\n    ans = -1\n    for i in range(1, len(frq)):\n        if frq[i] >= i:\n            ans = i\n    \n    return ans\n\nGenerated Tests:\n",
+  "record_identity": "0b129036e7239fb6ae461cabf2b80e71b85d32ecf29fb6fabe1d4cff20824a40",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 252,
+    "content": "import unittest\nfrom candidate import search\n\nclass TestSearch(unittest.TestCase):\n    def test_search_normal_case(self):\n        self.assertEqual(search([4, 1, 2, 2, 3, 1]), 2)\n    \n    def test_search_greatest_integer(self):\n        self.assertEqual(search([1, 2, 2, 3, 3, 3, 4, 4, 4]), 3)\n    \n    def test_search_no_such_value(self):\n        self.assertEqual(search([5, 5, 4, 4, 4]), -1)\n    \n    def test_search_single_element(self):\n        self.assertEqual(search([1]), -1)\n    \n    def test_search_empty_list(self):\n        with self.assertRaises(TypeError):\n            search([])\n    \n    def test_search_non_positive_integer(self):\n        with self.assertRaises(ValueError):\n            search([-1, 0, 2, 3])\n    \n    def test_search_non_integer(self):\n        with self.assertRaises(TypeError):\n            search([1, 2, 'a', 4])\n    \n    def test_search_none_input(self):\n        with self.assertRaises(TypeError):\n            search(None)\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 261606.850772,
+    "model": "llama3:70b",
+    "prompt_tokens": 828,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 252,
+      "prompt_eval_count": 828
+    }
+  },
+  "saved_at": "2026-10-10T13:39:08.973568+00:00",
+  "schema_version": "2.0"
+}

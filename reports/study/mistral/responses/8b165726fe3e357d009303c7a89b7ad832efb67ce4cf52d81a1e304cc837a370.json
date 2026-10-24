@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import below_threshold\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine below_threshold. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Return True if all numbers in the list l are below threshold t.\nCode to test:\ndef below_threshold(l: list, t: int):\n    \"\"\"Return True if all numbers in the list l are below threshold t.\n    >>> below_threshold([1, 2, 4, 10], 100)\n    True\n    >>> below_threshold([1, 20, 4, 10], 5)\n    False\n    \"\"\"\n    for e in l:\n        if e >= t:\n            return False\n    return True\n\nGenerated Tests:\n",
+  "record_identity": "8b165726fe3e357d009303c7a89b7ad832efb67ce4cf52d81a1e304cc837a370",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 551,
+    "content": " ```python\nimport unittest\nfrom candidate import below_threshold\n\nclass TestBelowThreshold(unittest.TestCase):\n    def test_below_threshold_empty_list(self):\n        self.assertTrue(below_threshold([]))\n\n    def test_below_threshold_no_elements(self):\n        self.assertTrue(below_threshold([], 100))\n\n    def test_below_threshold_below_threshold(self):\n        self.assertTrue(below_threshold([1, 2, 4, 10], 100))\n\n    def test_below_threshold_above_threshold(self):\n        self.assertFalse(below_threshold([1, 20, 4, 10], 5))\n\n    def test_below_threshold_threshold_is_zero(self):\n        self.assertTrue(below_threshold([0], 0))\n\n    def test_below_threshold_threshold_is_negative(self):\n        self.assertTrue(below_threshold([-1, -2, -3], -5))\n\n    def test_below_threshold_threshold_is_greater_than_all_numbers(self):\n        self.assertTrue(below_threshold([1, 2, 3], 1000))\n\n    def test_below_threshold_all_numbers_equal_to_threshold(self):\n        self.assertTrue(below_threshold([10, 10, 10], 10))\n\n    def test_below_threshold_mixed_numbers(self):\n        self.assertTrue(below_threshold([1, 10, 4, 10], 10))\n\n    def test_below_threshold_none_values(self):\n        self.assertRaises(TypeError, lambda: below_threshold([None, 10], 10))\n\n    def test_below_threshold_list_type_error(self):\n        self.assertRaises(TypeError, lambda: below_threshold(\"not_a_list\", 10))\n\n    def test_below_threshold_threshold_type_error(self):\n        self.assertRaises(TypeError, lambda: below_threshold([1, 2, 3], \"not_an_int\")\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 60945.839466,
+    "model": "mistral:7b",
+    "prompt_tokens": 834,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 551,
+      "prompt_eval_count": 834
+    }
+  },
+  "saved_at": "2026-10-11T02:09:42.302947+00:00",
+  "schema_version": "2.0"
+}

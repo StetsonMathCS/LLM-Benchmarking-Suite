@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import median\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine median. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Return median of elements in the list l.\nCode to test:\ndef median(l: list):\n    \"\"\"Return median of elements in the list l.\n    >>> median([3, 1, 2, 4, 5])\n    3\n    >>> median([-10, 4, 6, 1000, 10, 20])\n    15.0\n    \"\"\"\n    l = sorted(l)\n    if len(l) % 2 == 1:\n        return l[len(l) // 2]\n    else:\n        return (l[len(l) // 2 - 1] + l[len(l) // 2]) / 2.0\n\nGenerated Tests:\n",
+  "record_identity": "2124db4de05d1e2549c96f74f33c0cccd54277e201b47b60b933cd74c49626da",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 312,
+    "content": "```python\nimport pytest\nfrom candidate import median\n\ndef test_median_with_odd_number_of_elements():\n    assert median([3, 1, 2, 4, 5]) == 3\n\ndef test_median_with_even_number_of_elements():\n    assert median([-10, 4, 6, 1000, 10, 20]) == 15.0\n\ndef test_median_with_single_element():\n    assert median([42]) == 42\n\ndef test_median_with_two_identical_elements():\n    assert median([42, 42]) == 42\n\ndef test_median_with_empty_list():\n    with pytest.raises(TypeError):\n        median([])\n\ndef test_median_with_non_numeric_elements():\n    with pytest.raises(TypeError):\n        median([\"a\", \"b\", \"c\"])\n\ndef test_median_with_large_numbers():\n    assert median([10**6, 1, 2, 3, 4, 5]) == 3\n\ndef test_median_with_negative_numbers():\n    assert median([-10, -5, 0, 5, 10]) == 0\n\ndef test_median_with_large_positive_and_negative_numbers():\n    assert median([-100, -1, 0, 1, 100]) == 0\n\ndef test_median_with_floats():\n    assert median([1.1, 2.2, 3.3, 4.4, 5.5]) == 3.3\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 20856.175606,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 688,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 312,
+      "prompt_eval_count": 688
+    }
+  },
+  "saved_at": "2026-10-11T03:59:24.342786+00:00",
+  "schema_version": "2.0"
+}

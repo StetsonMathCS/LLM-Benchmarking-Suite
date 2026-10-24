@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Refactor the monolithic validator into composable per-field validator functions collected in a FIELD_VALIDATORS registry\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\ndef validate_user_input(data):\n    errors = []\n    if 'name' not in data:\n        errors.append('name is required')\n    elif len(data['name']) < 2:\n        errors.append('name must be at least 2 characters')\n    elif len(data['name']) > 100:\n        errors.append('name must be at most 100 characters')\n    if 'email' not in data:\n        errors.append('email is required')\n    elif '@' not in data['email']:\n        errors.append('email must contain @')\n    elif len(data['email']) > 254:\n        errors.append('email is too long')\n    if 'age' not in data:\n        errors.append('age is required')\n    elif not isinstance(data['age'], int):\n        errors.append('age must be an integer')\n    elif data['age'] < 0 or data['age'] > 150:\n        errors.append('age must be between 0 and 150')\n    if 'role' not in data:\n        errors.append('role is required')\n    elif data['role'] not in ('admin', 'user', 'moderator'):\n        errors.append('role must be admin, user, or moderator')\n    return errors\n\nRefactored Code:",
+  "record_identity": "3845787357de8911fd70dc94011ba94b3b38853b7251fae6b561592801bf4c7b",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 447,
+    "content": " ```python\nFIELD_VALIDATORS = {\n    'name': [\n        lambda data: errors.append('name is required') if 'name' not in data else None,\n        lambda data: errors.append('name must be at least 2 characters') if len(data['name']) < 2 else None,\n        lambda data: errors.append('name must be at most 100 characters') if len(data['name']) > 100 else None\n    ],\n    'email': [\n        lambda data: errors.append('email is required') if 'email' not in data else None,\n        lambda data: errors.append('email must contain @') if '@' not in data['email'] else None,\n        lambda data: errors.append('email is too long') if len(data['email']) > 254 else None\n    ],\n    'age': [\n        lambda data: errors.append('age is required') if 'age' not in data else None,\n        lambda data: errors.append('age must be an integer') if not isinstance(data['age'], int) else None,\n        lambda data: errors.append('age must be between 0 and 150') if data['age'] < 0 or data['age'] > 150 else None\n    ],\n    'role': [\n        lambda data: errors.append('role is required') if 'role' not in data else None,\n        lambda data: errors.append('role must be admin, user, or moderator') if data['role'] not in ('admin', 'user', 'moderator') else None\n    ]\n}\n\ndef validate_user_input(data):\n    errors = []\n    for field, validators in FIELD_VALIDATORS.items():\n        if field not in data:\n            errors.append(f'{field} is required')\n        for validator in validators:\n            validator(data)\n    return errors\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 45693.512537,
+    "model": "mistral:7b",
+    "prompt_tokens": 674,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 447,
+      "prompt_eval_count": 674
+    }
+  },
+  "saved_at": "2026-10-11T01:01:35.702482+00:00",
+  "schema_version": "2.0"
+}

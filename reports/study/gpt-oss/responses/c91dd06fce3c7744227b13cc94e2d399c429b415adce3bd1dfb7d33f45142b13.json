@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef is_bored(S):\n    \"\"\"\n    You'll be given a string of words, and your task is to count the number\n    of boredoms. A boredom is a sentence that starts with the word \"I\".\n    Sentences are delimited by '.', '?' or '!'.\n   \n    For example:\n    >>> is_bored(\"Hello world\")\n    0\n    >>> is_bored(\"The sky is blue. The sun is shining. I love this weather\")\n    1\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "c91dd06fce3c7744227b13cc94e2d399c429b415adce3bd1dfb7d33f45142b13",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 360,
+    "content": "import re\n\ndef is_bored(S: str) -> int:\n    \"\"\"\n    Count the number of sentences that start with the word \"I\".\n\n    Sentences are delimited by '.', '?' or '!'.\n    \"\"\"\n    sentences = re.split(r'[.!?]', S)\n    count = 0\n    for part in sentences:\n        stripped = part.strip()\n        if stripped.startswith('I'):\n            count += 1\n    return count\n\n# Example usage:\n# print(is_bored(\"Hello world\"))  # 0\n# print(is_bored(\"The sky is blue. The sun is shining. I love this weather\"))  # 1",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 25834.399005,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 333,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 360,
+      "prompt_eval_count": 333
+    }
+  },
+  "saved_at": "2026-10-10T16:13:19.073950+00:00",
+  "schema_version": "2.0"
+}

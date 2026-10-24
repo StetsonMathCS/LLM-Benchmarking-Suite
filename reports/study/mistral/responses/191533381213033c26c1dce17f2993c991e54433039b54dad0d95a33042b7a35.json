@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef skjkasdkd(lst):\n    \"\"\"You are given a list of integers.\n    You need to find the largest prime value and return the sum of its digits.\n\n    Examples:\n    For lst = [0,3,2,1,3,5,7,4,5,5,5,2,181,32,4,32,3,2,32,324,4,3] the output should be 10\n    For lst = [1,0,1,8,2,4597,2,1,3,40,1,2,1,2,4,2,5,1] the output should be 25\n    For lst = [1,3,1,32,5107,34,83278,109,163,23,2323,32,30,1,9,3] the output should be 13\n    For lst = [0,724,32,71,99,32,6,0,5,91,83,0,5,6] the output should be 11\n    For lst = [0,81,12,3,1,21] the output should be 3\n    For lst = [0,8,1,2,1,7] the output should be 7\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "191533381213033c26c1dce17f2993c991e54433039b54dad0d95a33042b7a35",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 370,
+    "content": " ```python\nimport math\n\ndef is_prime(n):\n    if n <= 1 or (n % 2 == 0 and n > 2):\n        return False\n    for i in range(3, int(math.sqrt(n)) + 1, 2):\n        if n % i == 0:\n            return False\n    return True\n\ndef sum_of_digits(n):\n    return sum(int(digit) for digit in str(n))\n\ndef find_largest_prime_sum_of_digits(lst):\n    largest_prime = None\n    largest_prime_sum = 0\n\n    for num in lst:\n        if is_prime(num) and (largest_prime is None or largest_prime_sum < sum_of_digits(num)):\n            largest_prime = num\n            largest_prime_sum = sum_of_digits(num)\n\n    return largest_prime_sum\n```\n\nThis code defines a function `find_largest_prime_sum_of_digits` that takes a list of integers as input and returns the sum of the digits of the largest prime number in the list. It first imports the `math` library to compute the square root of a number and checks if a number is prime using the `is_prime` function. Then, it defines another function `sum_of_digits` to compute the sum of the digits of a number. Finally, the `find_largest_prime_sum_of_digits` function iterates through the list, finding the largest prime number and returning its sum of digits.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 37749.120623,
+    "model": "mistral:7b",
+    "prompt_tokens": 539,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 370,
+      "prompt_eval_count": 539
+    }
+  },
+  "saved_at": "2026-10-11T00:09:56.952443+00:00",
+  "schema_version": "2.0"
+}

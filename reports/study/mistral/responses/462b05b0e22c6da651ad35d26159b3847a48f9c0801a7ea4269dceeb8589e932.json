@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are an expert code translator. Your task is to translate the provided code to javascript while preserving its original functionality and behavior.\n\nRequirements:\n1.) Analyze the provided code and understand its functionality completely.\n2.) Translate the code to javascript maintaining the exact same logic and behavior.\n3.) Use idiomatic javascript conventions, naming patterns, and best practices.\n4.) Preserve all variable names and function names where possible (translate only if necessary for javascript conventions).\n5.) Handle language-specific differences (e.g., data types, error handling, syntax) appropriately.\n6.) Include necessary imports, libraries, and dependencies for javascript.\n7.) Ensure the translated code is syntactically valid and executable.\n8.) Do not add comments or explanations beyond what's necessary.\n9.) Return ONLY the translated code without any additional text or preamble.\n\nImportant Notes:\n- Maintain the same algorithm and logic flow\n- Preserve the output behavior exactly as the original\n- Use proper error handling patterns for javascript\n- Follow javascript code style and conventions\n\nSource Code (in original language):\ndef bubble_sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(0, n-i-1):\n            if arr[j] > arr[j+1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n    return arr\nprint(bubble_sort([64, 34, 25, 12]))\n\nTranslated Code (in javascript):\n",
+  "record_identity": "462b05b0e22c6da651ad35d26159b3847a48f9c0801a7ea4269dceeb8589e932",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 185,
+    "content": " ```javascript\nfunction bubbleSort(arr) {\n    const n = arr.length;\n    for (let i = 0; i < n - 1; i++) {\n        for (let j = 0; j < n - i - 1; j++) {\n            if (arr[j] > arr[j + 1]) {\n                [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];\n            }\n        }\n    }\n    return arr;\n}\n\nconsole.log(bubbleSort([64, 34, 25, 12]));\n```\n\nThis JavaScript code performs the same bubble sort algorithm as the provided Python code. It sorts an array using the bubble sort algorithm and then logs the sorted array.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 17926.382407,
+    "model": "mistral:7b",
+    "prompt_tokens": 386,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 185,
+      "prompt_eval_count": 386
+    }
+  },
+  "saved_at": "2026-10-11T02:45:13.444597+00:00",
+  "schema_version": "2.0"
+}

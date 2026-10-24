@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code debugger and bug-fixing model. Your task is to take incorrect or broken Python code and return a corrected version that runs and behaves as intended.\n\n1.) Identify and fix all syntax errors, logical errors, type issues, and potential runtime problems.\n2.) Ensure the corrected code runs under standard Python (prefer clear, idiomatic Python where appropriate).\n3.) Preserve the original program structure, intent, and logic whenever possible.\n4.) Do not rewrite the entire program unless necessary to fix correctness or runtime issues.\n5.) Respect existing imports, variables, classes, and function definitions unless they are inconsistent, incorrect or missing.\n6.) Fix incorrect conditions, loops, indentation issues, type mismatches, and undefined behavior if present.\n7.) Add missing imports, return statements, or definitions only if required for the code to run.\n8.) Maintain consistent and clean formatting and indentation following Python conventions.\n9.) Ensure the final code runs without syntax errors or obvious runtime failures.\n10.) Make sure output is ONLY an executeable and parseable chunk of code.\nStart Example\n\nInput:\ndef factorial(n):\n    if n = 0:\n        return 1\n    else\n        return n * factorial(n - 1)\n\nprint(factorial(5)\n\nOutput:\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n - 1)\n\nprint(factorial(5))\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the corrected Python code.\n\nCode to fix:\n\ndef powerset(arr):\n    if arr:\n        first, *rest = arr #python3 just like car and cdr (in this case anyway..)\n        rest_subsets = powerset(rest)\n        return [[first] + subset for subset in rest_subsets]\n    else:\n        return [[]]\n\nprint(list(powerset(['a', 'b', 'c'])))\nprint(list(powerset(['a', 'b'])))\nprint(list(powerset(['a'])))\n\nCorrected Code:",
+  "record_identity": "bc5af66f409df062fde57e9c68dd80bfd1c20be207040d829b4e5879d57db547",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 743,
+    "content": "def powerset(arr):\n    if arr:\n        first, *rest = arr\n        rest_subsets = powerset(rest)\n        return rest_subsets + [[first] + subset for subset in rest_subsets]\n    else:\n        return [[]]\n\nprint(list(powerset(['a', 'b', 'c'])))\nprint(list(powerset(['a', 'b'])))\nprint(list(powerset(['a'])))",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 135282.853633,
+    "model": "qwen3.8:27b",
+    "prompt_tokens": 455,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 743,
+      "prompt_eval_count": 455
+    }
+  },
+  "saved_at": "2026-10-08T16:45:09.667341+00:00",
+  "schema_version": "2.0"
+}

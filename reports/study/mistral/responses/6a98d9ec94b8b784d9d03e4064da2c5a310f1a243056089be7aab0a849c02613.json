@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef is_bored(S):\n    \"\"\"\n    You'll be given a string of words, and your task is to count the number\n    of boredoms. A boredom is a sentence that starts with the word \"I\".\n    Sentences are delimited by '.', '?' or '!'.\n   \n    For example:\n    >>> is_bored(\"Hello world\")\n    0\n    >>> is_bored(\"The sky is blue. The sun is shining. I love this weather\")\n    1\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "6a98d9ec94b8b784d9d03e4064da2c5a310f1a243056089be7aab0a849c02613",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 224,
+    "content": " Here's the code that fulfills the requested functionality:\n\n```python\nimport re\n\ndef is_bored(S):\n    boredoms = 0\n    words = re.findall(r'\\b\\w+\\b', S)  # Find all words in the string\n    for word in words:\n        if word.lower() == 'i' and words[words.index(word) - 1] in ['.', '?', '!']:\n            boredoms += 1\n    return boredoms\n```\n\nThis code defines a function `is_bored(S)` that counts the number of boredoms in a given string `S`. It uses regular expressions to find all words in the string, then checks if each word is \"I\" and if it follows a punctuation mark ('.', '?', or '!'). If both conditions are met, it increments a counter for the number of boredoms. The function returns the total number of boredoms found in the string.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 21432.48944,
+    "model": "mistral:7b",
+    "prompt_tokens": 322,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 224,
+      "prompt_eval_count": 322
+    }
+  },
+  "saved_at": "2026-10-11T00:08:33.227972+00:00",
+  "schema_version": "2.0"
+}

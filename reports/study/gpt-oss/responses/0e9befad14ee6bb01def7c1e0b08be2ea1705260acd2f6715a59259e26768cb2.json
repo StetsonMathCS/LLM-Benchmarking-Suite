@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef greatest_common_divisor(a: int, b: int) -> int:\n    \"\"\" Return a greatest common divisor of two integers a and b\n    >>> greatest_common_divisor(3, 5)\n    1\n    >>> greatest_common_divisor(25, 15)\n    5\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "0e9befad14ee6bb01def7c1e0b08be2ea1705260acd2f6715a59259e26768cb2",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 383,
+    "content": "def greatest_common_divisor(a: int, b: int) -> int:\n    \"\"\"Return the greatest common divisor (GCD) of two integers a and b.\n\n    The function implements the Euclidean algorithm and always returns a\n    non‑negative integer.  The GCD of 0 and 0 is defined as 0.\n\n    >>> greatest_common_divisor(3, 5)\n    1\n    >>> greatest_common_divisor(25, 15)\n    5\n    >>> greatest_common_divisor(-12, 18)\n    6\n    >>> greatest_common_divisor(0, 0)\n    0\n    >>> greatest_common_divisor(0, 7)\n    7\n    \"\"\"\n    a, b = abs(a), abs(b)\n    if a == 0 and b == 0:\n        return 0\n    while b:\n        a, b = b, a % b\n    return a\n\n\nif __name__ == \"__main__\":\n    import doctest\n    doctest.testmod()\n",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 27374.345995,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 296,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 383,
+      "prompt_eval_count": 296
+    }
+  },
+  "saved_at": "2026-10-10T15:31:13.549821+00:00",
+  "schema_version": "2.0"
+}

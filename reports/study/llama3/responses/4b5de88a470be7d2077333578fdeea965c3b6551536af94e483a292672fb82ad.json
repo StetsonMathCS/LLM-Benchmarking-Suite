@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import hex_key\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine hex_key. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: You have been tasked to write a function that receives a hexadecimal number as a string and counts the number of hexadecimal digits that are primes (prime number, or a prime, is a natural number greater than 1 that is not a product of two smaller natural numbers). Hexadecimal digits are 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F. Prime numbers are 2, 3, 5, 7, 11, 13, 17,... So you have to determine a number of the following digits: 2, 3, 5, 7, B (=decimal 11), D (=decimal 13). Note: you may assume the input is always correct or empty string, and symbols A,B,C,D,E,F are always uppercase.\nCode to test:\ndef hex_key(num):\n    \"\"\"You have been tasked to write a function that receives \n    a hexadecimal number as a string and counts the number of hexadecimal \n    digits that are primes (prime number, or a prime, is a natural number \n    greater than 1 that is not a product of two smaller natural numbers).\n    Hexadecimal digits are 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F.\n    Prime numbers are 2, 3, 5, 7, 11, 13, 17,...\n    So you have to determine a number of the following digits: 2, 3, 5, 7, \n    B (=decimal 11), D (=decimal 13).\n    Note: you may assume the input is always correct or empty string, \n    and symbols A,B,C,D,E,F are always uppercase.\n    Examples:\n    For num = \"AB\" the output should be 1.\n    For num = \"1077E\" the output should be 2.\n    For num = \"ABED1A33\" the output should be 4.\n    For num = \"123456789ABCDEF0\" the output should be 6.\n    For num = \"2020\" the output should be 2.\n    \"\"\"\n    primes = ('2', '3', '5', '7', 'B', 'D')\n    total = 0\n    for i in range(0, len(num)):\n        if num[i] in primes:\n            total += 1\n    return total\n\nGenerated Tests:\n",
+  "record_identity": "4b5de88a470be7d2077333578fdeea965c3b6551536af94e483a292672fb82ad",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 268,
+    "content": "import unittest\nfrom candidate import hex_key\n\nclass TestHexKey(unittest.TestCase):\n    def test_hex_key_empty_string(self):\n        self.assertEqual(hex_key(\"\"), 0)\n    \n    def test_hex_key_single_prime(self):\n        self.assertEqual(hex_key(\"2\"), 1)\n    \n    def test_hex_key_single_non_prime(self):\n        self.assertEqual(hex_key(\"1\"), 0)\n    \n    def test_hex_key_multiple_primes(self):\n        self.assertEqual(hex_key(\"237B\"), 4)\n    \n    def test_hex_key_multiple_non_primes(self):\n        self.assertEqual(hex_key(\"0468\"), 0)\n    \n    def test_hex_key_mixed_primes_and_non_primes(self):\n        self.assertEqual(hex_key(\"1077E\"), 2)\n    \n    def test_hex_key_all_primes(self):\n        self.assertEqual(hex_key(\"23B5D7\"), 6)\n    \n    def test_hex_key_all_non_primes(self):\n        self.assertEqual(hex_key(\"04689ABCDEF\"), 0)\n    \n    def test_hex_key_repeated_primes(self):\n        self.assertEqual(hex_key(\"22BBDD\"), 6)\n    \n    def test_hex_key_repeated_non_primes(self):\n        self.assertEqual(hex_key(\"000011\"), 0)\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 299468.447025,
+    "model": "llama3:70b",
+    "prompt_tokens": 1074,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 268,
+      "prompt_eval_count": 1074
+    }
+  },
+  "saved_at": "2026-10-10T14:26:03.974621+00:00",
+  "schema_version": "2.0"
+}

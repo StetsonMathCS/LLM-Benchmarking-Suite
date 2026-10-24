@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef encode(message):\n    \"\"\"\n    Write a function that takes a message, and encodes in such a \n    way that it swaps case of all letters, replaces all vowels in \n    the message with the letter that appears 2 places ahead of that \n    vowel in the english alphabet. \n    Assume only letters. \n    \n    Examples:\n    >>> encode('test')\n    'TGST'\n    >>> encode('This is a message')\n    'tHKS KS C MGSSCGG'\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "b9780b8e1f20e78780c27627eeccff76973a4f3ee430147bda09d4bdbd3a6b5d",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 928,
+    "content": "```python\ndef encode(message: str) -> str:\n    \"\"\"\n    Encode a message by swapping the case of all letters and\n    replacing every vowel with the letter two positions ahead\n    in the English alphabet.\n\n    Parameters\n    ----------\n    message : str\n        The input string containing only letters and possibly\n        non‑letter characters (e.g., spaces).\n\n    Returns\n    -------\n    str\n        The encoded string.\n\n    Examples\n    --------\n    >>> encode('test')\n    'TGST'\n    >>> encode('This is a message')\n    'tHKS KS C MGSSCGG'\n    \"\"\"\n    vowels = set('aeiouAEIOU')\n    result = []\n\n    for ch in message:\n        if ch.isalpha():\n            swapped = ch.swapcase()\n            if swapped in vowels:\n                # Shift the vowel two places forward\n                new_char = chr(ord(swapped) + 2)\n                result.append(new_char)\n            else:\n                result.append(swapped)\n        else:\n            result.append(ch)\n\n    return ''.join(result)\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 65301.101087,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 335,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 928,
+      "prompt_eval_count": 335
+    }
+  },
+  "saved_at": "2026-10-10T16:15:00.368989+00:00",
+  "schema_version": "2.0"
+}

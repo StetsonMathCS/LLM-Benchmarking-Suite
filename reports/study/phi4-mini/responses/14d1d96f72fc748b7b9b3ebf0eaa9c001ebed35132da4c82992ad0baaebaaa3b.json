@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Refactor TaskRunner to use a TaskResult dataclass; eliminate the running flag and parallel error/result lists; expose a summary property\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\nclass TaskRunner:\n    def __init__(self):\n        self.tasks = []\n        self.results = []\n        self.errors = []\n        self.running = False\n\n    def add_task(self, func, *args, **kwargs):\n        self.tasks.append((func, args, kwargs))\n\n    def run(self):\n        self.running = True\n        self.results = []\n        self.errors = []\n        for func, args, kwargs in self.tasks:\n            try:\n                result = func(*args, **kwargs)\n                self.results.append({'status': 'ok', 'result': result})\n            except Exception as e:\n                self.errors.append({'status': 'error', 'error': str(e), 'func': func.__name__})\n                self.results.append({'status': 'error', 'error': str(e)})\n        self.running = False\n        return self.results\n\n    def get_errors(self):\n        return self.errors\n\n    def get_successes(self):\n        return [r for r in self.results if r['status'] == 'ok']\n\nRefactored Code:",
+  "record_identity": "14d1d96f72fc748b7b9b3ebf0eaa9c001ebed35132da4c82992ad0baaebaaa3b",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 224,
+    "content": "from dataclasses import dataclass\n\n@dataclass\nclass TaskResult:\n    status: str\n    result: any = None\n    error: str = None\n    func: str = None\n\n    @property\n    def summary(self):\n        return self.status\n\nclass TaskRunner:\n    def __init__(self):\n        self.tasks = []\n\n    def add_task(self, func, *args, **kwargs):\n        self.tasks.append((func, args, kwargs))\n\n    def run(self):\n        self.results = []\n        self.errors = []\n        for func, args, kwargs in self.tasks:\n            try:\n                result = func(*args, **kwargs)\n                self.results.append(TaskResult(status='ok', result=result))\n            except Exception as e:\n                self.errors.append(TaskResult(status='error', error=str(e), func=func.__name__))\n        return self.results\n\n    def get_errors(self):\n        return [error for result in self.errors if result.error is not None]\n\n    def get_successes(self):\n        return [result for result in self.results if result.status == 'ok']",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 13098.772405,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 517,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 224,
+      "prompt_eval_count": 517
+    }
+  },
+  "saved_at": "2026-10-11T03:19:43.166114+00:00",
+  "schema_version": "2.0"
+}

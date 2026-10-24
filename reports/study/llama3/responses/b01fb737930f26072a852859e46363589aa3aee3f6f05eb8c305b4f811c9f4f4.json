@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import string_xor\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine string_xor. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Input are two strings a and b consisting only of 1s and 0s. Perform binary XOR on these inputs and return result also as a string.\nCode to test:\nfrom typing import List\n\n\ndef string_xor(a: str, b: str) -> str:\n    \"\"\" Input are two strings a and b consisting only of 1s and 0s.\n    Perform binary XOR on these inputs and return result also as a string.\n    >>> string_xor('010', '110')\n    '100'\n    \"\"\"\n    def xor(i, j):\n        if i == j:\n            return '0'\n        else:\n            return '1'\n\n    return ''.join(xor(x, y) for x, y in zip(a, b))\n\nGenerated Tests:\n",
+  "record_identity": "b01fb737930f26072a852859e46363589aa3aee3f6f05eb8c305b4f811c9f4f4",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 387,
+    "content": "import unittest\nfrom candidate import string_xor\n\nclass TestStringXor(unittest.TestCase):\n    def test_string_xor_two_empty_strings(self):\n        self.assertEqual(string_xor('', ''), '')\n\n    def test_string_xor_two_single_character_strings(self):\n        self.assertEqual(string_xor('0', '0'), '0')\n        self.assertEqual(string_xor('0', '1'), '1')\n        self.assertEqual(string_xor('1', '0'), '1')\n        self.assertEqual(string_xor('1', '1'), '0')\n\n    def test_string_xor_two_multi_character_strings(self):\n        self.assertEqual(string_xor('010', '110'), '100')\n        self.assertEqual(string_xor('1010', '1100'), '0110')\n        self.assertEqual(string_xor('1111', '0000'), '1111')\n        self.assertEqual(string_xor('0000', '1111'), '1111')\n\n    def test_string_xor_with_different_lengths(self):\n        self.assertEqual(string_xor('010', '1100'), '1000')\n        self.assertEqual(string_xor('1010', '11'), '0101')\n        self.assertEqual(string_xor('1111', '1'), '0111')\n        self.assertEqual(string_xor('0', '1111'), '1111')\n\n    def test_string_xor_with_none_values(self):\n        with self.assertRaises(TypeError):\n            string_xor('010', None)\n        with self.assertRaises(TypeError):\n            string_xor(None, '110')\n\n    def test_string_xor_with_non_binary_strings(self):\n        with self.assertRaises(ValueError):\n            string_xor('012', '110')\n        with self.assertRaises(ValueError):\n            string_xor('1010', '120')\n\n    def test_string_xor_with_non_string_inputs(self):\n        with self.assertRaises(TypeError):\n            string_xor(123, '110')\n        with self.assertRaises(TypeError):\n            string_xor('1010', 120)\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 343165.712589,
+    "model": "llama3:70b",
+    "prompt_tokens": 688,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 387,
+      "prompt_eval_count": 688
+    }
+  },
+  "saved_at": "2026-10-10T09:05:19.123105+00:00",
+  "schema_version": "2.0"
+}

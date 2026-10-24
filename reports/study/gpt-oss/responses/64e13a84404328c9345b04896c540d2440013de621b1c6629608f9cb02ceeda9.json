@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef valid_date(date):\n    \"\"\"You have to write a function which validates a given date string and\n    returns True if the date is valid otherwise False.\n    The date is valid if all of the following rules are satisfied:\n    1. The date string is not empty.\n    2. The number of days is not less than 1 or higher than 31 days for months 1,3,5,7,8,10,12. And the number of days is not less than 1 or higher than 30 days for months 4,6,9,11. And, the number of days is not less than 1 or higher than 29 for the month 2.\n    3. The months should not be less than 1 or higher than 12.\n    4. The date should be in the format: mm-dd-yyyy\n\n    for example: \n    valid_date('03-11-2000') => True\n\n    valid_date('15-01-2012') => False\n\n    valid_date('04-0-2040') => False\n\n    valid_date('06-04-2020') => True\n\n    valid_date('06/04/2020') => False\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "64e13a84404328c9345b04896c540d2440013de621b1c6629608f9cb02ceeda9",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 650,
+    "content": "```python\nimport re\n\ndef valid_date(date: str) -> bool:\n    \"\"\"\n    Validate a date string in the format mm-dd-yyyy.\n    Returns True if the date is valid according to the specified rules,\n    otherwise False.\n    \"\"\"\n    if not date:\n        return False\n\n    # Must match exactly two digits, a dash, two digits, a dash, four digits\n    if not re.match(r'^\\d{2}-\\d{2}-\\d{4}$', date):\n        return False\n\n    month_str, day_str, year_str = date.split('-')\n    month, day = int(month_str), int(day_str)\n\n    # Month must be between 1 and 12\n    if not 1 <= month <= 12:\n        return False\n\n    # Days per month, February is capped at 29 regardless of year\n    days_in_month = {\n        1: 31, 2: 29, 3: 31, 4: 30,\n        5: 31, 6: 30, 7: 31, 8: 31,\n        9: 30,10: 31,11: 30,12: 31\n    }\n\n    # Day must be within the allowed range for the month\n    if not 1 <= day <= days_in_month[month]:\n        return False\n\n    return True\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 47808.83515,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 489,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 650,
+      "prompt_eval_count": 489
+    }
+  },
+  "saved_at": "2026-10-10T16:36:33.708178+00:00",
+  "schema_version": "2.0"
+}

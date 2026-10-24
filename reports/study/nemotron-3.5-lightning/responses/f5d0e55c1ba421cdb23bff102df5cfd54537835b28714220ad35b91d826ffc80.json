@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code review model. Your task is to analyze Python code and provide a structured review highlighting issues, potential improvements, and best practices.\n\n1.) Carefully analyze the provided Python code for correctness, readability, and maintainability.\n2.) Identify syntax issues, logical errors, potential runtime problems, and edge cases.\n3.) Detect inefficient algorithms, unnecessary complexity, or poor use of Python features.\n4.) Suggest improvements following idiomatic Python practices and common style conventions.\n5.) Highlight missing error handling, validation, or unsafe operations when relevant.\n6.) Point out maintainability concerns such as unclear variable names, deeply nested logic, or duplicated code.\n7.) Recommend improvements while preserving the original intent of the code.\n8.) Do not rewrite the entire program unless necessary to demonstrate a fix or improvement.\n9.) Present the review in a clear and structured manner.\n10.) If improvements are suggested, provide concise corrected snippets where appropriate.\n\nStart Example\n\nInput:\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n-1)\n\nOutput:\n\nIssues:\nThe function does not handle negative inputs.\nRecursive implementation may cause recursion depth issues for large values.\nSuggestions:\nAdd input validation to ensure n is non-negative.\nConsider an iterative implementation for better scalability.\n\nEnd Example\n\nYour turn now.\n\nCode to review:def cache_result(func):\n    cache = {}\n    def wrapper(*args):\n        if args in cache:\n            return cache[args]\n        result = func(*args)\n        cache[args] = result\n        return result\n    return wrapper\n\n",
+  "record_identity": "f5d0e55c1ba421cdb23bff102df5cfd54537835b28714220ad35b91d826ffc80",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 2818,
+    "content": "### Code Review: `cache_result`\n\n```python\ndef cache_result(func):\n    cache = {}\n    def wrapper(*args):\n        if args in cache:\n            return cache[args]\n        result = func(*args)\n        cache[args] = result\n        return result\n    return wrapper\n```\n\n#### Issues\n| Category | Description |\n|----------|-------------|\n| **Missing metadata preservation** | The wrapper doesn't use `functools.wraps`, so `__name__`, `__doc__`, and other function attributes are lost. This breaks introspection, debugging, and framework compatibility. |\n| **No `**kwargs` support** | Only `*args` is accepted. Calling the decorated function with keyword arguments raises `TypeError` or produces inconsistent cache behavior. |\n| **Unhashable argument types** | Using `args` directly as a `dict` key will raise `TypeError` if any argument is unhashable (e.g., `list`, `dict`, `set`). |\n| **Unbounded cache growth** | The dictionary grows indefinitely with no size limit or eviction policy, risking memory exhaustion over time. |\n| **Not thread-safe** | Concurrent reads/writes to `cache` from multiple threads are not atomic; race conditions may cause duplicate computations or corruption. |\n| **No documentation or type hints** | Missing docstring and annotations makes the API harder to adopt and misuse-prone. |\n| **No cache invalidation** | There's no way to clear or reset the cache without restarting the program, which is inflexible if underlying data changes. |\n\n#### Suggestions (following idiomatic Python)\n- **Use `functools.lru_cache`** if a simple, bounded cache suffices. It's standard library, handles `**kwargs`, enforces a max size, and provides `.cache_clear()`.\n- **If implementing a custom cache**, add `**kwargs` support (convert to a hashable key), use `functools.wraps`, include type hints and a docstring, and expose a `cache_clear` method.\n- **Add hashability validation or conversion** (e.g., `tuple(args)` for positional-only use, or a helper to recursively convert unhashable types).\n- **Consider thread safety** (e.g., `threading.Lock`) if the decorator will be used in concurrent contexts.\n- **Add `maxsize` parameter** to limit cache growth, or document that callers must manage argument hashability.\n\n#### Corrected Snippet (minimal improvement)\n```python\nfrom functools import wraps\n\ndef cache_result(func, maxsize=None):\n    \"\"\"Decorator that caches function results.\n\n    Args:\n        func: The function to decorate.\n        maxsize: Maximum number of cached results (None = unbounded).\n    \"\"\"\n    cache = {}\n    wrapped = wraps(func)(func)\n\n    def wrapper(*args, **kwargs):\n        # Simple key construction; kwargs must have hashable values\n        key = args + tuple(sorted(kwargs.items())) if kwargs else args\n        if key in cache:\n            return cache[key]\n        result = func(*args, **kwargs)\n        cache[key] = result\n        return result\n\n    wrapper.cache_clear = lambda: cache.clear()\n    return wrapper\n```\n> **Note**: For production use, prefer `functools.lru_cache(maxsize=maxsize)` unless you need custom cache semantics. The snippet above preserves the original structure while addressing metadata, `**kwargs`, and documentation gaps.\n\n#### Additional Recommendation\nIf this decorator is intended for general-purpose memoization, swapping the entire implementation for `@lru_cache` removes ~6 potential pitfalls, adds thread-safety guarantees (in CPython's GIL-bound cases), and provides built-in cache management (`cache_info()`, `cache_clear()`).",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 161236.699381,
+    "model": "nemotron-3.5-lightning:30b",
+    "prompt_tokens": 349,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 2818,
+      "prompt_eval_count": 349
+    }
+  },
+  "saved_at": "2026-10-08T08:33:00.970127+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef rounded_avg(n, m):\n    \"\"\"You are given two positive integers n and m, and your task is to compute the\n    average of the integers from n through m (including n and m). \n    Round the answer to the nearest integer and convert that to binary.\n    If n is greater than m, return -1.\n    Example:\n    rounded_avg(1, 5) => \"0b11\"\n    rounded_avg(7, 5) => -1\n    rounded_avg(10, 20) => \"0b1111\"\n    rounded_avg(20, 33) => \"0b11010\"\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "cd8d0fab076f6206397d7b982e75feb0f0ef1b063befbc2a576585776fd5a941",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 680,
+    "content": "```python\ndef rounded_avg(n, m):\n    \"\"\"Compute the rounded average of all integers from n through m inclusive\n    and return the result in binary string form. If n > m, return -1.\n\n    Parameters\n    ----------\n    n, m : int\n        Positive integers defining the inclusive range [n, m].\n\n    Returns\n    -------\n    str or int\n        Binary representation of the rounded average if n <= m,\n        otherwise the integer -1.\n    \"\"\"\n    if n > m:\n        return -1\n\n    # The average of an arithmetic sequence from n to m is (n + m) / 2.\n    avg = round((n + m) / 2)\n    return bin(avg)\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 47595.050768,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 366,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 680,
+      "prompt_eval_count": 366
+    }
+  },
+  "saved_at": "2026-10-10T16:20:56.191247+00:00",
+  "schema_version": "2.0"
+}

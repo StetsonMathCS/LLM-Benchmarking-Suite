@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef is_happy(s):\n    \"\"\"You are given a string s.\n    Your task is to check if the string is happy or not.\n    A string is happy if its length is at least 3 and every 3 consecutive letters are distinct\n    For example:\n    is_happy(a) => False\n    is_happy(aa) => False\n    is_happy(abcd) => True\n    is_happy(aabb) => False\n    is_happy(adb) => True\n    is_happy(xyy) => False\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "afdbaa0ae3652a5f03a0b15551e84cce43b89ca2ae5b4cc78a417e0f75720857",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 362,
+    "content": "def is_happy(s: str) -> bool:\n    \"\"\"Return True if the string is happy.\n\n    A string is happy if its length is at least 3 and every\n    consecutive three letters are all distinct.\n    \"\"\"\n    if len(s) < 3:\n        return False\n    for i in range(len(s) - 2):\n        a, b, c = s[i], s[i + 1], s[i + 2]\n        if a == b or a == c or b == c:\n            return False\n    return True\n",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 26722.422969,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 348,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 362,
+      "prompt_eval_count": 348
+    }
+  },
+  "saved_at": "2026-10-10T16:06:47.632990+00:00",
+  "schema_version": "2.0"
+}

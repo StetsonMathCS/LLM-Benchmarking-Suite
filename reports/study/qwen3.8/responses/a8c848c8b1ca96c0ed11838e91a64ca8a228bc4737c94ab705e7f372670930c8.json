@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Replace the manual frequency dict and if/else increment with collections.Counter\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\ndef word_frequency(text):\n    freq = {}\n    for word in text.lower().split():\n        word = word.strip('.,!?;:')\n        if word:\n            if word in freq:\n                freq[word] += 1\n            else:\n                freq[word] = 1\n    return freq\n\nRefactored Code:",
+  "record_identity": "a8c848c8b1ca96c0ed11838e91a64ca8a228bc4737c94ab705e7f372670930c8",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 283,
+    "content": "from collections import Counter\n\n\ndef word_frequency(text):\n    words = (word.strip('.,!?;:') for word in text.lower().split())\n    return Counter(word for word in words if word)",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 63809.838663,
+    "model": "qwen3.8:27b",
+    "prompt_tokens": 386,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 283,
+      "prompt_eval_count": 386
+    }
+  },
+  "saved_at": "2026-10-09T01:06:24.770409+00:00",
+  "schema_version": "2.0"
+}

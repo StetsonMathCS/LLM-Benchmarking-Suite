@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef largest_divisor(n: int) -> int:\n    \"\"\" For a given number n, find the largest number that divides n evenly, smaller than n\n    >>> largest_divisor(15)\n    5\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "1d42cb033c6cfbfbd5aff44cf30575bce11f5e11f34947cd84e75029b87897a5",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 347,
+    "content": "def largest_divisor(n: int) -> int:\n    \"\"\"For a given number n, find the largest number that divides n evenly, smaller than n.\n\n    >>> largest_divisor(15)\n    5\n    >>> largest_divisor(13)\n    1\n    >>> largest_divisor(1)\n    1\n    >>> largest_divisor(-12)\n    6\n    \"\"\"\n    if n == 0:\n        raise ValueError(\"Cannot compute divisor of zero.\")\n    n_abs = abs(n)\n    if n_abs <= 1:\n        return 1\n    for d in range(n_abs // 2, 0, -1):\n        if n_abs % d == 0:\n            return d\n    return 1\n",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 24586.86155,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 278,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 347,
+      "prompt_eval_count": 278
+    }
+  },
+  "saved_at": "2026-10-10T15:36:10.219075+00:00",
+  "schema_version": "2.0"
+}

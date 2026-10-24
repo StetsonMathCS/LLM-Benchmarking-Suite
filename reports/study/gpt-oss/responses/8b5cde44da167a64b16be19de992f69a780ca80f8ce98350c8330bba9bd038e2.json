@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef get_row(lst, x):\n    \"\"\"\n    You are given a 2 dimensional data, as a nested lists,\n    which is similar to matrix, however, unlike matrices,\n    each row may contain a different number of columns.\n    Given lst, and integer x, find integers x in the list,\n    and return list of tuples, [(x1, y1), (x2, y2) ...] such that\n    each tuple is a coordinate - (row, columns), starting with 0.\n    Sort coordinates initially by rows in ascending order.\n    Also, sort coordinates of the row by columns in descending order.\n    \n    Examples:\n    get_row([\n      [1,2,3,4,5,6],\n      [1,2,3,4,1,6],\n      [1,2,3,4,5,1]\n    ], 1) == [(0, 0), (1, 4), (1, 0), (2, 5), (2, 0)]\n    get_row([], 1) == []\n    get_row([[], [1], [1, 2, 3]], 3) == [(2, 2)]\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "8b5cde44da167a64b16be19de992f69a780ca80f8ce98350c8330bba9bd038e2",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 651,
+    "content": "def get_row(lst, x):\n    \"\"\"\n    Find all coordinates of the value `x` in a jagged 2D list `lst`.\n    Each coordinate is a tuple (row_index, column_index) with 0-based indexing.\n    The resulting list is sorted first by row indices in ascending order,\n    and for each row, by column indices in descending order.\n\n    Parameters\n    ----------\n    lst : list[list[int]]\n        A list of lists, possibly with rows of differing lengths.\n    x : int\n        The value to search for.\n\n    Returns\n    -------\n    list[tuple[int, int]]\n        List of coordinates where `x` appears, sorted as described.\n\n    Examples\n    --------\n    >>> get_row([\n    ...   [1,2,3,4,5,6],\n    ...   [1,2,3,4,1,6],\n    ...   [1,2,3,4,5,1]\n    ... ], 1)\n    [(0, 0), (1, 4), (1, 0), (2, 5), (2, 0)]\n\n    >>> get_row([], 1)\n    []\n\n    >>> get_row([[], [1], [1, 2, 3]], 3)\n    [(2, 2)]\n    \"\"\"\n    result = []\n    for row_index, row in enumerate(lst):\n        # Find all column indices where the element equals x\n        columns = [col_index for col_index, val in enumerate(row) if val == x]\n        # Sort columns in descending order as required\n        for col_index in sorted(columns, reverse=True):\n            result.append((row_index, col_index))\n    return result\n",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 48578.152097,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 485,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 651,
+      "prompt_eval_count": 485
+    }
+  },
+  "saved_at": "2026-10-10T16:11:32.036699+00:00",
+  "schema_version": "2.0"
+}

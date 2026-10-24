@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef maximum(arr, k):\n    \"\"\"\n    Given an array arr of integers and a positive integer k, return a sorted list \n    of length k with the maximum k numbers in arr.\n\n    Example 1:\n\n        Input: arr = [-3, -4, 5], k = 3\n        Output: [-4, -3, 5]\n\n    Example 2:\n\n        Input: arr = [4, -4, 4], k = 2\n        Output: [4, 4]\n\n    Example 3:\n\n        Input: arr = [-3, 2, 1, 2, -1, -2, 1], k = 1\n        Output: [2]\n\n    Note:\n        1. The length of the array will be in the range of [1, 1000].\n        2. The elements in the array will be in the range of [-1000, 1000].\n        3. 0 <= k <= len(arr)\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "35951d32b113e08ab69654b1d4acad9bb73eaa1c3002a8417095de3a5aaa407c",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 206,
+    "content": "```python\ndef maximum(arr, k):\n    \"\"\"\n    Return a sorted list of length k containing the maximum k elements of arr.\n    If k is 0, an empty list is returned.\n    \"\"\"\n    if k == 0:\n        return []\n\n    # Take the k largest elements (unsorted), then sort ascending\n    largest = sorted(arr, reverse=True)[:k]\n    return sorted(largest)\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 15951.389346,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 443,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 206,
+      "prompt_eval_count": 443
+    }
+  },
+  "saved_at": "2026-10-10T16:33:49.783465+00:00",
+  "schema_version": "2.0"
+}

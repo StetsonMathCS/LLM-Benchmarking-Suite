@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: from typing import List, Tuple\n\n\ndef find_closest_elements(numbers: List[float]) -> Tuple[float, float]:\n    \"\"\" From a supplied list of numbers (of length at least two) select and return two that are the closest to each\n    other and return them in order (smaller number, larger number).\n    >>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.2])\n    (2.0, 2.2)\n    >>> find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.0])\n    (2.0, 2.0)\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "c863fec0a0a42b935f76ab4ea5c480dcb34452c630129ad7e167aef4c69725a6",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 134,
+    "content": "```python\nfrom typing import List, Tuple\n\ndef find_closest_elements(numbers: List[float]) -> Tuple[float, float]:\n    if len(numbers) < 2:\n        raise ValueError(\"List must contain at least two elements.\")\n    numbers.sort()\n    min_diff = float('inf')\n    closest_pair = (numbers[0], numbers[1])\n    for i in range(len(numbers) - 1):\n        diff = numbers[i + 1] - numbers[i]\n        if diff < min_diff:\n            min_diff = diff\n            closest_pair = (numbers[i], numbers[i + 1])\n    return closest_pair\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 7830.912767,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 329,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 134,
+      "prompt_eval_count": 329
+    }
+  },
+  "saved_at": "2026-10-11T02:54:30.476762+00:00",
+  "schema_version": "2.0"
+}

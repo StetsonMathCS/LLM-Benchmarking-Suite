@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef strange_sort_list(lst):\n    '''\n    Given list of integers, return list in strange order.\n    Strange sorting, is when you start with the minimum value,\n    then maximum of the remaining integers, then minimum and so on.\n\n    Examples:\n    strange_sort_list([1, 2, 3, 4]) == [1, 4, 2, 3]\n    strange_sort_list([5, 5, 5, 5]) == [5, 5, 5, 5]\n    strange_sort_list([]) == []\n    '''\n\n\nGenerated Code:",
+  "record_identity": "fcf510e8c4dffb70bd505bc10f862b9caf9cd912d4a9a62553f0cf86f1bbc85c",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 55,
+    "content": "def strange_sort_list(lst):\n    if not lst:\n        return []\n    \n    lst.sort()\n    result = []\n    while lst:\n        result.append(lst.pop(0))\n        if lst:\n            result.append(lst.pop(-1))\n        lst.sort()\n    return result",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 3564.942339,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 286,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 55,
+      "prompt_eval_count": 286
+    }
+  },
+  "saved_at": "2026-10-11T02:58:39.967557+00:00",
+  "schema_version": "2.0"
+}

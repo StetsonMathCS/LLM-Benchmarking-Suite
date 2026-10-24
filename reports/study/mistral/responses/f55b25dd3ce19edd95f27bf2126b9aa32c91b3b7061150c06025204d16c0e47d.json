@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef monotonic(l: list):\n    \"\"\"Return True is list elements are monotonically increasing or decreasing.\n    >>> monotonic([1, 2, 4, 20])\n    True\n    >>> monotonic([1, 20, 4, 10])\n    False\n    >>> monotonic([4, 1, 0, -10])\n    True\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "f55b25dd3ce19edd95f27bf2126b9aa32c91b3b7061150c06025204d16c0e47d",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 260,
+    "content": " Here's a Python function that follows your requirements and checks if the list elements are monotonically increasing or decreasing:\n\n```python\nimport functools\n\ndef monotonic(l: list):\n    \"\"\"Return True if list elements are monotonically increasing or decreasing.\"\"\"\n\n    return functools.reduce(lambda a, b: (a[0] <= b[0] if a[1] else a[0] >= b[0]),\n                             sorted(enumerate(l)), (True, True))\n```\n\nThe `functools.reduce` function is used to reduce a list to a single value by repeatedly applying a given function to the initial value and each element of the list. In this case, the function compares the current and previous elements and checks if they are monotonically increasing or decreasing. If the list is empty, the function returns `True` as an empty list is considered monotonically increasing.\n\nThe `sorted(enumerate(l))` function returns a list of tuples, where each tuple contains an index and its corresponding element from the input list `l`. This is necessary to keep track of the positions of elements while comparing them.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 24346.108751,
+    "model": "mistral:7b",
+    "prompt_tokens": 300,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 260,
+      "prompt_eval_count": 300
+    }
+  },
+  "saved_at": "2026-10-10T23:53:15.030319+00:00",
+  "schema_version": "2.0"
+}

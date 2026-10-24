@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import total_match\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine total_match. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Write a function that accepts two lists of strings and returns the list that has total number of chars in the all strings of the list less than the other list. if the two lists have the same number of chars, return the first list.\nCode to test:\ndef total_match(lst1, lst2):\n    '''\n    Write a function that accepts two lists of strings and returns the list that has \n    total number of chars in the all strings of the list less than the other list.\n\n    if the two lists have the same number of chars, return the first list.\n\n    Examples\n    total_match([], []) ➞ []\n    total_match(['hi', 'admin'], ['hI', 'Hi']) ➞ ['hI', 'Hi']\n    total_match(['hi', 'admin'], ['hi', 'hi', 'admin', 'project']) ➞ ['hi', 'admin']\n    total_match(['hi', 'admin'], ['hI', 'hi', 'hi']) ➞ ['hI', 'hi', 'hi']\n    total_match(['4'], ['1', '2', '3', '4', '5']) ➞ ['4']\n    '''\n    l1 = 0\n    for st in lst1:\n        l1 += len(st)\n    \n    l2 = 0\n    for st in lst2:\n        l2 += len(st)\n    \n    if l1 <= l2:\n        return lst1\n    else:\n        return lst2\n\nGenerated Tests:\n",
+  "record_identity": "d91e8f958ba64f13e3c5c5bf4bd2059cb9c5c9b815e74bdf683aaf0389a3ca22",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 475,
+    "content": "```python\nimport pytest\nfrom candidate import total_match\n\nclass TestTotalMatch:\n    def test_empty_lists(self):\n        assert total_match([], []) == []\n\n    def test_different_lengths(self):\n        assert total_match(['hi', 'admin'], ['hI', 'Hi']) == ['hI', 'Hi']\n\n    def test_list_with_fewer_strings(self):\n        assert total_match(['hi', 'admin'], ['hi', 'hi', 'admin', 'project']) == ['hi', 'admin']\n\n    def test_list_with_more_strings(self):\n        assert total_match(['hI', 'hi', 'hi'], ['hi', 'hi', 'admin', 'project']) == ['hI', 'hi', 'hi']\n\n    def test_one_element_lists(self):\n        assert total_match(['4'], ['1', '2', '3', '4', '5']) == ['4']\n\n    def test_lists_with_equal_length(self):\n        assert total_match(['hi', 'admin'], ['hi', 'hi']) == ['hi', 'hi']\n\n    def test_mixed_case_strings(self):\n        assert total_match(['hi', 'Admin'], ['Hi', 'admin']) == ['Hi', 'admin']\n\n    def test_unicode_strings(self):\n        assert total_match(['héllo', 'world'], ['hèllo', 'world']) == ['hèllo', 'world']\n\n    def test_empty_strings(self):\n        assert total_match(['hi', ''], ['hi', '']) == ['hi', '']\n\n    def test_non_string_values(self):\n        with pytest.raises(TypeError):\n            total_match([1, 2, 3], ['hi', 'admin'])\n\n    def test_mixed_types_lists(self):\n        with pytest.raises(TypeError):\n            total_match([1, 'hi', 3], ['hi', 'admin'])\n\n    def test_large_lists(self):\n        assert total_match(['hi'] * 1000, ['hi'] * 999) == ['hi'] * 1000\n\n    def test_large_lists_with_mixed_contents(self):\n        assert total_match(['hi' * 1000, 'admin' * 999], ['hi' * 999, 'admin' * 1000]) == ['hi' * 1000, 'admin' * 999]\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 30360.874322,
+    "model": "phi4-mini:3.8b",
+    "prompt_tokens": 852,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 475,
+      "prompt_eval_count": 852
+    }
+  },
+  "saved_at": "2026-10-11T04:18:29.361778+00:00",
+  "schema_version": "2.0"
+}

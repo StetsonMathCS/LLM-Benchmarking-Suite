@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import all_prefixes\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine all_prefixes. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Return list of all prefixes from shortest to longest of the input string\nCode to test:\nfrom typing import List\n\n\ndef all_prefixes(string: str) -> List[str]:\n    \"\"\" Return list of all prefixes from shortest to longest of the input string\n    >>> all_prefixes('abc')\n    ['a', 'ab', 'abc']\n    \"\"\"\n    result = []\n\n    for i in range(len(string)):\n        result.append(string[:i+1])\n    return result\n\nGenerated Tests:\n",
+  "record_identity": "c078fddedc74e603550a5a40f3a3bdb1708db2adb601c1875ba3c05f731a3a66",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 232,
+    "content": "import unittest\nfrom candidate import all_prefixes\n\nclass TestAllPrefixes(unittest.TestCase):\n    def test_all_prefixes_normal_case(self):\n        self.assertEqual(all_prefixes('abc'), ['a', 'ab', 'abc'])\n    \n    def test_all_prefixes_empty_string(self):\n        self.assertEqual(all_prefixes(''), [])\n    \n    def test_all_prefixes_single_character(self):\n        self.assertEqual(all_prefixes('a'), ['a'])\n    \n    def test_all_prefixes_long_string(self):\n        self.assertEqual(all_prefixes('abcdefghij'), ['a', 'ab', 'abc', 'abcd', 'abcde', 'abcdef', 'abcdefg', 'abcdefghi', 'abcdefghij'])\n    \n    def test_all_prefixes_input_none(self):\n        with self.assertRaises(TypeError):\n            all_prefixes(None)\n    \n    def test_all_prefixes_input_not_string(self):\n        with self.assertRaises(TypeError):\n            all_prefixes(123)\n    \n    def test_all_prefixes_input_list(self):\n        with self.assertRaises(TypeError):\n            all_prefixes(['a', 'b', 'c'])\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 224801.413588,
+    "model": "llama3:70b",
+    "prompt_tokens": 634,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 232,
+      "prompt_eval_count": 634
+    }
+  },
+  "saved_at": "2026-10-10T09:18:53.641754+00:00",
+  "schema_version": "2.0"
+}

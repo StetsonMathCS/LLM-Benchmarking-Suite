@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import separate_paren_groups\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine separate_paren_groups. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Input to this function is a string containing multiple groups of nested parentheses. Your goal is to separate those group into separate strings and return the list of those. Separate groups are balanced (each open brace is properly closed) and not nested within each other Ignore any spaces in the input string.\nCode to test:\nfrom typing import List\n\n\ndef separate_paren_groups(paren_string: str) -> List[str]:\n    \"\"\" Input to this function is a string containing multiple groups of nested parentheses. Your goal is to\n    separate those group into separate strings and return the list of those.\n    Separate groups are balanced (each open brace is properly closed) and not nested within each other\n    Ignore any spaces in the input string.\n    >>> separate_paren_groups('( ) (( )) (( )( ))')\n    ['()', '(())', '(()())']\n    \"\"\"\n    result = []\n    current_string = []\n    current_depth = 0\n\n    for c in paren_string:\n        if c == '(':\n            current_depth += 1\n            current_string.append(c)\n        elif c == ')':\n            current_depth -= 1\n            current_string.append(c)\n\n            if current_depth == 0:\n                result.append(''.join(current_string))\n                current_string.clear()\n\n    return result\n\nGenerated Tests:\n",
+  "record_identity": "1af47edc019d7f135900340ed69af1c1d2c1bdedf15554d83375997a63ee60c2",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 462,
+    "content": " ```python\nimport unittest\nfrom candidate import separate_paren_groups\n\nclass TestSeparateParenGroups(unittest.TestCase):\n    def test_normal_case(self):\n        self.assertListEqual(separate_paren_groups('( ) (( )) (( )( ))'), ['()', '(())', '(()())'])\n\n    def test_empty_string(self):\n        self.assertListEqual(separate_paren_groups(''), [])\n\n    def test_single_group(self):\n        self.assertListEqual(separate_paren_groups('(a)'), ['(a)'])\n\n    def test_multiple_groups(self):\n        self.assertListEqual(separate_paren_groups('(a) (b) (c)'), ['(a)', '(b)', '(c)'])\n\n    def test_nested_groups(self):\n        self.assertListEqual(separate_paren_groups('((a))'), ['(a)'])\n\n    def test_mixed_nested_groups(self):\n        self.assertListEqual(separate_paren_groups('(a) ((b)) (c)'), ['(a)', '(b)', '(c)'])\n\n    def test_unbalanced_groups(self):\n        self.assertRaises(ValueError, separate_paren_groups, '(a) (b)(')\n\n    def test_only_open_brackets(self):\n        self.assertRaises(ValueError, separate_paren_groups, '(a) (b(')\n\n    def test_only_closed_brackets(self):\n        self.assertRaises(ValueError, separate_paren_groups, ')(a) (b)(')\n\n    def test_non_string_input(self):\n        self.assertRaises(TypeError, separate_paren_groups, 1)\n\nif __name__ == '__main__':\n    unittest.main()\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 55813.780619,
+    "model": "mistral:7b",
+    "prompt_tokens": 1029,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 462,
+      "prompt_eval_count": 1029
+    }
+  },
+  "saved_at": "2026-10-11T01:11:07.184701+00:00",
+  "schema_version": "2.0"
+}

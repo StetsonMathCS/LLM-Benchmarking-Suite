@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import derivative\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine derivative. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: xs represent coefficients of a polynomial. xs[0] + xs[1] * x + xs[2] * x^2 + .... Return derivative of this polynomial in the same form.\nCode to test:\ndef derivative(xs: list):\n    \"\"\" xs represent coefficients of a polynomial.\n    xs[0] + xs[1] * x + xs[2] * x^2 + ....\n     Return derivative of this polynomial in the same form.\n    >>> derivative([3, 1, 2, 4, 5])\n    [1, 4, 12, 20]\n    >>> derivative([1, 2, 3])\n    [2, 6]\n    \"\"\"\n    return [(i * x) for i, x in enumerate(xs)][1:]\n\nGenerated Tests:\n",
+  "record_identity": "ab10059e92bb263475fa2c44fd67bafa7f8b381d821a0da17e128521a243f81b",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 1471,
+    "content": "import unittest\nfrom candidate import derivative\n\nclass TestDerivative(unittest.TestCase):\n    def test_derivative_normal_cases(self):\n        self.assertEqual(derivative([3, 1, 2, 4, 5]), [1, 4, 12, 20])\n\n    def test_derivative_two_terms(self):\n        self.assertEqual(derivative([1, 2, 3]), [2, 6])\n\n    def test_derivative_empty_list(self):\n        self.assertEqual(derivative([]), [])\n\n    def test_derivative_single_element(self):\n        self.assertEqual(derivative([5]), [])\n\n    def test_derivative_two_elements(self):\n        self.assertEqual(derivative([5, 2]), [2])\n\n    def test_derivative_negative_numbers(self):\n        self.assertEqual(derivative([-3, -2, -1]), [-2, -2])\n\n    def test_derivative_zero_coefficients(self):\n        self.assertEqual(derivative([0, 0, 5]), [0, 10])\n\n    def test_derivative_large_numbers(self):\n        large1 = 2 ** 60\n        large2 = 3 ** 30\n        expected = [large1, 2 * large2]\n        self.assertEqual(derivative([1, large1, large2]), expected)\n\n    def test_derivative_no_modification(self):\n        original = [1, 2, 3]\n        copy = original.copy()\n        derivative(original)\n        self.assertEqual(original, copy)\n\n    def test_derivative_tuple_input(self):\n        self.assertEqual(derivative((1, 2, 3)), [2, 6])\n\n    def test_derivative_generator_input(self):\n        self.assertEqual(derivative((x for x in [1, 2, 3])), [2, 6])\n\n    def test_derivative_non_iterable(self):\n        with self.assertRaises(TypeError):\n            derivative(5)\n\n    def test_derivative_none_input(self):\n        with self.assertRaises(TypeError):\n            derivative(None)\n\n    def test_derivative_non_multipliable_type(self):\n        with self.assertRaises(TypeError):\n            derivative([1, [2]])\n\nif __name__ == \"__main__\":\n    unittest.main()\n",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 111576.146312,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 771,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 1471,
+      "prompt_eval_count": 771
+    }
+  },
+  "saved_at": "2026-10-10T20:25:53.580921+00:00",
+  "schema_version": "2.0"
+}

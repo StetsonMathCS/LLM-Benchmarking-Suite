@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef is_sorted(lst):\n    '''\n    Given a list of numbers, return whether or not they are sorted\n    in ascending order. If list has more than 1 duplicate of the same\n    number, return False. Assume no negative numbers and only integers.\n\n    Examples\n    is_sorted([5]) ➞ True\n    is_sorted([1, 2, 3, 4, 5]) ➞ True\n    is_sorted([1, 3, 2, 4, 5]) ➞ False\n    is_sorted([1, 2, 3, 4, 5, 6]) ➞ True\n    is_sorted([1, 2, 3, 4, 5, 6, 7]) ➞ True\n    is_sorted([1, 3, 2, 4, 5, 6, 7]) ➞ False\n    is_sorted([1, 2, 2, 3, 3, 4]) ➞ True\n    is_sorted([1, 2, 2, 2, 3, 4]) ➞ False\n    '''\n\n\nGenerated Code:",
+  "record_identity": "7c83b8686f3b08096193fe82c99456842b0cfb6d0ea7efc167d91d1cf4d50de2",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 19,
+    "content": "def is_sorted(lst):\n    return lst == sorted(set(lst), key=lst.index)",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 39817.102578,
+    "model": "llama3:70b",
+    "prompt_tokens": 422,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 19,
+      "prompt_eval_count": 422
+    }
+  },
+  "saved_at": "2026-10-10T04:51:45.234254+00:00",
+  "schema_version": "2.0"
+}

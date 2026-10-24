@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python test generation expert. Your task is to generate comprehensive unit tests for the provided Python code.\n\nRequirements:\n1.) Analyze the provided Python code and understand its functionality.\n2.) Generate comprehensive unit tests that cover main functionality, edge cases, and error conditions.\n3.) Use pytest or unittest. Import the implementation from the supplied module exactly as:\n    from candidate import will_it_fly\n4.) Use descriptive test names that clearly indicate what is being tested (e.g., test_function_normalcase_expectedbehavior).\n5.) Include tests for: normal cases, boundary conditions, empty inputs, None values, type errors, and edge cases.\n6.) Ensure tests are independent and can run in any order.\n7.) Mock external dependencies if necessary using unittest.mock.\n8.) Do NOT use any explanations, comments, or docstrings in the test code.\n9.) Return ONLY the test code without any preamble or postamble text.\n\nCRITICAL: The tests are collected with pytest (which also collects unittest.TestCase).\nThe implementation is available only through the module named candidate. Do not\ncopy or redefine will_it_fly. Suites that shadow the candidate are rejected.\n\nStart Example\n\nInput:\ndef add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n\nOutput\nimport unittest\nfrom candidate import add, multiply\n\nclass TestMathOperations(unittest.TestCase):\n    def test_add_positive_numbers(self):\n        self.assertEqual(add(2, 3), 5)\n    \n    def test_add_negative_numbers(self):\n        self.assertEqual(add(-2, -3), -5)\n    \n    def test_add_mixed_numbers(self):\n        self.assertEqual(add(-2, 3), 1)\n    \n    def test_add_zero(self):\n        self.assertEqual(add(0, 5), 5)\n    \n    def test_add_with_floats(self):\n        self.assertAlmostEqual(add(2.5, 3.5), 6.0)\n    \n    def test_multiply_positive_numbers(self):\n        self.assertEqual(multiply(2, 3), 6)\n    \n    def test_multiply_by_zero(self):\n        self.assertEqual(multiply(5, 0), 0)\n    \n    def test_multiply_negative_numbers(self):\n        self.assertEqual(multiply(-2, 3), -6)\n    \n    def test_multiply_with_floats(self):\n        self.assertAlmostEqual(multiply(2.5, 4), 10.0)\n\nif __name__ == '__main__':\n    unittest.main()\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the test code without any additional text or explanation.\n\nContext: Write a function that returns True if the object q will fly, and False otherwise. The object q will fly if it's balanced (it is a palindromic list) and the sum of its elements is less than or equal the maximum possible weight w.\nCode to test:\ndef will_it_fly(q,w):\n    '''\n    Write a function that returns True if the object q will fly, and False otherwise.\n    The object q will fly if it's balanced (it is a palindromic list) and the sum of its elements is less than or equal the maximum possible weight w.\n\n    Example:\n    will_it_fly([1, 2], 5) ➞ False \n    # 1+2 is less than the maximum possible weight, but it's unbalanced.\n\n    will_it_fly([3, 2, 3], 1) ➞ False\n    # it's balanced, but 3+2+3 is more than the maximum possible weight.\n\n    will_it_fly([3, 2, 3], 9) ➞ True\n    # 3+2+3 is less than the maximum possible weight, and it's balanced.\n\n    will_it_fly([3], 5) ➞ True\n    # 3 is less than the maximum possible weight, and it's balanced.\n    '''\n    if sum(q) > w:\n        return False\n\n    i, j = 0, len(q)-1\n    while i<j:\n        if q[i] != q[j]:\n            return False\n        i+=1\n        j-=1\n    return True\n\nGenerated Tests:\n",
+  "record_identity": "33aee96ac61f93785825ca81f81ee6a2f5c5cf23f49bc781fadf494360b24aa4",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 3837,
+    "content": "import unittest\nfrom candidate import will_it_fly\n\nclass TestWillItFly(unittest.TestCase):\n    def test_balanced_and_within_weight_limit(self):\n        self.assertTrue(will_it_fly([3, 2, 3], 9))\n\n    def test_unbalanced_but_within_weight_limit(self):\n        self.assertFalse(will_it_fly([1, 2], 5))\n\n    def test_balanced_but_exceeds_weight_limit(self):\n        self.assertFalse(will_it_fly([3, 2, 3], 1))\n\n    def test_single_element_within_weight(self):\n        self.assertTrue(will_it_fly([3], 5))\n\n    def test_empty_list_within_zero_weight(self):\n        self.assertTrue(will_it_fly([], 0))\n\n    def test_empty_list_with_negative_weight(self):\n        self.assertFalse(will_it_fly([], -1))\n\n    def test_boundary_condition_sum_equals_weight(self):\n        self.assertTrue(will_it_fly([2, 1, 2], 5))\n\n    def test_negative_values_in_palindrome_within_weight(self):\n        self.assertTrue(will_it_fly([-2, 0, -2], 3))\n\n    def test_float_elements_and_weight_within_limit(self):\n        self.assertTrue(will_it_fly([1.5, 2.5, 1.5], 6.0))\n\n    def test_float_sum_equals_weight_boundary(self):\n        self.assertTrue(will_it_fly([1.5, 2.5, 1.5], 5.5))\n\n    def test_none_value_for_q_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            will_it_fly(None, 5)\n\n    def test_none_value_for_w_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            will_it_fly([1, 2, 1], None)\n\n    def test_non_list_q_value_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            will_it_fly(\"not a list\", 5)\n\n    def test_non_numeric_elements_in_q_raises_type_error(self):\n        with self.assertRaises(TypeError):\n            will_it_fly([1, \"2\", 1], 5)\n\nif __name__ == '__main__':\n    unittest.main()",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 205158.824182,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 934,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 3837,
+      "prompt_eval_count": 934
+    }
+  },
+  "saved_at": "2026-10-10T00:32:51.392670+00:00",
+  "schema_version": "2.0"
+}

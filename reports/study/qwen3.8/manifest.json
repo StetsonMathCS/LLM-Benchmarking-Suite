@@ -1,0 +1,406 @@
+{
+  "completed_at": "2026-10-09T09:38:46.608088+00:00",
+  "completed_count": 345,
+  "config_fingerprint": "00c0c9d3f28ad9267f23fb5078abf671f83f61ad78b03ccea270461564bd35b2",
+  "dataset": {
+    "bug_fixing": {
+      "benchmark_class": "BugFixingBenchmark",
+      "columns": [
+        "id",
+        "buggy_code",
+        "fixed_code",
+        "expected_output"
+      ],
+      "csv_path": "/home/ypatel2/codebase/facets/datasets/bug_fixing/python.csv",
+      "dataset_hash": "de41fd66bff70bb2189f1f05565923ed3aaa9a3d73231b9871ee0d1d5a886051",
+      "language": "python",
+      "record_count": 31,
+      "record_ids_unique": true,
+      "task_name": "bug_fixing"
+    },
+    "code_generation": {
+      "benchmark_class": "CodeGenerationBenchmark",
+      "columns": {
+        "cpp": [
+          "id",
+          "instruction",
+          "generated_code",
+          "expected_output"
+        ],
+        "javascript": [
+          "id",
+          "instruction",
+          "generated_code",
+          "expected_output"
+        ],
+        "python": [
+          "id",
+          "prompt",
+          "completed",
+          "test",
+          "entry_point"
+        ]
+      },
+      "csv_path": "/home/ypatel2/codebase/facets/datasets/code_generation/python.csv",
+      "dataset_hash": "c15da86bdf2ab106b02435afe86decd495e6e450f5d86f9cd02003543cd0a077",
+      "language": "python",
+      "record_count": 164,
+      "record_ids_unique": true,
+      "task_name": "code_generation"
+    },
+    "code_review": {
+      "benchmark_class": "CodeReviewBenchmark",
+      "columns": [
+        "id",
+        "code_snippet",
+        "review",
+        "expected_reviews"
+      ],
+      "csv_path": "/home/ypatel2/codebase/facets/datasets/code_review/python.csv",
+      "dataset_hash": "4fe94d3b683999490046010ecbfe9bfd73f9ba93e2dd9306febf4544d4f843d5",
+      "language": "python",
+      "record_count": 20,
+      "record_ids_unique": true,
+      "task_name": "code_review"
+    },
+    "refactoring": {
+      "benchmark_class": "RefactoringBenchmark",
+      "columns": [
+        "id",
+        "original_code",
+        "refactoring_task",
+        "output_expected",
+        "expected_console_output",
+        "test_harness"
+      ],
+      "csv_path": "/home/ypatel2/codebase/facets/datasets/refactoring/python.csv",
+      "dataset_hash": "946712057d63e38ef8fb871d6a723058aadde7a89908043ef8b8d067a191340a",
+      "language": "python",
+      "record_count": 20,
+      "record_ids_unique": true,
+      "task_name": "refactoring"
+    },
+    "test_generation": {
+      "benchmark_class": "TestGenerationBenchmark",
+      "columns": [
+        "id",
+        "code_snippet",
+        "description",
+        "test",
+        "entry_point"
+      ],
+      "csv_path": "/home/ypatel2/codebase/facets/datasets/test_generation/python.csv",
+      "dataset_hash": "5ef13046810e89c8a4be6cff89f1d5885db827854737b26dc7d48fb6a34dfd13",
+      "language": "python",
+      "record_count": 80,
+      "record_ids_unique": true,
+      "task_name": "test_generation"
+    },
+    "translation": {
+      "benchmark_class": "TranslationBenchmark",
+      "columns": [
+        "id",
+        "code_snippet",
+        "expected_output"
+      ],
+      "csv_path": "/home/ypatel2/codebase/facets/datasets/translation/python.csv",
+      "dataset_hash": "24fa2464e86307e0e91a3f504bd483256b294e08643f32389fa105bee44c3eaa",
+      "language": "python",
+      "record_count": 30,
+      "record_ids_unique": true,
+      "task_name": "translation"
+    }
+  },
+  "dependency_versions": {
+    "anthropic": "1.11.0",
+    "bandit": "1.9.4",
+    "cppcheck": null,
+    "docker": "Docker version 29.1.3, build 29.1.3-0ubuntu3~24.04.2",
+    "eslint": "v6.4.0",
+    "g++": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "node": "v18.19.1",
+    "ollama": "0.6.3",
+    "openai": "3.24.0",
+    "podman": null,
+    "pylint": "4.1.2",
+    "pytest": "9.1.1",
+    "pyyaml": "6.0.3"
+  },
+  "effective_generation_settings": [
+    {
+      "num_predict": 4096
+    }
+  ],
+  "evaluator_version": "revised-v1",
+  "generated_count": 345,
+  "git": {
+    "dirty": true,
+    "sha": "63d4d348ab4b9ed0b84ab444828aefc20adfa6a4"
+  },
+  "model": "qwen3.8:27b",
+  "model_alias": "qwen3.8",
+  "mutant_pool_hashes": [
+    "02230febf0f4a36469002f1f9f8b82a843175c36c47598eb359a3af6ef5cfed0",
+    "02e9f517c7e2dd4232ff863eccfa751018962ab4d71569fc78aa53b9ca286e29",
+    "0ecfbf0131d05b1763ea4de7291a81a0c25bd62375115d6b6e0aa344be7b57b1",
+    "0f08c014ec932f0ed5cc78456659f59f9a10cd895542b4c20fe13a73383b3d77",
+    "11fa9f591c126fa68a517493f96a75bd361733691d2f6410a315de73af41bcf3",
+    "12370e94329f2807b48617f0ecffd54dc1b8503427868e39f49861b87a8d1949",
+    "1e5b77f2e0972bb1494be10ee814a06a78af9088d09826fe14e997089e0951c8",
+    "23cd018d7ff1c3116332ea5bfa924d27cfd79ce0528bddc602c3630efad9c796",
+    "29dcbedb49eac332c0b181f6ee0edf71a23fef419d68ff38ef55155c333a99e9",
+    "2d680b803ec28945170e70a791a37b88e2283e2ada6de4451960423b9c083960",
+    "2de4090a2653b9f56059302c4e0713864a083ab0e2a0945cc5f7ad0bf18fe23b",
+    "3026d848e147958604b1971e9a619f7e263f8ad814be911b7bf10f0b518d923b",
+    "326bda17d7342a29b2ef2c6c19fed7258c9fb5542a90099bc8718d1d7a419f2f",
+    "328084a2841760e49185312c1c86365f17e902529f651ef47642b7909ed74c0a",
+    "3bf714f690229eb51f713ab10b374a89b115e14bd52a36ceb1bb5cbc17cbc5f6",
+    "3d5402648e52a786b09205dd43607503ec0fb03e741a6754ccb0e23aa1d10fa3",
+    "4346a5016c0eac75b3cf6751c9f672180f0073a3a525cf0c1eaa10b8b8f926f9",
+    "48b08555d562cc93fd5b119915a3a02b93bd3c5f7c193fddf2d20517ffcf5968",
+    "4b5805ea901f91f2c1e8b719afebdc21c4245956ee017fa693f7b9f203842a24",
+    "4d7933272d20c37bd85dca0a139bd0ccc8f91a485bdcdce6e1294341da7d548e",
+    "4e2121037d1559560815538c47f54feb9f04c0bbcf159ab9f6ba05aa46996ae7",
+    "4fb297d86565e7609d01ca1caf2abfa3da0ae1a2732b965936f65cf847ece3db",
+    "508a1320de8ab945dd8e9bdb20afc7671b0ccf85f123da80083de02c6422b256",
+    "50b7a83e75775863827339d7753a60c1feada4668cb5fb9ed8e169ebd37cfad9",
+    "5273c352d2af219c83eec7ddfbba08401aae2e712e2fe0f51c582c16264633a8",
+    "528b9ae304fe8d20fd637ba6f1148267796c81c7c40e63737000423ee515c21d",
+    "5377d36b2d2e34b5c745a6d314cdea212e247cd3fb5e0eff8f36c4e33ff032d6",
+    "55c34505bea90fa89bd1d5514292a21cfa932ee666d9d2256109b99d54ac9a93",
+    "572a0c6ed3bbc1dc9329f314321b1666034458baec66b5ef38b89e116a00e2a2",
+    "5bb010556c57e9621f48bfe4b29dae01814ef50dcf19c264aadc8b57dabda13a",
+    "5d021b618a53da2b40a18ff4217f0429fcee4ec377a1651d337f85c2958170c2",
+    "64cb22072dc09bd6e3b716e9284072e2179f7489694be5f66f60f711d9e76017",
+    "65341de1f1ea7b8e1e78267f73622c8df1af38214041beed12e1e408419142b3",
+    "68276337096c810fceddc19140ea908f5cf9e60021dee360c959f00280418f79",
+    "6b36e28a4bd180a4d672044bc7210910e69e88e5caf3320535585c243322d3ec",
+    "6fec4aba0a19e0c934ecc2e773b31434557cedfa7a83025eccdcb86599a277d6",
+    "6ff9a148c126e5f7b2d38ebcc79ecdf1634599de8679fe4832ea88f37b216243",
+    "732ed046221cccecc939be688b746173e5d5e6efe08a1901bbed63da6461d841",
+    "736114c308958a897d86d6af43d56d6ea1e1529b6356e8c38733661b9d27a6f5",
+    "7d00007c374f72612d2d5685d528be169f470db822ea099dff1d1f6392fe8989",
+    "80c9f03da8350c1c052dd5c03255c7d7da760ade95e60fb8f625e2c78f5e72af",
+    "80f36d162279f6c56f29400de21d7273ce7da8fc68dc3a04322feaaa8e8122c9",
+    "860a92044a7b45be676012f2005293d31dfd8baab0a2f9d661c07ae638128e42",
+    "86d937ef561208781903237e66ea492a52a9334792b879af95987b4f79a07c3a",
+    "8ad513358ae78778bf7c8e89cbdafd01ce51a1146ee34e5a8ea9d752ab1181dd",
+    "8bea09669a0667653964b2f54563e9cea87e4b555a9d9f3e794210a457e6bd4d",
+    "9685e889feb2ec3be88d80d0a08d4488b51905f4bb45e1e483323c75873a8d3c",
+    "991abdca1e9efd41a814384c261e135c0aa1a412707d13a31ec5170628f28ec8",
+    "997aa0218aa88c58fa9615cb57fbb12ae7b61991c55758c5b0f73976074efa4e",
+    "a04e5672c3f8ecf93f77bed9fc72912edb7c25c7d46bf0257ebf56175819ace8",
+    "a0c339bae116b731c4fc00d4afa19fb3259a243deb5dc4acd77c91642af68ac1",
+    "a2a547f1b47c694f0b2f8991611ec8ca2429992ff87a9c921fc223baebae5c2d",
+    "a4176b85809074bd7470262ef10524ee334f976b3f7af598744daf2200ac45f5",
+    "b01996ee64836d534ddfbdeb68e92b2549519644997dd9a917150377603a4568",
+    "b1196b44ccc701bf1c6bf7189f5aad56c52949ea642126f233f72dd5b005117f",
+    "b5c10554832c0bd62df25a4da0f421046287abd3bb0cc61ff5d4197901a43daa",
+    "b8c1a530e0184afd831dc8c28e97e2d615596a334b05ac464fef3164e7775d57",
+    "bb9353f51e7638abdee46fa7246d9fd6d1f1e3b8f46f669793bce653c5b2dbaa",
+    "bce18e2b5acddbd4f880f8f5332bc3e1409e0280c7f715c45f0685aa03da2938",
+    "c0d89de0f4cacd12d1344a99a046bb994ad41b1db44feb2c66d3625224589143",
+    "c485c611b3340c09d8463542040f157c13ac61d42f4df368255e84c7494a599e",
+    "d141c37a489d43ecf5fce2e4d8fe677c63701690c31ec87b75d2ca48bbbc1e77",
+    "d285b58de3197623c5f65b68da81b5d98969a6e7e86bb1252bc70a79a4c6f1f1",
+    "de7758e166d54303c440411bc50aa13af7bcb3adb14344f6d6dfb92140a4a652",
+    "e05f2b8ec025ff451feb30d066bf9c61e15bd61dfa4485d929898c110f6e6243",
+    "e11757dad479bc9b9c30be1117bb077af2ba31d16089696fa63ad82800db59ea",
+    "e191794c024daea68e5b0f5f08caf2f5f08a3cfb90ad9fe7bdf6be2de388ee23",
+    "e44adfd939e4b273350d2400ffd9231a24cba4d016d355b079a9a9d21fdb96b6",
+    "ea77f7001d6c339967ff20e4dfed6506952d6f75cad5156f7fb5e48b470c3a21",
+    "eca85312ca35c7aaeee4fc58e0d0d69c8a56cc09f12a976db3fa80968b18fc98",
+    "f1954ed110328d8deaad64d6a9f7d40c98c3de61ac4abf5e4430a06735613304"
+  ],
+  "planned_count": 345,
+  "prompt_hashes": {
+    "cpp_bugfix.txt": "2bf769ddaab283bfe07feac2cdd4c78b30eddcf20bc7562c03105a64572cb28d",
+    "cpp_completion.txt": "8136b49245d7799a199d7dae27d64643f14d39a646d41c6c19a88f6171e584de",
+    "cpp_refactor.txt": "b7e3b9435537d0fa897322eba6279431acfb8b3aa152a9d507209a245b0a4582",
+    "cpp_review.txt": "f75df179094024a21416108406055a7c4f6e77ea8caf13b504431ce547b3c0cc",
+    "cpp_test_gen.txt": "e1b4c0288413c5d07241e64eeaa32d2e65a853cef8dce13fa7b59a591e965e05",
+    "generation.txt": "d1961cb026459b94c8ffb32fb45f44bb2a9a03633dbdfef28b56d46ab7a8390b",
+    "javascript_bugfix.txt": "4c4f040615819c0b2bb313bad6211890b172048d877fe83969e49ab2a5de359d",
+    "javascript_completion.txt": "7a8bdbb74bf4136f269d2da43afd87bb43e8673a2a560c1bd9ce2ad9681ba02b",
+    "javascript_refactor.txt": "16bf1f7ac55a53c57d691357044365080c4c6cd4e3824467bd8571d9a373604d",
+    "javascript_review.txt": "e474adb79215d4dbc0e5544370b3b86c10307e566a8223a2d3f668676a48575b",
+    "javascript_test_gen.txt": "02deaf420f9a0dd60bc2c89f3ceabb632d4de6041a09436a1d5be22091f32079",
+    "python_bugfix.txt": "ac4cd8ad84263fc91fe107649d2c7f4108a531cbf3ea98e5387415d7b662a97b",
+    "python_completion.txt": "8bdb8ca6c187ef3dc7a106a7bc6a53096cb1193e4ff512b9bb3d471911bdd0aa",
+    "python_refactor.txt": "c643f266952e3e12aaa21481c62393e661ceb8fd260b766e2da42eaffa3fd7ab",
+    "python_review.txt": "9c42b5049c74d0cfb5d1deb3afb8ec840ac68aecb21935fb341c5d487e16f4f9",
+    "python_test_gen.txt": "889847d31ce9d96e1738a5322aec6d20438fc0b88cc076ed5fd67330c89f1061",
+    "transform.txt": "f84145ae3c4f7f76a78664c9ec307d23657ff153f9387dde44fa15c549b07232",
+    "translate.txt": "b3d01f6c0f2cc42961357ee9d9c14f5672a1f2850bf9fd9a782dfb3b5a74f0d4"
+  },
+  "provider": "ollama",
+  "requested_generation_settings": {
+    "max_tokens": 4096,
+    "provider_extras": {},
+    "temperature": null
+  },
+  "resolved_config": {
+    "embedding": {
+      "base_url": "http://127.0.0.1:1561",
+      "model": "nomic-embed-text:latest"
+    },
+    "evaluator_concurrency": 1,
+    "execution": {
+      "backend": "container",
+      "cpus": 1.0,
+      "image": "facets-evaluator:revised-v1",
+      "memory_mb": 256,
+      "pids_limit": 64
+    },
+    "expected_counts": {
+      "bug_fixing": 31,
+      "code_generation": 164,
+      "code_review": 20,
+      "refactoring": 20,
+      "test_generation": 80,
+      "translation": 30
+    },
+    "generation_concurrency": 1,
+    "language": "python",
+    "max_tokens": 4096,
+    "model": {
+      "alias": "qwen3.8",
+      "availability": "local_model_required",
+      "base_url": "http://127.0.0.1:1561",
+      "model": "qwen3.8:27b",
+      "parameter_size": "27B",
+      "provider": "ollama"
+    },
+    "mutation_preflight": "full",
+    "output_dir": "reports/runs",
+    "profile": "revised-v1",
+    "retries": {
+      "attempts": 3,
+      "initial_backoff_s": 1,
+      "max_backoff_s": 8
+    },
+    "samples": 1,
+    "schema_version": 1,
+    "tasks": [
+      "bug_fixing",
+      "code_generation",
+      "code_review",
+      "refactoring",
+      "test_generation",
+      "translation"
+    ],
+    "temperature": null,
+    "timeouts": {
+      "evaluator_s": 60,
+      "provider_s": 900
+    },
+    "translation_target": "javascript"
+  },
+  "reused_response_count": 0,
+  "runtime": {
+    "platform": "Linux 6.8.0-142-generic",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]"
+  },
+  "schema_version": "2.0",
+  "scoring_profile": "revised-v1",
+  "scoring_profile_definition": {
+    "active_weight_policy": "deterministic_profile_subset_recorded",
+    "composite_threshold": 0.5,
+    "dimension_weights": {
+      "bug_fixing": {
+        "code_consistency": 0.1,
+        "functional_correctness": 0.7,
+        "linting": 0.1,
+        "structural_similarity": 0.05,
+        "vulnerabilities": 0.05
+      },
+      "code_generation": {
+        "code_consistency": 0.4,
+        "reference_test_success": 0.6
+      },
+      "code_review": {
+        "reference_review_similarity": 1.0
+      },
+      "refactoring": {
+        "code_consistency": 0.1,
+        "functional_correctness": 0.4,
+        "linting": 0.1,
+        "runtime_analysis": 0.35,
+        "vulnerabilities": 0.05
+      },
+      "test_generation": {
+        "code_consistency": 0.25,
+        "generated_test_effectiveness": 0.75
+      },
+      "translation": {
+        "code_consistency": 0.3,
+        "functional_correctness": 0.5,
+        "linting": 0.1,
+        "vulnerabilities": 0.1
+      }
+    },
+    "evaluator_version": "revised-v1",
+    "failure_policy": {
+      "candidate_failure": "score_zero_keep_planned_denominator",
+      "infrastructure_failure": "run_incomplete_no_official_aggregate",
+      "not_applicable": "frozen_profile_only"
+    },
+    "functional_pass_dimensions": {
+      "bug_fixing": "functional_correctness",
+      "code_generation": "reference_test_success",
+      "refactoring": "functional_correctness",
+      "translation": "functional_correctness"
+    },
+    "gte_formula": "validity_times_mutation_detection",
+    "not_applicable": {
+      "runtime_analysis": [
+        "bug_fixing",
+        "code_generation",
+        "code_review",
+        "test_generation",
+        "translation"
+      ]
+    },
+    "performance_formula": "geometric_mean(min(1, baseline_time/generated_time), min(1, baseline_memory/generated_memory))",
+    "profile_id": "revised-v1",
+    "samples_per_problem": 1,
+    "task_weights": {
+      "bug_fixing": 0.15,
+      "code_generation": 0.27,
+      "code_review": 0.15,
+      "refactoring": 0.15,
+      "test_generation": 0.12,
+      "translation": 0.16
+    }
+  },
+  "scoring_profile_hash": "88e485d33e86e8583939c8f9cf9b4e989edbf8477eb7ef3c9e00a0bab24506cf",
+  "started_at": "2026-10-08T14:50:13.946015+00:00",
+  "status": "complete",
+  "token_usage": {
+    "counted_input_tokens": 162823,
+    "counted_output_tokens": 365181,
+    "counted_total_tokens": 528004,
+    "detail": "usage/summary.json",
+    "embedding": {
+      "counted_input_tokens": 4533,
+      "counted_output_tokens": 0,
+      "counted_total_tokens": 4533,
+      "requests_total": 20,
+      "requests_with_unknown_usage": 0
+    },
+    "generation": {
+      "counted_input_tokens": 158290,
+      "counted_output_tokens": 365181,
+      "counted_total_tokens": 523471,
+      "requests_total": 345,
+      "requests_with_unknown_usage": 0
+    },
+    "inherited_requests": 0,
+    "known_coverage": 1.0,
+    "requests_total": 365,
+    "requests_with_known_usage": 365,
+    "requests_with_unknown_usage": 0,
+    "totals_are_exact": true
+  },
+  "usage_ledger": "usage/ledger.jsonl"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are an expert code translator. Your task is to translate the provided code to javascript while preserving its original functionality and behavior.\n\nRequirements:\n1.) Analyze the provided code and understand its functionality completely.\n2.) Translate the code to javascript maintaining the exact same logic and behavior.\n3.) Use idiomatic javascript conventions, naming patterns, and best practices.\n4.) Preserve all variable names and function names where possible (translate only if necessary for javascript conventions).\n5.) Handle language-specific differences (e.g., data types, error handling, syntax) appropriately.\n6.) Include necessary imports, libraries, and dependencies for javascript.\n7.) Ensure the translated code is syntactically valid and executable.\n8.) Do not add comments or explanations beyond what's necessary.\n9.) Return ONLY the translated code without any additional text or preamble.\n\nImportant Notes:\n- Maintain the same algorithm and logic flow\n- Preserve the output behavior exactly as the original\n- Use proper error handling patterns for javascript\n- Follow javascript code style and conventions\n\nSource Code (in original language):\nseen = set()\nitems = [1, 2, 2, 3, 3, 4]\nunique = [x for x in items if x not in seen and not seen.add(x)]\nprint(unique)\n\nTranslated Code (in javascript):\n",
+  "record_identity": "19f5f5d5074f6bd0d14a75d59c818d87021699887de548ad1fae07204621f242",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 4045,
+    "content": "let seen = new Set();\nconst items = [1, 2, 2, 3, 3, 4];\nconst unique = [];\nfor (const x of items) {\n  if (!seen.has(x)) {\n    seen.add(x);\n    unique.push(x);\n  }\n}\nconsole.log(unique);",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 208094.787149,
+    "model": "qwen3.6:35b",
+    "prompt_tokens": 289,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 4045,
+      "prompt_eval_count": 289
+    }
+  },
+  "saved_at": "2026-10-10T01:23:20.933474+00:00",
+  "schema_version": "2.0"
+}

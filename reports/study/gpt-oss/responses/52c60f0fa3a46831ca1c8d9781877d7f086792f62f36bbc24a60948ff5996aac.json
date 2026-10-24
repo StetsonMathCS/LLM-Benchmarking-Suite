@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef hex_key(num):\n    \"\"\"You have been tasked to write a function that receives \n    a hexadecimal number as a string and counts the number of hexadecimal \n    digits that are primes (prime number, or a prime, is a natural number \n    greater than 1 that is not a product of two smaller natural numbers).\n    Hexadecimal digits are 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F.\n    Prime numbers are 2, 3, 5, 7, 11, 13, 17,...\n    So you have to determine a number of the following digits: 2, 3, 5, 7, \n    B (=decimal 11), D (=decimal 13).\n    Note: you may assume the input is always correct or empty string, \n    and symbols A,B,C,D,E,F are always uppercase.\n    Examples:\n    For num = \"AB\" the output should be 1.\n    For num = \"1077E\" the output should be 2.\n    For num = \"ABED1A33\" the output should be 4.\n    For num = \"123456789ABCDEF0\" the output should be 6.\n    For num = \"2020\" the output should be 2.\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "52c60f0fa3a46831ca1c8d9781877d7f086792f62f36bbc24a60948ff5996aac",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 249,
+    "content": "def hex_key(num: str) -> int:\n    \"\"\"Count prime hexadecimal digits in the given string.\n\n    Prime hexadecimal digits are: 2, 3, 5, 7, B (decimal 11), D (decimal 13).\n\n    Parameters\n    ----------\n    num : str\n        A string containing hexadecimal digits (0-9, A-F, uppercase). The\n        string may be empty.\n\n    Returns\n    -------\n    int\n        The number of prime hexadecimal digits in ``num``.\n    \"\"\"\n    prime_digits = {\"2\", \"3\", \"5\", \"7\", \"B\", \"D\"}\n    return sum(1 for ch in num if ch in prime_digits)",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 19813.736739,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 525,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 249,
+      "prompt_eval_count": 525
+    }
+  },
+  "saved_at": "2026-10-10T16:06:01.027277+00:00",
+  "schema_version": "2.0"
+}

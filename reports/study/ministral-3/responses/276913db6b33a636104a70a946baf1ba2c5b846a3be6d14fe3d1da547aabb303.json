@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef encode(message):\n    \"\"\"\n    Write a function that takes a message, and encodes in such a \n    way that it swaps case of all letters, replaces all vowels in \n    the message with the letter that appears 2 places ahead of that \n    vowel in the english alphabet. \n    Assume only letters. \n    \n    Examples:\n    >>> encode('test')\n    'TGST'\n    >>> encode('This is a message')\n    'tHKS KS C MGSSCGG'\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "276913db6b33a636104a70a946baf1ba2c5b846a3be6d14fe3d1da547aabb303",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 200,
+    "content": "```python\ndef encode(message):\n    vowels = {'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'}\n    vowel_map = {\n        'a': 'c', 'e': 'g', 'i': 'k', 'o': 'q', 'u': 'w',\n        'A': 'C', 'E': 'G', 'I': 'K', 'O': 'Q', 'U': 'W'\n    }\n    result = []\n    for char in message:\n        if char.islower():\n            if char in vowels:\n                result.append(vowel_map[char])\n            else:\n                result.append(char.swapcase())\n        elif char.isupper():\n            if char in vowels:\n                result.append(vowel_map[char])\n            else:\n                result.append(char.swapcase())\n        else:\n            result.append(char)\n    return ''.join(result)\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 10286.022994,
+    "model": "ministral-3:3b",
+    "prompt_tokens": 834,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 200,
+      "prompt_eval_count": 834
+    }
+  },
+  "saved_at": "2026-10-10T21:37:45.229205+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \n\ndef greatest_common_divisor(a: int, b: int) -> int:\n    \"\"\" Return a greatest common divisor of two integers a and b\n    >>> greatest_common_divisor(3, 5)\n    1\n    >>> greatest_common_divisor(25, 15)\n    5\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "0b9f36cbd9dbcc622618c4a4930053e34d38c42bb05b34b541611ca4f193a61b",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 70,
+    "content": "```python\ndef greatest_common_divisor(a: int, b: int) -> int:\n    def _gcd(a: int, b: int) -> int:\n        while b:\n            a, b = b, a % b\n        return a\n    return _gcd(a, abs(a), abs(b))\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 3844.621787,
+    "model": "ministral-3:3b",
+    "prompt_tokens": 793,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 70,
+      "prompt_eval_count": 793
+    }
+  },
+  "saved_at": "2026-10-10T21:29:38.626603+00:00",
+  "schema_version": "2.0"
+}

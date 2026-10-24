@@ -1,0 +1,23 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code refactoring model. Your task is to improve the structure, readability, and maintainability of existing Python code while preserving its original functionality.\n\n1.) Refactor the provided Python code to improve clarity, structure, and maintainability.\n2.) Preserve the original behavior and functionality of the code.\n3.) Apply idiomatic Python practices and common style conventions where appropriate.\n4.) Simplify complex logic, remove redundancy, and improve variable or function naming if necessary.\n5.) Avoid unnecessary changes that do not improve readability or maintainability.\n6.) Ensure the refactored code is syntactically valid and runs without errors.\n7.) Maintain clean and consistent formatting and indentation following Python conventions.\n8.) Do not include explanations or extra text.\n9.) DO NOT REPLY IN MARKDOWN. OUTPUT ONLY AND ONLY THE CODE.\n\nStart Example\n\nInput:\ndef factorial(n):\n    result = 1\n    i = 1\n    while i <= n:\n        result = result * i\n        i = i + 1\n    return result\n\nOutput\ndef factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nEnd Example\n\nYour turn now.\n\nrefactoring task: Replace the closure-based running stats with a RunningStats dataclass that exposes update(), mean, variance, and snapshot() as methods/properties\n\nReturn ONLY the refactored Python code.\n\nCode to refactor:\ndef make_running_stats():\n    data = {'count': 0, 'total': 0.0, 'sq_total': 0.0, 'min': None, 'max': None}\n\n    def update(x):\n        data['count'] += 1\n        data['total'] += x\n        data['sq_total'] += x * x\n        if data['min'] is None or x < data['min']:\n            data['min'] = x\n        if data['max'] is None or x > data['max']:\n            data['max'] = x\n\n    def mean():\n        return data['total'] / data['count'] if data['count'] else 0.0\n\n    def variance():\n        if data['count'] < 2:\n            return 0.0\n        m = mean()\n        return data['sq_total'] / data['count'] - m * m\n\n    def snapshot():\n        return {'count': data['count'], 'mean': mean(), 'variance': variance(),\n                'min': data['min'], 'max': data['max']}\n\n    return update, snapshot\n\nRefactored Code:",
+  "record_identity": "83df224514ecf72a5625e94c95095b503c71e6ef8f51ecbd1a29bc08651e26d5",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 0,
+    "content": "",
+    "effective_settings": {},
+    "error": "model 'deepseek-r1:32b' not found (status code: 404)",
+    "latency_ms": 0.0,
+    "model": "deepseek-r1:32b",
+    "prompt_tokens": 0,
+    "provider": "ollama",
+    "requested_settings": {},
+    "status": "completed",
+    "stop_reason": null,
+    "truncated": false,
+    "usage": {}
+  },
+  "saved_at": "2026-10-09T09:38:53.059401+00:00",
+  "schema_version": "2.0"
+}

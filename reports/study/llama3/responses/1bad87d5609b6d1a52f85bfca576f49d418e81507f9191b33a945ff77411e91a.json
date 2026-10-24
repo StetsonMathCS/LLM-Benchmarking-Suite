@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a Python code debugger and bug-fixing model. Your task is to take incorrect or broken Python code and return a corrected version that runs and behaves as intended.\n\n1.) Identify and fix all syntax errors, logical errors, type issues, and potential runtime problems.\n2.) Ensure the corrected code runs under standard Python (prefer clear, idiomatic Python where appropriate).\n3.) Preserve the original program structure, intent, and logic whenever possible.\n4.) Do not rewrite the entire program unless necessary to fix correctness or runtime issues.\n5.) Respect existing imports, variables, classes, and function definitions unless they are inconsistent, incorrect or missing.\n6.) Fix incorrect conditions, loops, indentation issues, type mismatches, and undefined behavior if present.\n7.) Add missing imports, return statements, or definitions only if required for the code to run.\n8.) Maintain consistent and clean formatting and indentation following Python conventions.\n9.) Ensure the final code runs without syntax errors or obvious runtime failures.\n10.) Make sure output is ONLY an executeable and parseable chunk of code.\nStart Example\n\nInput:\ndef factorial(n):\n    if n = 0:\n        return 1\n    else\n        return n * factorial(n - 1)\n\nprint(factorial(5)\n\nOutput:\ndef factorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * factorial(n - 1)\n\nprint(factorial(5))\n\nEnd Example\n\nYour turn now.\n\nReturn ONLY the corrected Python code.\n\nCode to fix:\n\ndef knapsack(capacity, items):\n    from collections import defaultdict\n    memo = defaultdict(int)\n\n    for i in range(1, len(items) + 1):\n        weight, value = items[i - 1]\n\n        for j in range(1, capacity + 1):\n            memo[i, j] = memo[i - 1, j]\n\n            if weight < j:\n                memo[i, j] = max(\n                    memo[i, j],\n                    value + memo[i - 1, j - weight]\n                )\n\n    return memo[len(items), capacity]\n\nprint(knapsack(100, [[60, 10], [50, 8], [20, 4], [20, 4], [8, 3], [3, 2]]))\nprint(knapsack(40, [[30, 10], [50, 5], [10, 20], [40, 25]]))\nprint(knapsack(750, [[70, 135], [73, 139], [77, 149], [80, 150], [82, 156], [87, 163], [90, 173], [94, 184], [98, 192], [106, 201], [110, 210], [113, 214], [115, 221], [118, 229], [120, 240]]))\n\nCorrected Code:",
+  "record_identity": "1bad87d5609b6d1a52f85bfca576f49d418e81507f9191b33a945ff77411e91a",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 297,
+    "content": "def knapsack(capacity, items):\n    from collections import defaultdict\n    memo = defaultdict(int)\n\n    for i in range(1, len(items) + 1):\n        weight, value = items[i - 1]\n\n        for j in range(1, capacity + 1):\n            memo[i, j] = memo[i - 1, j]\n\n            if weight <= j:\n                memo[i, j] = max(\n                    memo[i, j],\n                    value + memo[i - 1, j - weight]\n                )\n\n    return memo[len(items), capacity]\n\nprint(knapsack(100, [(60, 10), (50, 8), (20, 4), (20, 4), (8, 3), (3, 2)]))\nprint(knapsack(40, [(30, 10), (50, 5), (10, 20), (40, 25)]))\nprint(knapsack(750, [(70, 135), (73, 139), (77, 149), (80, 150), (82, 156), (87, 163), (90, 173), (94, 184), (98, 192), (106, 201), (110, 210), (113, 214), (115, 221), (118, 229), (120, 240)]))",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 245794.467481,
+    "model": "llama3:70b",
+    "prompt_tokens": 619,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 297,
+      "prompt_eval_count": 619
+    }
+  },
+  "saved_at": "2026-10-10T02:02:32.986471+00:00",
+  "schema_version": "2.0"
+}

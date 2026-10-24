@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef closest_integer(value):\n    '''\n    Create a function that takes a value (string) representing a number\n    and returns the closest integer to it. If the number is equidistant\n    from two integers, round it away from zero.\n\n    Examples\n    >>> closest_integer(\"10\")\n    10\n    >>> closest_integer(\"15.3\")\n    15\n\n    Note:\n    Rounding away from zero means that if the given number is equidistant\n    from two integers, the one you should return is the one that is the\n    farthest from zero. For example closest_integer(\"14.5\") should\n    return 15 and closest_integer(\"-14.5\") should return -15.\n    '''\n\n\nGenerated Code:",
+  "record_identity": "6c63edd411cb474a5f632ace188a8b954cca41d501c0efe0af75997ff27ad29d",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 503,
+    "content": "```python\nimport math\n\ndef closest_integer(value: str) -> int:\n    \"\"\"\n    Return the integer closest to the numeric value given as a string.\n    If the value is exactly halfway between two integers, round\n    away from zero.\n\n    Parameters\n    ----------\n    value : str\n        String representation of a number (e.g., \"10\", \"15.3\", \"-14.5\").\n\n    Returns\n    -------\n    int\n        The closest integer, rounded away from zero on ties.\n    \"\"\"\n    # Convert the string to a float\n    number = float(value.strip())\n\n    # Integer bounds\n    lower = math.floor(number)\n    upper = math.ceil(number)\n\n    # If the number is already an integer, return it directly\n    if number == lower:\n        return int(lower)\n\n    # Distances to the nearest integers\n    dist_lower = number - lower\n    dist_upper = upper - number\n\n    if dist_lower < dist_upper:\n        return int(lower)\n    if dist_upper < dist_lower:\n        return int(upper)\n\n    # Distances are equal – round away from zero\n    return int(upper if number >= 0 else lower)\n```",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 36386.14133,
+    "model": "gpt-oss:20b",
+    "prompt_tokens": 382,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 503,
+      "prompt_eval_count": 382
+    }
+  },
+  "saved_at": "2026-10-10T16:18:20.158965+00:00",
+  "schema_version": "2.0"
+}

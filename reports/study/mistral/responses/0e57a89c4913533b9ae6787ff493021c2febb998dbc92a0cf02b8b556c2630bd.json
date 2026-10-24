@@ -1,0 +1,30 @@
+{
+  "origin": "generated",
+  "prompt": "You are a python code generation model. Your task is to generate correct, functional, and idiomatic code based on the user's request.\n\n1.) Carefully read the user's request and determine requirements and constraints.\n2.) Generate complete, syntactically valid code that fulfills the requested functionality.\n3.) Use clear, idiomatic patterns and best practices for python.\n4.) Ensure the code is logically correct and avoids common runtime errors where possible.\n5.) Include necessary imports, libraries, or dependencies required for the code to run.\n6.) Maintain consistent and clean formatting and indentation appropriate for python.\n7.) Avoid unnecessary complexity, excessive comments, or unrelated functionality.\n8.) Do not include explanations or natural language unless the user explicitly asks for them.\n9.) Output only the requested code and nothing else.\n\n\nInput Request: \ndef check_dict_case(dict):\n    \"\"\"\n    Given a dictionary, return True if all keys are strings in lower \n    case or all keys are strings in upper case, else return False.\n    The function should return False is the given dictionary is empty.\n    Examples:\n    check_dict_case({\"a\":\"apple\", \"b\":\"banana\"}) should return True.\n    check_dict_case({\"a\":\"apple\", \"A\":\"banana\", \"B\":\"banana\"}) should return False.\n    check_dict_case({\"a\":\"apple\", 8:\"banana\", \"a\":\"apple\"}) should return False.\n    check_dict_case({\"Name\":\"John\", \"Age\":\"36\", \"City\":\"Houston\"}) should return False.\n    check_dict_case({\"STATE\":\"NC\", \"ZIP\":\"12345\" }) should return True.\n    \"\"\"\n\n\nGenerated Code:",
+  "record_identity": "0e57a89c4913533b9ae6787ff493021c2febb998dbc92a0cf02b8b556c2630bd",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 210,
+    "content": " Here is the Python code for the function `check_dict_case()` as per your request:\n\n```python\ndef check_dict_case(dict):\n    if not dict:\n        return False\n\n    keys_uppercase = all(isinstance(key, str) and key.isupper() for key in dict.keys())\n    keys_lowercase = all(isinstance(key, str) and key.islower() for key in dict.keys())\n\n    return keys_uppercase or keys_lowercase\n```\n\nThis function checks if the given dictionary is empty and then checks if all keys are either uppercase or lowercase. It uses the built-in `isinstance()` function to check the type of the keys and the `isupper()` and `islower()` methods for checking the case of the keys. The `all()` function is used to check if all elements in the resulting iterable are `True`.",
+    "effective_settings": {
+      "num_predict": 4096
+    },
+    "error": null,
+    "latency_ms": 21288.798508,
+    "model": "mistral:7b",
+    "prompt_tokens": 411,
+    "provider": "ollama",
+    "requested_settings": {
+      "max_tokens": 4096
+    },
+    "status": "completed",
+    "stop_reason": "stop",
+    "truncated": false,
+    "usage": {
+      "eval_count": 210,
+      "prompt_eval_count": 411
+    }
+  },
+  "saved_at": "2026-10-11T00:10:18.558214+00:00",
+  "schema_version": "2.0"
+}

@@ -1,0 +1,23 @@
+{
+  "origin": "generated",
+  "prompt": "You are an expert code translator. Your task is to translate the provided code to javascript while preserving its original functionality and behavior.\n\nRequirements:\n1.) Analyze the provided code and understand its functionality completely.\n2.) Translate the code to javascript maintaining the exact same logic and behavior.\n3.) Use idiomatic javascript conventions, naming patterns, and best practices.\n4.) Preserve all variable names and function names where possible (translate only if necessary for javascript conventions).\n5.) Handle language-specific differences (e.g., data types, error handling, syntax) appropriately.\n6.) Include necessary imports, libraries, and dependencies for javascript.\n7.) Ensure the translated code is syntactically valid and executable.\n8.) Do not add comments or explanations beyond what's necessary.\n9.) Return ONLY the translated code without any additional text or preamble.\n\nImportant Notes:\n- Maintain the same algorithm and logic flow\n- Preserve the output behavior exactly as the original\n- Use proper error handling patterns for javascript\n- Follow javascript code style and conventions\n\nSource Code (in original language):\ntext = 'hello world'\nprint(text.upper())\n\nTranslated Code (in javascript):\n",
+  "record_identity": "7c3d23d56248941249babd539adf886f45dd4ebcdb38d03a25a89a9e0b373016",
+  "response": {
+    "attempts": 1,
+    "completion_tokens": 0,
+    "content": "",
+    "effective_settings": {},
+    "error": "model 'deepseek-r1:32b' not found (status code: 404)",
+    "latency_ms": 0.0,
+    "model": "deepseek-r1:32b",
+    "prompt_tokens": 0,
+    "provider": "ollama",
+    "requested_settings": {},
+    "status": "completed",
+    "stop_reason": null,
+    "truncated": false,
+    "usage": {}
+  },
+  "saved_at": "2026-10-09T09:38:55.454547+00:00",
+  "schema_version": "2.0"
+}
