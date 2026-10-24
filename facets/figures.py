@@ -375,8 +375,14 @@ def _annotate_no_overlap(ax, points, fontsize=8):
             boxes.append(placed.get_window_extent(renderer=renderer))
 
 
-def cmp_score_vs_size(models: list[str], model_scores: dict[str, float], output: Path) -> dict | None:
-    local = [m for m in models if m in MODEL_SIZES]
+def cmp_score_vs_size(models: list[str], model_scores: dict[str, float], output: Path, parameter_sizes: dict[str, float] | None = None, undisclosed_sizes: Sequence[str] | None = None) -> dict | None:
+    parameter_sizes = parameter_sizes or {}
+    local = []
+    for m in models:
+        if m in parameter_sizes and parameter_sizes[m] and parameter_sizes[m] > 0:
+            local.append(m)
+        elif m in MODEL_SIZES:
+            local.append(m)
     if not local:
         return None
     import matplotlib.pyplot as plt
@@ -386,7 +392,9 @@ def cmp_score_vs_size(models: list[str], model_scores: dict[str, float], output:
     fig, ax = plt.subplots(figsize=(9, 5.5))
     points = []
     for m in local:
-        size = MODEL_SIZES[m]
+        size = parameter_sizes.get(m) if parameter_sizes.get(m) else MODEL_SIZES.get(m)
+        if not size:
+            continue
         score = model_scores.get(m) * 100 if model_scores.get(m) is not None else None
         if score is None:
             continue
@@ -594,7 +602,8 @@ def render_figures(
             "output": output, "models": list(models),
             "latency_rows": latency_rows, "model_scores": model_scores,
         },
-        cmp_score_vs_size: {"models": list(models), "model_scores": model_scores, "output": output},
+        cmp_score_vs_size: {"models": list(models), "model_scores": model_scores, "output": output,
+                            "parameter_sizes": parameter_sizes, "undisclosed_sizes": undisclosed_sizes},
         cmp_task_difficulty: {"task_summary": task_summary, "output": output, "models": list(models), "tasks": list(tasks)},
         cmp_score_violin: {"records": records, "output": output, "models": list(models)},
         cmp_radar_all: {"task_summary": task_summary, "output": output, "models": list(models), "tasks": list(tasks)},
