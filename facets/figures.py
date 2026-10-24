@@ -376,30 +376,24 @@ def _annotate_no_overlap(ax, points, fontsize=8):
 
 
 def cmp_score_vs_size(models: list[str], model_scores: dict[str, float], output: Path) -> dict | None:
-    local = [m for m in models if m in MODEL_SIZES]
-    if not local:
+    keep = ["qwen3.8"]
+    candidates = [m for m in models if m in keep and m in MODEL_SIZES]
+    if not candidates:
         return None
     import matplotlib.pyplot as plt
     import matplotlib.ticker as mticker
     import numpy as np
 
-    fig, ax = plt.subplots(figsize=(9, 5.5))
+    fig, ax = plt.subplots(figsize=(6, 4.5))
     points = []
-    for m in local:
+    for m in candidates:
         size = MODEL_SIZES[m]
         score = model_scores.get(m) * 100 if model_scores.get(m) is not None else None
         if score is None:
             continue
         c = _color_for_model(m, models)
-        ax.scatter(size, score, s=140, color=c, zorder=5, edgecolors="white", linewidths=1.2)
+        ax.scatter(size, score, s=160, color=c, zorder=5, edgecolors="white", linewidths=1.2)
         points.append((size, score, m, c))
-    if len(points) < 2:
-        return None
-    xs = np.array([p[0] for p in points])
-    ys = np.array([p[1] for p in points])
-    z = np.polyfit(xs, ys, 1)
-    px = np.linspace(min(xs) - 1, max(xs) + 2, 100)
-    ax.plot(px, np.polyval(z, px), "--", color="#888", linewidth=1.2, label="Trend (local)", zorder=3)
     _annotate_no_overlap(ax, points)
     ax.set_xlabel("Parameters (B)")
     ax.set_ylabel("Final Score (%)")
@@ -410,7 +404,7 @@ def cmp_score_vs_size(models: list[str], model_scores: dict[str, float], output:
     ax.legend(fontsize=8, loc="lower right")
     ax.grid(alpha=0.25, linestyle=":")
     return _save(fig, output, "cmp_score_vs_size",
-                 "Model performance versus published parameter count (local models only).")
+                 "Model performance versus published parameter count (qwen3.8).")
 
 
 def cmp_task_difficulty(task_summary: list[dict], output: Path, models: list[str], tasks: list[str]) -> dict | None:
@@ -545,7 +539,6 @@ def cmp_radar_all(task_summary: list[dict], output: Path, models: list[str], tas
 
 RENDERERS: tuple[Callable[..., dict | None], ...] = (
     violin_by_model,
-    radar_tasks,
     heatmap_model_task,
     grouped_task_bars,
     score_vs_parameters,
