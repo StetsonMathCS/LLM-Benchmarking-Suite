@@ -513,41 +513,30 @@ def cmp_radar_all(task_summary: list[dict], output: Path, models: list[str], tas
     line_styles = ["-", ":"]
     markers = ["o", "s", "^", "D", "v", "p", "h", "X", "*"]
 
-    cloud = [m for m in models if _provider_for_model(m) in ("openai", "anthropic")]
-    local = [m for m in models if _provider_for_model(m) == "ollama"]
-
-    def _draw_panel(ax, group):
-        for r, lbl in [(0.25, "25%"), (0.50, "50%"), (0.75, "75%"), (1.0, "100%")]:
-            ax.plot(angles_plot, [r] * (N + 1), color="#ccc", linewidth=0.9, linestyle="--", zorder=1)
-            ax.text(angles[0], r + 0.03, lbl, ha="center", fontsize=8, color="#AAAAAA")
-        handles = []
-        for i, m in enumerate(group):
-            values = []
-            for t in tasks:
-                row = next((e for e in task_summary if e["model"] == m and e["task"] == t), None)
-                values.append(float(row["mean_score"]) if row and row["mean_score"] is not None else 0.0)
-            values_plot = values + [values[0]]
-            c = _color_for_model(m, models)
-            ls = line_styles[i % len(line_styles)]
-            mk = markers[i % len(markers)]
-            line, = ax.plot(angles_plot, values_plot, color=c, linewidth=2.0, linestyle=ls,
-                            marker=mk, markersize=6, markerfacecolor=c, markeredgecolor="white",
-                            label=m, zorder=3)
-            handles.append(line)
-        ax.set_xticks(angles)
-        ax.set_xticklabels(labels, fontsize=10.5, fontweight="bold")
-        ax.set_yticks([])
-        ax.set_ylim(0, 1.08)
-        return handles
-
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 8.5), subplot_kw=dict(polar=True))
-    handles = _draw_panel(ax1, cloud) + _draw_panel(ax2, local)
-    fig.legend(handles=handles, labels=[h.get_label() for h in handles],
-               loc="lower center", ncol=4, fontsize=9, framealpha=0.95,
-               bbox_to_anchor=(0.5, -0.02))
-    fig.subplots_adjust(left=0.04, right=0.96, top=0.98, bottom=0.20, wspace=0.30)
+    fig, ax = plt.subplots(figsize=(9, 9), subplot_kw=dict(polar=True))
+    for r, lbl in [(0.25, "25%"), (0.50, "50%"), (0.75, "75%"), (1.0, "100%")]:
+        ax.plot(angles_plot, [r] * (N + 1), color="#ccc", linewidth=0.9, linestyle="--", zorder=1)
+        ax.text(angles[0], r + 0.03, lbl, ha="center", fontsize=8, color="#AAAAAA")
+    for i, m in enumerate(models):
+        values = []
+        for t in tasks:
+            row = next((e for e in task_summary if e["model"] == m and e["task"] == t), None)
+            values.append(float(row["mean_score"]) if row and row["mean_score"] is not None else 0.0)
+        values_plot = values + [values[0]]
+        c = _color_for_model(m, models)
+        ls = line_styles[i % len(line_styles)]
+        mk = markers[i % len(markers)]
+        ax.plot(angles_plot, values_plot, color=c, linewidth=2.0, linestyle=ls,
+                marker=mk, markersize=6, markerfacecolor=c, markeredgecolor="white",
+                label=m, zorder=3)
+    ax.set_xticks(angles)
+    ax.set_xticklabels(labels, fontsize=10, fontweight="bold")
+    ax.set_yticks([])
+    ax.set_ylim(0, 1.08)
+    ax.legend(loc="upper right", bbox_to_anchor=(1.35, 1.15), fontsize=8, framealpha=0.95, ncol=1)
+    plt.tight_layout()
     return _save(fig, output, "cmp_radar_all",
-                 "Radar comparison across tasks with cloud and local models separated.")
+                 "Radar comparison across tasks for all models.")
 
 
 RENDERERS: tuple[Callable[..., dict | None], ...] = (
