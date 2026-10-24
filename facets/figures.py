@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import math
+import random
 from collections.abc import Callable, Sequence
 from pathlib import Path
 from statistics import median
@@ -23,6 +24,33 @@ MODEL_COLORS = (
     "#4269d0", "#efb118", "#ff725c", "#6cc5b0", "#3ca951",
     "#ff8ab7", "#a463f2", "#97bbf5", "#9c6b4e", "#9498a0",
 )
+
+MODEL_SIZES = {
+    "phi4-mini:3.8b": 3.8,
+    "ministral-3:3b": 3.0,
+    "mistral:7b": 7.0,
+    "gpt-oss:20b": 20.0,
+    "deepseek-r1:32b": 32.0,
+    "llama3:70b": 70.0,
+    "qwen3.6:35b": 35.0,
+    "qwen3.8": 27.0,
+    "nemotron-3.5-lightning": 30.0,
+}
+
+TASK_LABELS = {
+    "bug_fixing": "Bug Fixing",
+    "code_generation": "Code Generation",
+    "code_review": "Code Review",
+    "refactoring": "Refactoring",
+    "test_generation": "Test Generation",
+    "translation": "Translation",
+}
+
+PROVIDER_COLORS = {
+    "openai": "#4C72B0",
+    "anthropic": "#C44E52",
+    "ollama": "#2ca02c",
+}
 
 STYLE = {
     "figure.dpi": 120,
@@ -305,6 +333,216 @@ def score_vs_latency(
     )
 
 
+def _provider_for_model(model: str) -> str:
+    if model.startswith("gpt") or model.startswith("o3") or model.startswith("o4") or model in {"gpt-5-codex", "gpt-5.4", "gpt-5-nano"}:
+        return "openai"
+    if model.startswith("claude"):
+        return "anthropic"
+    return "ollama"
+
+
+def _color_for_model(model: str, models: Sequence[str]) -> str:
+    provider = _provider_for_model(model)
+    if provider == "openai":
+        return "#4C72B0"
+    if provider == "anthropic":
+        return "#C44E52"
+    if provider == "ollama":
+        return "#2ca02c"
+    return color_for(list(models).index(model))
+
+
+def _annotate_no_overlap(ax, points, fontsize=8):
+    fig = ax.figure
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    offsets = [(6, 4), (6, -12), (6, 20), (6, -28), (6, 36), (-70, 4), (6, -44)]
+    boxes = []
+    for x, y, label, color in points:
+        placed = None
+        for dx, dy in offsets:
+            text = ax.annotate(label, (x, y), textcoords="offset points",
+                               xytext=(dx, dy), fontsize=fontsize, color=color)
+            bb = text.get_window_extent(renderer=renderer)
+            if not any(bb.overlaps(b) for b in boxes):
+                boxes.append(bb)
+                placed = text
+                break
+            text.remove()
+        if placed is None:
+            placed = ax.annotate(label, (x, y), textcoords="offset points",
+                                 xytext=(6, 4), fontsize=fontsize, color=color)
+            boxes.append(placed.get_window_extent(renderer=renderer))
+
+
+def cmp_score_vs_size(models: list[str], model_scores: dict[str, float], output: Path) -> dict | None:
+    local = [m for m in models if m in MODEL_SIZES]
+    if not local:
+        return None
+    import matplotlib.pyplot as plt
+    import matplotlib.ticker as mticker
+    import numpy as np
+
+    fig, ax = plt.subplots(figsize=(9, 5.5))
+    points = []
+    for m in local:
+        size = MODEL_SIZES[m]
+        score = model_scores.get(m) * 100 if model_scores.get(m) is not None else None
+        if score is None:
+            continue
+        c = _color_for_model(m, models)
+        ax.scatter(size, score, s=140, color=c, zorder=5, edgecolors="white", linewidths=1.2)
+        points.append((size, score, m, c))
+    if len(points) < 2:
+        return None
+    xs = np.array([p[0] for p in points])
+    ys = np.array([p[1] for p in points])
+    z = np.polyfit(xs, ys, 1)
+    px = np.linspace(min(xs) - 1, max(xs) + 2, 100)
+    ax.plot(px, np.polyval(z, px), "--", color="#888", linewidth=1.2, label="Trend (local)", zorder=3)
+    _annotate_no_overlap(ax, points)
+    ax.set_xlabel("Parameters (B)")
+    ax.set_ylabel("Final Score (%)")
+    ax.yaxis.set_major_formatter(mticker.FormatStrFormatter("%g%%"))
+    ax.xaxis.set_major_locator(mticker.FixedLocator([0, 20, 40, 60]))
+    ax.xaxis.set_major_formatter(mticker.FormatStrFormatter("%g"))
+    ax.set_xlim(0, 76)
+    ax.legend(fontsize=8, loc="lower right")
+    ax.grid(alpha=0.25, linestyle=":")
+    return _save(fig, output, "cmp_score_vs_size",
+                 "Model performance versus published parameter count (local models only).")
+
+
+def cmp_task_difficulty(task_summary: list[dict], output: Path, models: list[str], tasks: list[str]) -> dict | None:
+    if not task_summary or not models:
+        return None
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    tasks = [t for t in tasks if t in TASK_LABELS]
+    if not tasks:
+        return None
+    means, stds = [], []
+    for task in tasks:
+        vals = [row["mean_score"] for row in task_summary
+                if row["task"] == task and row["mean_score"] is not None]
+        if not vals:
+            return None
+        means.append(np.mean(vals) * 100)
+        stds.append(np.std(vals) * 100)
+    cmap = plt.cm.RdYlGn
+    colors = [cmap(v / 100) for v in means]
+    fig, ax = plt.subplots(figsize=(10, 5.5))
+    x = np.arange(len(tasks))
+    bars = ax.bar(x, means, yerr=stds, color=colors, zorder=3, edgecolor="white", capsize=6,
+                  error_kw=dict(color="#333", linewidth=1.4, capthick=1.4))
+    for bar, mean, std in zip(bars, means, stds):
+        ax.text(bar.get_x() + bar.get_width() / 2, mean + std + 2,
+                f"{mean:.1f}%", ha="center", va="bottom", fontsize=8)
+    ax.set_ylabel("Mean Score (%)")
+    ax.set_xticks(x)
+    ax.set_xticklabels([TASK_LABELS[t] for t in tasks], fontsize=10, rotation=20, ha="right")
+    ax.set_ylim(0, 116)
+    ax.axhline(80, color="#888", linewidth=1, linestyle=":", zorder=2, label="80% threshold")
+    ax.legend(fontsize=8, loc="upper left")
+    ax.grid(axis="y", alpha=0.25, linestyle=":")
+    return _save(fig, output, "cmp_task_difficulty",
+                 "Mean task performance across all models with standard deviation.")
+
+
+def cmp_score_violin(records: list[dict], output: Path, models: list[str]) -> dict | None:
+    if not records or not models:
+        return None
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    all_scores = []
+    colors = []
+    for m in models:
+        scores = [row["combined_score"] for row in records
+                  if row["model"] == m and row["combined_score"] is not None]
+        if not scores:
+            continue
+        all_scores.append(scores)
+        colors.append(_color_for_model(m, models))
+    if not all_scores:
+        return None
+    fig, ax = plt.subplots(figsize=(13, 6))
+    parts = ax.violinplot(all_scores, positions=range(len(all_scores)), showmedians=True, showextrema=True)
+    for pc, color in zip(parts["bodies"], colors):
+        pc.set_facecolor(color)
+        pc.set_alpha(0.45)
+        pc.set_edgecolor(color)
+    for part in ["cmedians", "cmaxes", "cmins", "cbars"]:
+        parts[part].set_color("#333")
+        parts[part].set_linewidth(1.0)
+    rng = np.random.default_rng(42)
+    for i, (scores, color) in enumerate(zip(all_scores, colors)):
+        jitter = rng.uniform(-0.14, 0.14, size=len(scores))
+        ax.scatter(i + jitter, scores, color=color, alpha=0.45, s=10, zorder=3, edgecolors="none")
+    ax.set_xticks(range(len(all_scores)))
+    ax.set_xticklabels([models[i] for i in range(len(models)) if any(r["model"] == models[i] and r["combined_score"] is not None for r in records)], fontsize=8, rotation=20, ha="right")
+    ax.set_ylim(-0.05, 1.1)
+    ax.axhline(0.8, color="#888", linewidth=1, linestyle=":", zorder=2, label="0.80 threshold")
+    ax.legend(fontsize=8)
+    ax.grid(axis="y", alpha=0.25, linestyle=":")
+    return _save(fig, output, "cmp_score_violin",
+                 "Distribution of individual task scores across all models.")
+
+
+def cmp_radar_all(task_summary: list[dict], output: Path, models: list[str], tasks: list[str]) -> dict | None:
+    if not task_summary or not models:
+        return None
+    tasks = [t for t in tasks if t in TASK_LABELS]
+    if len(tasks) < 3:
+        return None
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    labels = [TASK_LABELS[t] for t in tasks]
+    N = len(tasks)
+    angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
+    angles_plot = angles + [angles[0]]
+    line_styles = ["-", ":"]
+    markers = ["o", "s", "^", "D", "v", "p", "h", "X", "*"]
+
+    cloud = [m for m in models if _provider_for_model(m) in ("openai", "anthropic")]
+    local = [m for m in models if _provider_for_model(m) == "ollama"]
+
+    def _draw_panel(ax, group):
+        for r, lbl in [(0.25, "25%"), (0.50, "50%"), (0.75, "75%"), (1.0, "100%")]:
+            ax.plot(angles_plot, [r] * (N + 1), color="#ccc", linewidth=0.9, linestyle="--", zorder=1)
+            ax.text(angles[0], r + 0.03, lbl, ha="center", fontsize=8, color="#AAAAAA")
+        handles = []
+        for i, m in enumerate(group):
+            values = []
+            for t in tasks:
+                row = next((e for e in task_summary if e["model"] == m and e["task"] == t), None)
+                values.append(float(row["mean_score"]) if row and row["mean_score"] is not None else 0.0)
+            values_plot = values + [values[0]]
+            c = _color_for_model(m, models)
+            ls = line_styles[i % len(line_styles)]
+            mk = markers[i % len(markers)]
+            line, = ax.plot(angles_plot, values_plot, color=c, linewidth=2.0, linestyle=ls,
+                            marker=mk, markersize=6, markerfacecolor=c, markeredgecolor="white",
+                            label=m, zorder=3)
+            handles.append(line)
+        ax.set_xticks(angles)
+        ax.set_xticklabels(labels, fontsize=10.5, fontweight="bold")
+        ax.set_yticks([])
+        ax.set_ylim(0, 1.08)
+        return handles
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 8.5), subplot_kw=dict(polar=True))
+    handles = _draw_panel(ax1, cloud) + _draw_panel(ax2, local)
+    fig.legend(handles=handles, labels=[h.get_label() for h in handles],
+               loc="lower center", ncol=4, fontsize=9, framealpha=0.95,
+               bbox_to_anchor=(0.5, -0.02))
+    fig.subplots_adjust(left=0.04, right=0.96, top=0.98, bottom=0.20, wspace=0.30)
+    return _save(fig, output, "cmp_radar_all",
+                 "Radar comparison across tasks with cloud and local models separated.")
+
+
 RENDERERS: tuple[Callable[..., dict | None], ...] = (
     violin_by_model,
     radar_tasks,
@@ -312,6 +550,10 @@ RENDERERS: tuple[Callable[..., dict | None], ...] = (
     grouped_task_bars,
     score_vs_parameters,
     score_vs_latency,
+    cmp_score_vs_size,
+    cmp_task_difficulty,
+    cmp_score_violin,
+    cmp_radar_all,
 )
 
 RENDERABLE_FAILURES = (AttributeError, IndexError, KeyError, OSError, RuntimeError, TypeError, ValueError)
@@ -354,6 +596,10 @@ def render_figures(
             "output": output, "models": list(models),
             "latency_rows": latency_rows, "model_scores": model_scores,
         },
+        cmp_score_vs_size: {"models": list(models), "model_scores": model_scores, "output": output},
+        cmp_task_difficulty: {"task_summary": task_summary, "output": output, "models": list(models), "tasks": list(tasks)},
+        cmp_score_violin: {"records": records, "output": output, "models": list(models)},
+        cmp_radar_all: {"task_summary": task_summary, "output": output, "models": list(models), "tasks": list(tasks)},
     }
     figures = []
     failures = []
